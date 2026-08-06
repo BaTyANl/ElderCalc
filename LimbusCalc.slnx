@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="LimbusCalc/LimbusCalc.csproj" />
+  <Project Path="LimbusCalc.Checks/LimbusCalc.Checks.csproj" />
+</Solution>

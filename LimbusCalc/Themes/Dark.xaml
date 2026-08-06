@@ -1,0 +1,23 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Тёмная тема. Ключи должны совпадать с Light.xaml: словари подменяются целиком. -->
+
+    <SolidColorBrush x:Key="AppBackgroundBrush" Color="#15171C"/>
+    <SolidColorBrush x:Key="SurfaceBrush" Color="#1E2128"/>
+    <SolidColorBrush x:Key="SurfaceAltBrush" Color="#272B34"/>
+    <SolidColorBrush x:Key="InputBackgroundBrush" Color="#272B34"/>
+    <SolidColorBrush x:Key="OutlineBrush" Color="#363B47"/>
+
+    <SolidColorBrush x:Key="TextBrush" Color="#E9EBEF"/>
+    <SolidColorBrush x:Key="SubtleTextBrush" Color="#98A0AD"/>
+
+    <SolidColorBrush x:Key="AccentBrush" Color="#DE5040"/>
+    <SolidColorBrush x:Key="AccentHoverBrush" Color="#EA6152"/>
+    <SolidColorBrush x:Key="AccentPressedBrush" Color="#C13F31"/>
+    <SolidColorBrush x:Key="OnAccentBrush" Color="#FFFFFF"/>
+
+    <!-- Отдельный цвет флажка крита. -->
+    <SolidColorBrush x:Key="CritBrush" Color="#4C8DFF"/>
+
+</ResourceDictionary>

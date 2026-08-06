@@ -427,3 +427,9 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+.claude/
+Limbus something.xlsx
+damage.xlsx
+*.zip
+images/
+picturesPng/

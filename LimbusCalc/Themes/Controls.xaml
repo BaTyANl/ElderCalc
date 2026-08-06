@@ -1,0 +1,420 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:conv="clr-namespace:LimbusCalc.Converters"
+                    xmlns:behaviors="clr-namespace:LimbusCalc.Behaviors">
+
+    <!-- Общий на всё приложение: на него ссылаются и шаблоны отсюда, и разметка окна. -->
+    <conv:NumberConverter x:Key="Num"/>
+
+    <!-- Ссылка на вшитый шрифт: до "#" идёт папка ресурса, после — имя семейства
+         внутри файла (не имя файла). Начертания WPF подбирает по FontWeight сам. -->
+    <FontFamily x:Key="AppFontFamily">/Assets/Fonts/#Kreon</FontFamily>
+
+    <!-- Цвета берутся через DynamicResource, иначе смена темы не подхватится на лету. -->
+
+    <Style TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="TextOptions.TextFormattingMode" Value="Ideal"/>
+    </Style>
+
+    <Style x:Key="CardTitleText" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Margin" Value="0,0,0,10"/>
+    </Style>
+
+    <Style x:Key="FieldLabelText" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource SubtleTextBrush}"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Margin" Value="0,10,0,4"/>
+    </Style>
+
+    <!-- Заголовок подгруппы в колонке подписей. -->
+    <Style x:Key="GroupCaptionText" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="LineHeight" Value="19"/>
+        <Setter Property="LineStackingStrategy" Value="BlockLineHeight"/>
+    </Style>
+
+    <!-- Клетка сопротивления: иконка сверху, поле под ней. -->
+    <DataTemplate x:Key="ResistanceCellTemplate">
+        <StackPanel Width="52" Margin="2,4">
+            <Image Source="{Binding Option.IconPath}" Width="26" Height="26"
+                   HorizontalAlignment="Center"
+                   ToolTip="{Binding Option.Name}"
+                   RenderOptions.BitmapScalingMode="HighQuality"/>
+            <TextBox Margin="0,4,0,0" TextAlignment="Center" MinHeight="26" Padding="2,3"
+                     behaviors:NumericBox.Value="{Binding Value}"/>
+        </StackPanel>
+    </DataTemplate>
+
+    <Style x:Key="RowLabelText" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource SubtleTextBrush}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <Style x:Key="ResultValueText" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <!-- Панель со скруглёнными углами. -->
+    <Style x:Key="Card" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Padding" Value="14"/>
+    </Style>
+
+    <!-- Горизонтальная линия-разделитель; высота фиксирована, чтобы колонки монет
+         и колонка подписей оставались выровненными построчно. -->
+    <Style x:Key="RowDivider" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource OutlineBrush}"/>
+        <Setter Property="Height" Value="1"/>
+        <Setter Property="Margin" Value="0,7"/>
+    </Style>
+
+    <Style TargetType="Button">
+        <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource OnAccentBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="12,7"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Root"
+                            CornerRadius="8"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            SnapsToDevicePixels="True">
+                        <ContentPresenter Margin="{TemplateBinding Padding}"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource AccentHoverBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource AccentPressedBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Root" Property="Opacity" Value="0.45"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Второстепенная кнопка: без заливки акцентом. -->
+    <Style x:Key="SecondaryButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+        <Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Root"
+                            CornerRadius="8"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{DynamicResource OutlineBrush}"
+                            BorderThickness="1"
+                            SnapsToDevicePixels="True">
+                        <ContentPresenter Margin="{TemplateBinding Padding}"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Root" Property="Opacity" Value="0.45"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="TextBox">
+        <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="CaretBrush" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="SelectionBrush" Value="{DynamicResource AccentBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="8,4"/>
+        <Setter Property="MinHeight" Value="30"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border x:Name="Root"
+                            CornerRadius="6"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            SnapsToDevicePixels="True">
+                        <!-- Padding здесь не повторяем: поле применяет его к тексту само,
+                             а второй отступ раздувает содержимое и обрезает цифры. -->
+                        <ScrollViewer x:Name="PART_ContentHost"
+                                      Focusable="False"
+                                      HorizontalScrollBarVisibility="Hidden"
+                                      VerticalScrollBarVisibility="Hidden"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                            <Setter TargetName="Root" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Root" Property="Opacity" Value="0.4"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Флажок без подписи: сама подпись живёт в колонке слева.
+         Background задаёт цвет во включённом состоянии — так один шаблон
+         обслуживает и обычный флажок, и синий флажок крита. -->
+    <Style TargetType="CheckBox">
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="CheckBox">
+                    <Grid Background="Transparent" Width="22" Height="22">
+                        <Border x:Name="Box"
+                                CornerRadius="6"
+                                Background="{DynamicResource InputBackgroundBrush}"
+                                BorderBrush="{DynamicResource OutlineBrush}"
+                                BorderThickness="1"/>
+                        <Path x:Name="Check"
+                              Width="11" Height="8" Stretch="Fill"
+                              Data="M0,4 L4,8 L11,0"
+                              Stroke="{DynamicResource OnAccentBrush}"
+                              StrokeThickness="2"
+                              StrokeEndLineCap="Round"
+                              StrokeStartLineCap="Round"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              Visibility="Collapsed"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <!-- TemplateBinding в триггерах не работает, поэтому цвет
+                             берём привязкой к самому контролу. -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Box" Property="BorderBrush"
+                                    Value="{Binding Background, RelativeSource={RelativeSource TemplatedParent}}"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Box" Property="Background"
+                                    Value="{Binding Background, RelativeSource={RelativeSource TemplatedParent}}"/>
+                            <Setter TargetName="Box" Property="BorderBrush"
+                                    Value="{Binding Background, RelativeSource={RelativeSource TemplatedParent}}"/>
+                            <Setter TargetName="Check" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Пункт списка с иконкой: используется и в выпадающем списке, и для выбранного значения. -->
+    <DataTemplate x:Key="ElementOptionTemplate">
+        <StackPanel Orientation="Horizontal">
+            <Image Source="{Binding IconPath}" Width="18" Height="18" Margin="0,0,6,0"
+                   RenderOptions.BitmapScalingMode="HighQuality"/>
+            <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+        </StackPanel>
+    </DataTemplate>
+
+    <Style TargetType="ComboBoxItem">
+        <Setter Property="Padding" Value="8,5"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBoxItem">
+                    <Border x:Name="Root" CornerRadius="4" Background="Transparent"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource SurfaceAltBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource AccentBrush}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource OnAccentBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="ComboBox">
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="MinHeight" Value="30"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="ItemTemplate" Value="{StaticResource ElementOptionTemplate}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBox">
+                    <Grid>
+                        <Border x:Name="Root" CornerRadius="6"
+                                Background="{DynamicResource InputBackgroundBrush}"
+                                BorderBrush="{DynamicResource OutlineBrush}"
+                                BorderThickness="1"
+                                SnapsToDevicePixels="True"/>
+
+                        <!-- Кнопка на всю площадь: клик в любое место раскрывает список. -->
+                        <ToggleButton Background="Transparent" BorderThickness="0" Focusable="False"
+                                      ClickMode="Press"
+                                      IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+                            <ToggleButton.Template>
+                                <ControlTemplate TargetType="ToggleButton">
+                                    <Border Background="Transparent"/>
+                                </ControlTemplate>
+                            </ToggleButton.Template>
+                        </ToggleButton>
+
+                        <ContentPresenter Margin="8,0,24,0" VerticalAlignment="Center"
+                                          IsHitTestVisible="False"
+                                          Content="{TemplateBinding SelectionBoxItem}"
+                                          ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"/>
+
+                        <Path Data="M0,0 L4,4 L8,0" Stroke="{DynamicResource SubtleTextBrush}" StrokeThickness="1.4"
+                              HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,9,0"
+                              IsHitTestVisible="False"/>
+
+                        <Popup x:Name="PART_Popup" AllowsTransparency="True" Placement="Bottom" Focusable="False"
+                               IsOpen="{TemplateBinding IsDropDownOpen}"
+                               MinWidth="{TemplateBinding ActualWidth}">
+                            <Border Background="{DynamicResource SurfaceBrush}"
+                                    BorderBrush="{DynamicResource OutlineBrush}"
+                                    BorderThickness="1" CornerRadius="6" Padding="3" Margin="0,4,0,4">
+                                <ScrollViewer MaxHeight="280">
+                                    <ItemsPresenter/>
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Маленькая кнопка без заливки: удаление строки бонуса. -->
+    <Style x:Key="IconButton" TargetType="Button">
+        <Setter Property="Foreground" Value="{DynamicResource SubtleTextBrush}"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Root" CornerRadius="5" Background="Transparent"
+                            Width="22" Height="22">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource AccentBrush}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource OnAccentBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Квадратная кнопка с картинкой. -->
+    <Style x:Key="IconTileButton" TargetType="Button">
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Root" CornerRadius="6"
+                            Background="{DynamicResource SurfaceAltBrush}"
+                            BorderBrush="{DynamicResource OutlineBrush}"
+                            BorderThickness="1"
+                            SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Root" Property="Opacity" Value="0.35"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Компактная кнопка добавления бонуса. -->
+    <Style x:Key="SmallButton" TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+        <Setter Property="Padding" Value="8,4"/>
+        <Setter Property="FontSize" Value="12"/>
+    </Style>
+
+    <!-- Флажок крита: тот же шаблон, другой цвет заливки. -->
+    <Style x:Key="CritCheckBox" TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
+        <Setter Property="Background" Value="{DynamicResource CritBrush}"/>
+    </Style>
+
+    <!-- Переключатель темы. -->
+    <Style x:Key="ThemeToggle" TargetType="ToggleButton">
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="Padding" Value="12,6"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border x:Name="Root"
+                            CornerRadius="8"
+                            Background="{DynamicResource SurfaceBrush}"
+                            BorderBrush="{DynamicResource OutlineBrush}"
+                            BorderThickness="1"
+                            SnapsToDevicePixels="True">
+                        <ContentPresenter Margin="{TemplateBinding Padding}"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter Property="Content" Value="Light theme"/>
+            </Trigger>
+            <Trigger Property="IsChecked" Value="False">
+                <Setter Property="Content" Value="Dark theme"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+</ResourceDictionary>

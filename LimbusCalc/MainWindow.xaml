@@ -1,0 +1,354 @@
+﻿<Window x:Class="LimbusCalc.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:conv="clr-namespace:LimbusCalc.Converters"
+        xmlns:behaviors="clr-namespace:LimbusCalc.Behaviors"
+        xmlns:vm="clr-namespace:LimbusCalc.ViewModels"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
+        Title="ElderCalc"
+        Icon="Assets/elderjar.ico"
+        Height="730" Width="1060" MinHeight="520" MinWidth="820"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        FontSize="13"
+        FontFamily="{StaticResource AppFontFamily}"
+        Background="{DynamicResource AppBackgroundBrush}">
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Шапка -->
+        <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="2,0,2,14">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Image Source="Assets/elderjar.ico" Width="28" Height="28" Margin="0,0,10,0"
+                       RenderOptions.BitmapScalingMode="HighQuality"/>
+                <TextBlock Text="ElderCalc" FontSize="20" FontWeight="SemiBold"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+            <ToggleButton x:Name="ThemeSwitch" Style="{StaticResource ThemeToggle}"
+                          HorizontalAlignment="Right" VerticalAlignment="Center"
+                          Checked="ThemeSwitch_Changed" Unchecked="ThemeSwitch_Changed"/>
+        </Grid>
+
+        <!-- Общие параметры -->
+        <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource Card}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel>
+                    <TextBlock Text="Parameters" Style="{StaticResource CardTitleText}"/>
+
+                    <TextBlock Text="Base roll" Style="{StaticResource FieldLabelText}"/>
+                    <TextBox behaviors:NumericBox.IsInteger="True"
+                             behaviors:NumericBox.Value="{Binding BaseRoll}"/>
+
+                    <TextBlock Text="Passive dyn mod (%)" Style="{StaticResource FieldLabelText}"/>
+                    <TextBox behaviors:NumericBox.Value="{Binding PassiveModDynPercent}"/>
+
+                    <TextBlock Text="Skill type" Style="{StaticResource FieldLabelText}"/>
+                    <ComboBox ItemsSource="{Binding DamageTypeOptions}"
+                              SelectedItem="{Binding SkillType}"/>
+
+                    <TextBlock Text="Skill sin" Style="{StaticResource FieldLabelText}"/>
+                    <ComboBox ItemsSource="{Binding SinOptions}"
+                              SelectedItem="{Binding SkillSin}"/>
+
+                    <Border Style="{StaticResource RowDivider}" Margin="0,14"/>
+
+                    <!-- Сопротивления цели: типы в ряд, грехи трапецией 3 + 4. -->
+                    <Border Background="{DynamicResource SurfaceAltBrush}" CornerRadius="10" Padding="6,10">
+                        <StackPanel>
+                            <TextBlock FontSize="14" FontWeight="SemiBold" TextAlignment="Center"
+                                       HorizontalAlignment="Center" Margin="0,0,0,6">
+                                <Run Text="Main target"/><LineBreak/><Run Text="Resistances"/>
+                            </TextBlock>
+
+                            <ItemsControl ItemsSource="{Binding TypeResistances}"
+                                          ItemTemplate="{StaticResource ResistanceCellTemplate}"
+                                          HorizontalAlignment="Center">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+
+                            <Border Height="1" Margin="10,10" Background="{DynamicResource OutlineBrush}"/>
+
+                            <ItemsControl ItemsSource="{Binding SinResistancesTop}"
+                                          ItemTemplate="{StaticResource ResistanceCellTemplate}"
+                                          HorizontalAlignment="Center">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+
+                            <ItemsControl ItemsSource="{Binding SinResistancesBottom}"
+                                          ItemTemplate="{StaticResource ResistanceCellTemplate}"
+                                          HorizontalAlignment="Center">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Монеты: подписи слева, каждая монета — своя колонка -->
+        <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource Card}" Margin="14,0,0,0">
+            <!-- Общая вертикальная прокрутка: подписи и монеты должны ехать вместе.
+                 Прозрачный фон обязателен: без него пустые места не ловят мышь,
+                 и колесо работает только над самими полями. -->
+            <ScrollViewer x:Name="CoinsVerticalScroll" Background="Transparent"
+                          VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <DockPanel Background="Transparent">
+                    <!-- Высоты строк здесь и в шаблоне монеты обязаны совпадать.
+                         Первые два отступа заменяют заголовок карточки и строку "Coin N",
+                         которые живут справа от разделителя. -->
+                    <StackPanel DockPanel.Dock="Left" Width="180" Margin="0,0,12,0" VerticalAlignment="Top">
+                        <Border Height="40"/>
+                        <Border Height="26"/>
+                        <Border Height="34"><TextBlock Text="Heads" Style="{StaticResource RowLabelText}"/></Border>
+                        <Border Height="34"><TextBlock Text="Coin Power" Style="{StaticResource RowLabelText}"/></Border>
+                        <Border Height="34"><TextBlock Text="Dyn mod (%)" Style="{StaticResource RowLabelText}"/></Border>
+                        <Border Height="44">
+                            <TextBlock Style="{StaticResource GroupCaptionText}">
+                                <Run Text="Static"/><LineBreak/><Run Text="multipliers"/>
+                            </TextBlock>
+                        </Border>
+                        <Border Height="34"><TextBlock Text="Crit" Style="{StaticResource RowLabelText}"/></Border>
+                        <Border Height="34"><TextBlock Text="Crit mod (%)" Style="{StaticResource RowLabelText}"/></Border>
+                        <Border Height="34"><TextBlock Text="Lvl diff" Style="{StaticResource RowLabelText}"/></Border>
+                        <Border Height="34"><TextBlock Text="Clash count" Style="{StaticResource RowLabelText}"/></Border>
+                        <!-- Нижняя граница подгруппы; высота обязана совпадать с шаблоном монеты. -->
+                        <Border Height="14">
+                            <Border Height="1" VerticalAlignment="Center" Background="{DynamicResource OutlineBrush}"/>
+                        </Border>
+
+                        <Border Height="34"><TextBlock Text="Bonus" Style="{StaticResource GroupCaptionText}"/></Border>
+
+                        <!-- Строки бонусов: вид и цель задаются здесь, значения — в колонках монет. -->
+                        <ItemsControl ItemsSource="{Binding BonusRows}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Height="34">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="30"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="24"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="{Binding KindLabel}"
+                                                       Style="{StaticResource RowLabelText}"/>
+                                            <ComboBox Grid.Column="1" Margin="0,2" MinHeight="28"
+                                                      ItemsSource="{Binding TargetOptions}"
+                                                      SelectedItem="{Binding Target}"/>
+                                            <Button Grid.Column="2" Content="✕" Style="{StaticResource IconButton}"
+                                                    ToolTip="Remove this bonus"
+                                                    Click="RemoveBonus_Click"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Border Height="38">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button Content="+ flat" Style="{StaticResource SmallButton}"
+                                        Click="AddFlatBonus_Click"/>
+                                <Button Content="+ %" Style="{StaticResource SmallButton}"
+                                        Margin="6,0,0,0" Click="AddPercentBonus_Click"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Height="14">
+                            <Border Height="1" VerticalAlignment="Center" Background="{DynamicResource OutlineBrush}"/>
+                        </Border>
+
+                        <Border Height="34"><TextBlock Text="Weight" Style="{StaticResource RowLabelText}"/></Border>
+                        <Border Height="36"/>
+                        <Border Style="{StaticResource RowDivider}"/>
+                        <Border Height="26"><TextBlock Text="Roll" Style="{StaticResource RowLabelText}"/></Border>
+                        <Border Height="26"><TextBlock Text="Mod stat" Style="{StaticResource RowLabelText}"/></Border>
+                        <Border Height="26"><TextBlock Text="Damage" Style="{StaticResource RowLabelText}"/></Border>
+                    </StackPanel>
+
+                    <!-- Вертикальный разделитель между подписями и колонками монет. -->
+                    <Border DockPanel.Dock="Left" Width="1" Margin="0,0,14,0"
+                            Background="{DynamicResource OutlineBrush}"/>
+
+                    <DockPanel>
+                        <!-- Высота с отступом равна 40: столько же занимает верхний
+                             пустой ряд в колонке подписей. -->
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal"
+                                    Height="30" Margin="0,0,0,10">
+                            <TextBlock Text="Coins" FontSize="15" FontWeight="SemiBold"
+                                       VerticalAlignment="Center"/>
+                            <Button Content="Add coin" Padding="10,4" FontSize="12"
+                                    Margin="18,0,0,0" VerticalAlignment="Center"
+                                    Click="AddCoin_Click"/>
+                            <Button Content="Remove last coin" Style="{StaticResource SmallButton}"
+                                    Margin="6,0,0,0" VerticalAlignment="Center"
+                                    Click="RemoveCoin_Click"/>
+                        </StackPanel>
+
+                        <!-- Колесо над монетами отдаём внешней прокрутке: сюда оно не нужно. -->
+                        <ScrollViewer Background="Transparent"
+                                      HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled"
+                                      PreviewMouseWheel="CoinsScroll_PreviewMouseWheel">
+                            <ItemsControl ItemsSource="{Binding Coins}" VerticalAlignment="Top">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Width="96" Margin="0,0,10,0">
+                                            <Border Height="26">
+                                                <TextBlock Text="{Binding Number, StringFormat='Coin {0}'}"
+                                                           FontWeight="SemiBold"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+
+                                            <Border Height="34">
+                                                <CheckBox IsChecked="{Binding Active, UpdateSourceTrigger=PropertyChanged}"
+                                                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <Border Height="34">
+                                                <TextBox Margin="0,2" TextAlignment="Center"
+                                                         behaviors:NumericBox.IsInteger="True"
+                                                         behaviors:NumericBox.Value="{Binding Power}"/>
+                                            </Border>
+                                            <Border Height="34">
+                                                <TextBox Margin="0,2" TextAlignment="Center"
+                                                         behaviors:NumericBox.Value="{Binding ModDynPercent}"/>
+                                            </Border>
+
+                                            <!-- Полоса вместо заголовка подгруппы: сам заголовок стоит слева. -->
+                                            <Border Height="44">
+                                                <Border Height="1" VerticalAlignment="Center"
+                                                        Background="{DynamicResource OutlineBrush}"/>
+                                            </Border>
+                                            <Border Height="34">
+                                                <CheckBox Style="{StaticResource CritCheckBox}"
+                                                          IsChecked="{Binding HasCrit, UpdateSourceTrigger=PropertyChanged}"
+                                                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <Border Height="34">
+                                                <TextBox Margin="0,2" TextAlignment="Center"
+                                                         IsEnabled="{Binding HasCrit}"
+                                                         behaviors:NumericBox.Value="{Binding CritPercent}"/>
+                                            </Border>
+                                            <Border Height="34">
+                                                <TextBox Margin="0,2" TextAlignment="Center"
+                                                         behaviors:NumericBox.IsInteger="True"
+                                                         behaviors:NumericBox.Value="{Binding OffenseDefenseDiff}"/>
+                                            </Border>
+                                            <Border Height="34">
+                                                <TextBox Margin="0,2" TextAlignment="Center"
+                                                         behaviors:NumericBox.IsInteger="True"
+                                                         behaviors:NumericBox.Value="{Binding ClashCount}"/>
+                                            </Border>
+                                            <!-- Нижняя граница подгруппы. -->
+                                            <Border Height="14">
+                                                <Border Height="1" VerticalAlignment="Center"
+                                                        Background="{DynamicResource OutlineBrush}"/>
+                                            </Border>
+
+                                            <!-- Пустой ряд под заголовком группы бонусов слева. -->
+                                            <Border Height="34"/>
+
+                                            <!-- Значения бонусов; строки те же, что в колонке подписей. -->
+                                            <ItemsControl ItemsSource="{Binding Bonuses}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Border Height="34">
+                                                            <TextBox Margin="0,2" TextAlignment="Center"
+                                                                     behaviors:NumericBox.Value="{Binding Value}"/>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+
+                                            <!-- Отступ под кнопками добавления бонуса слева. -->
+                                            <Border Height="38"/>
+
+                                            <Border Height="14">
+                                                <Border Height="1" VerticalAlignment="Center"
+                                                        Background="{DynamicResource OutlineBrush}"/>
+                                            </Border>
+
+                                            <Border Height="34">
+                                                <TextBox Margin="0,2" TextAlignment="Center"
+                                                         behaviors:NumericBox.IsInteger="True"
+                                                         behaviors:NumericBox.Value="{Binding Weight}"/>
+                                            </Border>
+                                            <!-- Сопротивления дополнительных целей; при весе 1 их нет. -->
+                                            <Border Height="36">
+                                                <Button Width="28" Height="28" Padding="0"
+                                                        Style="{StaticResource IconTileButton}"
+                                                        AutomationProperties.AutomationId="SubtargetsButton"
+                                                        IsEnabled="{Binding HasSubtargets}"
+                                                        Click="Subtargets_Click">
+                                                    <Button.ToolTip>
+                                                        <TextBlock>
+                                                            <Run Text="Subtargets"/><LineBreak/><Run Text="resistances"/>
+                                                        </TextBlock>
+                                                    </Button.ToolTip>
+                                                    <Image Source="Assets/Icons/resistances.png"
+                                                           Width="18" Height="18"
+                                                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                                                </Button>
+                                            </Border>
+
+                                            <Border Style="{StaticResource RowDivider}"/>
+
+                                            <Border Height="26">
+                                                <TextBlock Style="{StaticResource ResultValueText}"
+                                                           Text="{Binding Roll, Converter={StaticResource Num}, ConverterParameter=F0, Mode=OneWay}"/>
+                                            </Border>
+                                            <Border Height="26">
+                                                <TextBlock Style="{StaticResource ResultValueText}"
+                                                           Text="{Binding ModStat, Converter={StaticResource Num}, ConverterParameter=F3, Mode=OneWay}"/>
+                                            </Border>
+                                            <!-- Фон нужен, чтобы подсказка ловилась по всей клетке, а не по цифрам. -->
+                                            <Border Height="26" Background="Transparent"
+                                                    ToolTip="{Binding DamageTooltip}">
+                                                <!-- 0.## отбрасывает нулевую дробную часть: 1.00 выводится как 1. -->
+                                                <TextBlock Style="{StaticResource ResultValueText}" FontWeight="SemiBold"
+                                                           Text="{Binding Damage, Converter={StaticResource Num}, ConverterParameter=0.##, Mode=OneWay}"/>
+                                            </Border>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </DockPanel>
+                </DockPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Итог -->
+        <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Style="{StaticResource Card}" Margin="0,14,0,0">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
+                        Background="Transparent" ToolTip="{Binding TotalTooltip}">
+                <TextBlock Text="Total damage" FontSize="15" Foreground="{DynamicResource SubtleTextBrush}"
+                           VerticalAlignment="Center"/>
+                <TextBlock FontSize="24" FontWeight="Bold" Margin="14,0,0,0" VerticalAlignment="Center"
+                           Foreground="{DynamicResource AccentBrush}"
+                           Text="{Binding Total, Converter={StaticResource Num}, ConverterParameter=0.##, Mode=OneWay}"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
