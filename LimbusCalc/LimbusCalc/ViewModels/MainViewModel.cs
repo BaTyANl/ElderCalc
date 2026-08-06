@@ -132,7 +132,20 @@ public sealed class MainViewModel : ObservableObject
             coin.Bonuses.Add(CreateBonusValue(BonusRows[i], value));
         }
 
+        // Вес скопирован, поэтому подцелей столько же; переносим и их сопротивления —
+        // у монет одного скилла цели, как правило, те же самые.
         SyncSubtargets(coin);
+
+        if (source is not null)
+        {
+            int shared = Math.Min(coin.Subtargets.Count, source.Subtargets.Count);
+
+            for (int i = 0; i < shared; i++)
+            {
+                CopyResistances(source.Subtargets[i], coin.Subtargets[i]);
+            }
+        }
+
         Coins.Add(coin);
     }
 
@@ -305,6 +318,17 @@ public sealed class MainViewModel : ObservableObject
         while (coin.Subtargets.Count < needed)
         {
             coin.Subtargets.Add(CreateSubtarget(coin.Subtargets.Count + 2));
+        }
+    }
+
+    /// <summary>Списки сопротивлений идут в одном порядке, поэтому переносим по позициям.</summary>
+    private static void CopyResistances(SubtargetViewModel from, SubtargetViewModel to)
+    {
+        int shared = Math.Min(from.Resistances.Count, to.Resistances.Count);
+
+        for (int i = 0; i < shared; i++)
+        {
+            to.Resistances[i].Value = from.Resistances[i].Value;
         }
     }
 
