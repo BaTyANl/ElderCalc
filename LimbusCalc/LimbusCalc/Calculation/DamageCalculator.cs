@@ -69,9 +69,11 @@ public sealed class Skill
 }
 
 /// <summary>Разбор урона по одной монете — для вывода таблицей в интерфейсе.</summary>
-/// <param name="Damage">Итог монеты, уже округлённый вниз до целого.</param>
+/// <param name="Damage">Итог монеты с учётом Time Moratorium, округлённый вниз.</param>
+/// <param name="BaseDamage">Тот же итог без Time Moratorium: его и показываем в таблице.</param>
 /// <param name="TargetDamage">
-/// Вклад каждой цели до общего округления: нулевая — основная, дальше подцели.
+/// Вклад каждой цели без Time Moratorium: нулевая — основная, дальше подцели.
+/// Совпадает по смыслу с <paramref name="BaseDamage"/>, чтобы подсказка сходилась с числом.
 /// </param>
 public readonly record struct CoinBreakdown(
     int SkillIndex,
@@ -79,6 +81,7 @@ public readonly record struct CoinBreakdown(
     double Roll,
     double ModStat,
     double Damage,
+    double BaseDamage,
     IReadOnlyList<double> TargetDamage);
 
 public sealed class DamageResult
@@ -87,6 +90,9 @@ public sealed class DamageResult
 
     /// <summary>Сумма урона по всем монетам; вес каждой уже учтён в её уроне.</summary>
     public required double Total { get; init; }
+
+    /// <summary>Тот же итог без Time Moratorium — левая часть равенства в интерфейсе.</summary>
+    public required double TotalBase { get; init; }
 
     /// <summary>Сколько всего пришлось по каждой цели: нулевая — основная, дальше подцели.</summary>
     public required IReadOnlyList<double> TotalByTarget { get; init; }
@@ -99,6 +105,15 @@ public sealed class DamageInput
 
     /// <summary>Сопротивления основной цели.</summary>
     public ResistanceSet Resistances { get; } = new();
+
+    /// <summary>
+    /// Time Moratorium: урон растёт на 15% за стак и превращается в чистый sloth,
+    /// поэтому в конце домножается ещё и на сопротивление цели к sloth.
+    /// </summary>
+    public bool TimeMoratorium { get; set; }
+
+    /// <summary>Число стаков Time Moratorium: только 1 или 2.</summary>
+    public int TimeMoratoriumStacks { get; set; } = 1;
 }
 
 public static class DamageCalculator
@@ -111,6 +126,9 @@ public static class DamageCalculator
 
     /// <summary>Вклад одного клэша в Mod stat.</summary>
     public const double ClashCountModifier = 0.03;
+
+    /// <summary>Прибавка к урону за один стак Time Moratorium.</summary>
+    public const double TimeMoratoriumPerStack = 0.15;
 
     /// <summary>
     /// Допуск при округлении вниз. Дроби вроде 0.03 в double хранятся неточно, и там,
@@ -167,6 +185,7 @@ public static class DamageCalculator
         List<CoinBreakdown> breakdown = [];
         List<double> totalByTarget = [];
         double sum = 0.0;
+        double sumBase = 0.0;
 
         for (int s = 0; s < input.Skills.Count; s++)
         {
@@ -186,6 +205,7 @@ public static class DamageCalculator
                 // считается по каждой отдельно и складывается. При одинаковых
                 // сопротивлениях итог совпадает с прежним умножением на вес.
                 double coinDamage = 0.0;
+                double coinBaseDamage = 0.0;
                 List<double> targetDamage = [];
 
                 for (int t = 0; t < coin.Weight; t++)
@@ -228,8 +248,19 @@ public static class DamageCalculator
                         + FloorWithTolerance(core * percentBonus / 100.0)
                         + flatBonus;
 
-                    coinDamage += perTarget;
+                    // В таблице показываем урон без моратория, поэтому копим обе величины.
+                    coinBaseDamage += perTarget;
                     targetDamage.Add(perTarget);
+
+                    if (input.TimeMoratorium)
+                    {
+                        // Урон уже посчитан по обычным правилам; сверху идёт прибавка за стаки,
+                        // а конверсия в sloth добавляет ещё и сопротивление цели к sloth.
+                        perTarget *= 1.0 + (TimeMoratoriumPerStack * input.TimeMoratoriumStacks);
+                        perTarget *= resistances[Element.Sloth];
+                    }
+
+                    coinDamage += perTarget;
 
                     while (totalByTarget.Count <= t)
                     {
@@ -240,6 +271,7 @@ public static class DamageCalculator
                 }
 
                 double damage = FloorWithTolerance(coinDamage);
+                double baseDamage = FloorWithTolerance(coinBaseDamage);
 
                 // В таблице показываем Mod stat по основной цели.
                 double modStat = ModStat(
@@ -249,8 +281,9 @@ public static class DamageCalculator
                     ResistanceModifier(input.Resistances[skill.Type])
                         + ResistanceModifier(input.Resistances[skill.Sin]));
 
-                breakdown.Add(new CoinBreakdown(s, c, roll, modStat, damage, targetDamage));
+                breakdown.Add(new CoinBreakdown(s, c, roll, modStat, damage, baseDamage, targetDamage));
                 sum += damage;
+                sumBase += baseDamage;
 
                 previousRoll = roll;
             }
@@ -260,6 +293,7 @@ public static class DamageCalculator
         {
             Coins = breakdown,
             Total = sum,
+            TotalBase = sumBase,
             TotalByTarget = totalByTarget,
         };
     }

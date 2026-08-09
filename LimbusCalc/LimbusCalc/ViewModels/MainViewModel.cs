@@ -12,7 +12,12 @@ public sealed class MainViewModel : ObservableObject
     private double _passiveModDynPercent;
     private ElementOption _skillType = ElementOptions.DamageTypes[0];
     private ElementOption _skillSin = ElementOptions.Sins[0];
+    private int _clashCount;
+    private bool _timeMoratorium;
+    private int _timeMoratoriumStacks = 1;
     private double _total;
+    private double _totalBase;
+    private double _moratoriumBuff = 1.0;
     private string _totalTooltip = string.Empty;
 
     private readonly List<ResistanceViewModel> _allResistances = [];
@@ -103,10 +108,76 @@ public sealed class MainViewModel : ObservableObject
         }
     }
 
+    /// <summary>Число клэшей — общее для всех монет скилла, каждый даёт 3% к Mod stat.</summary>
+    public int ClashCount
+    {
+        get => _clashCount;
+        set
+        {
+            if (SetProperty(ref _clashCount, value))
+            {
+                Recalculate();
+            }
+        }
+    }
+
+    /// <summary>Time Moratorium включён: урон растёт за стаки и становится sloth-уроном.</summary>
+    public bool TimeMoratorium
+    {
+        get => _timeMoratorium;
+        set
+        {
+            if (SetProperty(ref _timeMoratorium, value))
+            {
+                Recalculate();
+            }
+        }
+    }
+
+    /// <summary>Число стаков; допустимы только 1 и 2, всё прочее подтягивается к границе.</summary>
+    public int TimeMoratoriumStacks
+    {
+        get => _timeMoratoriumStacks;
+        set
+        {
+            int clamped = Math.Clamp(value, 1, 2);
+
+            if (_timeMoratoriumStacks != clamped)
+            {
+                _timeMoratoriumStacks = clamped;
+                OnPropertyChanged();
+                Recalculate();
+            }
+            else if (value != clamped)
+            {
+                // Значение уже на границе, но ввели за её пределами — вернём поле к границе.
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public double Total
     {
         get => _total;
         private set => SetProperty(ref _total, value);
+    }
+
+    /// <summary>Итог без Time Moratorium — левая часть равенства в строке итога.</summary>
+    public double TotalBase
+    {
+        get => _totalBase;
+        private set => SetProperty(ref _totalBase, value);
+    }
+
+    /// <summary>
+    /// Множитель Time Moratorium: прибавка за стаки на сопротивление основной цели к sloth.
+    /// Берётся по формуле, а не как отношение итогов — иначе округление урона вниз
+    /// искажало бы его на мелких числах (5 превращается в 11, и выходит 2.2 вместо 2.3).
+    /// </summary>
+    public double MoratoriumBuff
+    {
+        get => _moratoriumBuff;
+        private set => SetProperty(ref _moratoriumBuff, value);
     }
 
     /// <summary>Разбивка итога по целям — показывается подсказкой над итоговым числом.</summary>
@@ -207,10 +278,15 @@ public sealed class MainViewModel : ObservableObject
 
         foreach (CoinViewModel coin in Coins)
         {
-            skill.Coins.Add(coin.ToModel(PassiveModDynPercent));
+            skill.Coins.Add(coin.ToModel(PassiveModDynPercent, ClashCount));
         }
 
-        DamageInput input = new();
+        DamageInput input = new()
+        {
+            TimeMoratorium = TimeMoratorium,
+            TimeMoratoriumStacks = TimeMoratoriumStacks,
+        };
+
         input.Skills.Add(skill);
 
         foreach (ResistanceViewModel resistance in _allResistances)
@@ -228,6 +304,11 @@ public sealed class MainViewModel : ObservableObject
         }
 
         Total = result.Total;
+        TotalBase = result.TotalBase;
+        MoratoriumBuff = TimeMoratorium
+            ? (1.0 + (DamageCalculator.TimeMoratoriumPerStack * TimeMoratoriumStacks))
+                * MainResistance(Element.Sloth)
+            : 1.0;
         TotalTooltip = TargetDamageText.Format(result.TotalByTarget);
     }
 

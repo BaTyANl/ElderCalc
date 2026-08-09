@@ -24,7 +24,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="340"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
@@ -41,8 +41,8 @@
                           Checked="ThemeSwitch_Changed" Unchecked="ThemeSwitch_Changed"/>
         </Grid>
 
-        <!-- Общие параметры -->
-        <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource Card}">
+        <!-- Общие параметры: занимают всю высоту, включая ряд с итогом справа. -->
+        <Border Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" Style="{StaticResource Card}">
             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                 <StackPanel>
                     <TextBlock Text="Parameters" Style="{StaticResource CardTitleText}"/>
@@ -100,6 +100,28 @@
                         </StackPanel>
                     </Border>
 
+                    <!-- Time Moratorium: урон растёт за стаки и считается уроном sloth. -->
+                    <Border Background="{DynamicResource SurfaceAltBrush}" CornerRadius="10"
+                            Padding="10" Margin="0,10,0,0">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox Style="{StaticResource MoratoriumCheckBox}"
+                                          VerticalAlignment="Center"
+                                          IsChecked="{Binding TimeMoratorium, UpdateSourceTrigger=PropertyChanged}"/>
+                                <Image Source="Assets/Icons/timeMoratorium.png" Width="22" Height="22"
+                                       Margin="8,0,6,0" VerticalAlignment="Center"
+                                       RenderOptions.BitmapScalingMode="HighQuality"/>
+                                <TextBlock Text="Time Moratorium" FontWeight="SemiBold"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <TextBlock Text="Stacks (1 or 2)" Style="{StaticResource FieldLabelText}"/>
+                            <TextBox IsEnabled="{Binding TimeMoratorium}"
+                                     behaviors:NumericBox.IsInteger="True"
+                                     behaviors:NumericBox.Value="{Binding TimeMoratoriumStacks}"/>
+                        </StackPanel>
+                    </Border>
+
                 </StackPanel>
             </ScrollViewer>
         </Border>
@@ -121,10 +143,12 @@
                         <Border Height="34"><TextBlock Text="Heads" Style="{StaticResource RowLabelText}"/></Border>
                         <Border Height="34"><TextBlock Text="Coin Power" Style="{StaticResource RowLabelText}"/></Border>
                         <Border Height="34"><TextBlock Text="Dyn mod (%)" Style="{StaticResource RowLabelText}"/></Border>
-                        <Border Height="44">
-                            <TextBlock Style="{StaticResource GroupCaptionText}">
-                                <Run Text="Static"/><LineBreak/><Run Text="multipliers"/>
-                            </TextBlock>
+                        <!-- Верхняя граница подгруппы; высоты обязаны совпадать с шаблоном монеты. -->
+                        <Border Height="14">
+                            <Border Height="1" VerticalAlignment="Center" Background="{DynamicResource OutlineBrush}"/>
+                        </Border>
+                        <Border Height="30">
+                            <TextBlock Text="Static multipliers" Style="{StaticResource GroupCaptionText}"/>
                         </Border>
                         <Border Height="34"><TextBlock Text="Crit" Style="{StaticResource RowLabelText}"/></Border>
                         <Border Height="34"><TextBlock Text="Crit mod (%)" Style="{StaticResource RowLabelText}"/></Border>
@@ -206,7 +230,11 @@
                         <ScrollViewer Background="Transparent"
                                       HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled"
                                       PreviewMouseWheel="CoinsScroll_PreviewMouseWheel">
-                            <ItemsControl ItemsSource="{Binding Coins}" VerticalAlignment="Top">
+                            <!-- Колонки монет разрезаны на две части, а между ними — общая
+                                 строка Clash count. Так она сама тянется по ширине колонок. -->
+                            <StackPanel VerticalAlignment="Top" HorizontalAlignment="Left">
+                            <ItemsControl x:Name="CoinTopRows" ItemsSource="{Binding Coins}"
+                                          VerticalAlignment="Top" HorizontalAlignment="Left">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <StackPanel Orientation="Horizontal"/>
@@ -235,11 +263,12 @@
                                                          behaviors:NumericBox.Value="{Binding ModDynPercent}"/>
                                             </Border>
 
-                                            <!-- Полоса вместо заголовка подгруппы: сам заголовок стоит слева. -->
-                                            <Border Height="44">
+                                            <!-- Верхняя граница подгруппы; заголовок к ней стоит слева. -->
+                                            <Border Height="14">
                                                 <Border Height="1" VerticalAlignment="Center"
                                                         Background="{DynamicResource OutlineBrush}"/>
                                             </Border>
+                                            <Border Height="30"/>
                                             <Border Height="34">
                                                 <CheckBox Style="{StaticResource CritCheckBox}"
                                                           IsChecked="{Binding HasCrit, UpdateSourceTrigger=PropertyChanged}"
@@ -255,11 +284,34 @@
                                                          behaviors:NumericBox.IsInteger="True"
                                                          behaviors:NumericBox.Value="{Binding OffenseDefenseDiff}"/>
                                             </Border>
-                                            <Border Height="34">
-                                                <TextBox Margin="0,2" TextAlignment="Center"
-                                                         behaviors:NumericBox.IsInteger="True"
-                                                         behaviors:NumericBox.Value="{Binding ClashCount}"/>
-                                            </Border>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <!-- Clash count один на скилл. Ширину берём у ряда колонок,
+                                 поэтому поле само растёт при добавлении монет. -->
+                            <Border Height="34" HorizontalAlignment="Left"
+                                    Width="{Binding ActualWidth, ElementName=CoinTopRows}">
+                                <TextBox Margin="0,2,10,2" TextAlignment="Center"
+                                         AutomationProperties.AutomationId="ClashCountField"
+                                         behaviors:NumericBox.IsInteger="True"
+                                         behaviors:NumericBox.Value="{Binding ClashCount}"/>
+                            </Border>
+
+                            <!-- Выравнивание влево обязательно: иначе колонки растянулись бы
+                                 по ширине общего поля, а оно берёт ширину у них — и при
+                                 удалении монеты ряд уже не сузился бы. -->
+                            <ItemsControl ItemsSource="{Binding Coins}" VerticalAlignment="Top"
+                                          HorizontalAlignment="Left">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Width="96" Margin="0,0,10,0">
                                             <!-- Нижняя граница подгруппы. -->
                                             <Border Height="14">
                                                 <Border Height="1" VerticalAlignment="Center"
@@ -306,7 +358,7 @@
                                                             <Run Text="Subtargets"/><LineBreak/><Run Text="resistances"/>
                                                         </TextBlock>
                                                     </Button.ToolTip>
-                                                    <Image Source="Assets/Icons/resistances.png"
+                                                    <Image Source="Assets/Icons/lodgedArrow.png"
                                                            Width="18" Height="18"
                                                            RenderOptions.BitmapScalingMode="HighQuality"/>
                                                 </Button>
@@ -333,20 +385,40 @@
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
+                            </StackPanel>
                         </ScrollViewer>
                     </DockPanel>
                 </DockPanel>
             </ScrollViewer>
         </Border>
 
-        <!-- Итог -->
-        <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Style="{StaticResource Card}" Margin="0,14,0,0">
+        <!-- Итог: под колонками монет, а не во всю ширину окна. -->
+        <Border Grid.Row="2" Grid.Column="1" Style="{StaticResource Card}" Margin="14,14,0,0">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
                         Background="Transparent" ToolTip="{Binding TotalTooltip}">
                 <TextBlock Text="Total damage" FontSize="15" Foreground="{DynamicResource SubtleTextBrush}"
                            VerticalAlignment="Center"/>
+                <!-- Урон до моратория — красным, он же и есть итог, когда мораторий выключен. -->
                 <TextBlock FontSize="24" FontWeight="Bold" Margin="14,0,0,0" VerticalAlignment="Center"
                            Foreground="{DynamicResource AccentBrush}"
+                           Text="{Binding TotalBase, Converter={StaticResource Num}, ConverterParameter=0.##, Mode=OneWay}"/>
+
+                <!-- Остальная часть равенства появляется только при включённом мораторие. -->
+                <TextBlock FontSize="24" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center"
+                           Text="&#215;"
+                           Foreground="{DynamicResource TextBrush}"
+                           Visibility="{Binding TimeMoratorium, Converter={StaticResource BoolToVisibility}}"/>
+                <TextBlock FontSize="24" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center"
+                           Foreground="{DynamicResource MoratoriumTextBrush}"
+                           Visibility="{Binding TimeMoratorium, Converter={StaticResource BoolToVisibility}}"
+                           Text="{Binding MoratoriumBuff, Converter={StaticResource Num}, ConverterParameter=0.##, Mode=OneWay}"/>
+                <TextBlock FontSize="24" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center"
+                           Text="="
+                           Foreground="{DynamicResource TextBrush}"
+                           Visibility="{Binding TimeMoratorium, Converter={StaticResource BoolToVisibility}}"/>
+                <TextBlock FontSize="24" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center"
+                           Foreground="{DynamicResource MoratoriumTextBrush}"
+                           Visibility="{Binding TimeMoratorium, Converter={StaticResource BoolToVisibility}}"
                            Text="{Binding Total, Converter={StaticResource Num}, ConverterParameter=0.##, Mode=OneWay}"/>
             </StackPanel>
         </Border>

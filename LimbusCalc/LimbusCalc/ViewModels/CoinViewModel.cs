@@ -13,7 +13,6 @@ public sealed class CoinViewModel : ObservableObject
     private double _offenseDefenseDiff;
     private bool _hasCrit;
     private double _critPercent = 20.0;
-    private int _clashCount;
     private int _weight = 1;
 
     private double _roll;
@@ -30,7 +29,6 @@ public sealed class CoinViewModel : ObservableObject
         nameof(OffenseDefenseDiff),
         nameof(HasCrit),
         nameof(CritPercent),
-        nameof(ClashCount),
         nameof(Weight),
     ];
 
@@ -89,13 +87,6 @@ public sealed class CoinViewModel : ObservableObject
         set => SetProperty(ref _critPercent, value);
     }
 
-    /// <summary>Число клэшей этой монеты: каждый добавляет 3% к Mod stat. Только целое.</summary>
-    public int ClashCount
-    {
-        get => _clashCount;
-        set => SetProperty(ref _clashCount, value);
-    }
-
     /// <summary>Вес этой монеты — по скольким целям она бьёт. Только целое.</summary>
     public int Weight
     {
@@ -151,14 +142,14 @@ public sealed class CoinViewModel : ObservableObject
         OffenseDefenseDiff = OffenseDefenseDiff,
         HasCrit = HasCrit,
         CritPercent = CritPercent,
-        ClashCount = ClashCount,
         Weight = Weight,
     };
 
     /// <param name="passiveModDynPercent">
     /// Общая для всех монет надбавка к Dyn mod в процентах; складывается с собственной.
     /// </param>
-    public Coin ToModel(double passiveModDynPercent)
+    /// <param name="clashCount">Число клэшей — оно общее для всех монет скилла.</param>
+    public Coin ToModel(double passiveModDynPercent, int clashCount)
     {
         Coin coin = new()
         {
@@ -168,7 +159,7 @@ public sealed class CoinViewModel : ObservableObject
             OffenseDefenseDiff = OffenseDefenseDiff,
             HasCrit = HasCrit,
             Crit = CritPercent / 100.0,
-            ClashCount = ClashCount,
+            ClashCount = clashCount,
             Weight = Weight,
         };
 
@@ -201,7 +192,8 @@ public sealed class CoinViewModel : ObservableObject
     {
         Roll = breakdown.Roll;
         ModStat = breakdown.ModStat;
-        Damage = breakdown.Damage;
+        // В таблице показываем урон без Time Moratorium: его прибавка учтена только в итоге.
+        Damage = breakdown.BaseDamage;
         DamageTooltip = TargetDamageText.Format(breakdown.TargetDamage);
     }
 }

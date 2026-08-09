@@ -20,4 +20,14 @@
     <!-- Отдельный цвет флажка крита. -->
     <SolidColorBrush x:Key="CritBrush" Color="#4C8DFF"/>
 
+    <!-- Флажок Time Moratorium. -->
+    <SolidColorBrush x:Key="MoratoriumBrush" Color="#F0B429"/>
+
+    <!-- Итог при включённом Time Moratorium. -->
+    <SolidColorBrush x:Key="MoratoriumTextBrush" Color="#F7C948"/>
+
+    <!-- Ползунок прокрутки. -->
+    <SolidColorBrush x:Key="ScrollThumbBrush" Color="#3E4553"/>
+    <SolidColorBrush x:Key="ScrollThumbHoverBrush" Color="#525B6D"/>
+
 </ResourceDictionary>

@@ -110,7 +110,7 @@ allOk &= Check("flat 2 + flat 3", bonusResult.Coins[7].Damage, 15.0);
 // --- Проверка 8: clash count даёт по 3% к Mod stat -----------------------------
 DamageInput clash = new();
 Skill clashSkill = new() { BaseRoll = 100 };
-clashSkill.Coins.Add(new Coin { Active = false });
+clashSkill.Coins.Add(new Coin { Active = false, ClashCount = 0 });
 clashSkill.Coins.Add(new Coin { Active = false, ClashCount = 1 });
 clashSkill.Coins.Add(new Coin { Active = false, ClashCount = 5 });
 clashSkill.Coins.Add(new Coin { Active = false, ClashCount = 5, HasCrit = true, Crit = 0.2 });
@@ -203,7 +203,51 @@ allOk &= Check("Вес 2, подцель слабее", subResult.Coins[1].Damag
 allOk &= Check("Вес 3, разные цели", subResult.Coins[2].Damage, 420.0);
 allOk &= Check("Mod stat по основной цели", subResult.Coins[1].ModStat, 1.2);
 
-// --- Проверка 12: отрицательная разница уровней по эталону MyCalculator --------
+// --- Проверка 12: Time Moratorium ---------------------------------------------
+// Обычный расчёт идёт как есть, сверху прибавка за стаки, в конце — сопротивление
+// цели к sloth. Ролл 100, навык slash/wrath, у цели slash 1.5 и sloth 0.5:
+// Mod stat 1.5 -> 150, x1.15 или x1.30, затем x0.5.
+static DamageInput Moratorium(bool on, int stacks)
+{
+    DamageInput input = new() { TimeMoratorium = on, TimeMoratoriumStacks = stacks };
+    input.Resistances[Element.Slash] = 1.5;
+    input.Resistances[Element.Sloth] = 0.5;
+    Skill skill = new() { BaseRoll = 100, Type = Element.Slash, Sin = Element.Wrath };
+    skill.Coins.Add(new Coin { Active = false });
+    input.Skills.Add(skill);
+    return input;
+}
+
+allOk &= Check("Без Moratorium", DamageCalculator.Calculate(Moratorium(false, 2)).Total, 150.0);
+// В таблице монета показывает урон без моратория, а итог — уже с ним.
+DamageResult shown = DamageCalculator.Calculate(Moratorium(true, 2));
+allOk &= Check("Урон монеты без моратория", shown.Coins[0].BaseDamage, 150.0);
+allOk &= Check("Итог до моратория", shown.TotalBase, 150.0);
+allOk &= Check("Множитель моратория", shown.Total / shown.TotalBase, 97.0 / 150.0);
+// 150 x 1.15 x 0.5 = 86.25 -> 86
+allOk &= Check("Moratorium, 1 стак", DamageCalculator.Calculate(Moratorium(true, 1)).Total, 86.0);
+// 150 x 1.30 x 0.5 = 97.5 -> 97
+allOk &= Check("Moratorium, 2 стака", DamageCalculator.Calculate(Moratorium(true, 2)).Total, 97.0);
+
+// Сопротивление к sloth = 1: остаётся только прибавка за стаки, 150 x 1.3 = 195.
+DamageInput neutralSloth = Moratorium(true, 2);
+neutralSloth.Resistances[Element.Sloth] = 1.0;
+allOk &= Check("Moratorium при sloth 1.0", DamageCalculator.Calculate(neutralSloth).Total, 195.0);
+
+// У подцели своё сопротивление к sloth: основная 0.5, подцель 2.0.
+DamageInput subSloth = new() { TimeMoratorium = true, TimeMoratoriumStacks = 2 };
+subSloth.Resistances[Element.Sloth] = 0.5;
+Skill subSlothSkill = new() { BaseRoll = 100, Type = Element.Pierce, Sin = Element.Envy };
+Coin twoTargets = new() { Active = false, Weight = 2 };
+ResistanceSet slothStrong = new();
+slothStrong[Element.Sloth] = 2.0;
+twoTargets.SubtargetResistances.Add(slothStrong);
+subSlothSkill.Coins.Add(twoTargets);
+subSloth.Skills.Add(subSlothSkill);
+// Основная: 100 x 1.3 x 0.5 = 65; подцель: 100 x 1.3 x 2.0 = 260; вместе 325.
+allOk &= Check("Moratorium по подцелям", DamageCalculator.Calculate(subSloth).Total, 325.0);
+
+// --- Проверка 13: отрицательная разница уровней по эталону MyCalculator --------
 // diff / (|diff| + 25): при diff = -20 это -20/45, а не -20/|-20+25| = -4.
 allOk &= Check("ModStat(-20; 0)", DamageCalculator.ModStat(-20, 0), 1.0 - 20.0 / 45.0);
 
