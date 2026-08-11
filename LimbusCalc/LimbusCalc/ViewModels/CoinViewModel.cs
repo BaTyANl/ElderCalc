@@ -18,7 +18,6 @@ public sealed class CoinViewModel : ObservableObject
     private double _roll;
     private double _modStat;
     private double _damage;
-    private string _damageTooltip = string.Empty;
 
     /// <summary>Имена свойств, изменение которых требует пересчёта.</summary>
     public static readonly HashSet<string> InputPropertyNames =
@@ -175,17 +174,10 @@ public sealed class CoinViewModel : ObservableObject
 
         foreach (SubtargetViewModel subtarget in Subtargets)
         {
-            coin.SubtargetResistances.Add(subtarget.ToModel());
+            coin.Subtargets.Add(subtarget.ToModel(passiveModDynPercent));
         }
 
         return coin;
-    }
-
-    /// <summary>Разбивка урона по целям — показывается подсказкой над числом урона.</summary>
-    public string DamageTooltip
-    {
-        get => _damageTooltip;
-        private set => SetProperty(ref _damageTooltip, value);
     }
 
     public void ApplyResult(CoinBreakdown breakdown)
@@ -194,6 +186,5 @@ public sealed class CoinViewModel : ObservableObject
         ModStat = breakdown.ModStat;
         // В таблице показываем урон без Time Moratorium: его прибавка учтена только в итоге.
         Damage = breakdown.BaseDamage;
-        DamageTooltip = TargetDamageText.Format(breakdown.TargetDamage);
     }
 }

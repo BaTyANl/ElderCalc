@@ -1,0 +1,166 @@
+﻿<Window x:Class="LimbusCalc.DamageByTargetWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:LimbusCalc.ViewModels"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
+        Title="Damage by target"
+        Icon="Assets/Icons/targetAim.png"
+        SizeToContent="WidthAndHeight"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        FontSize="13"
+        FontFamily="{StaticResource AppFontFamily}"
+        Background="{DynamicResource AppBackgroundBrush}">
+
+    <!-- Общая область размеров: столбец итога подстраивается под самую широкую запись
+         (с мораторием это целое равенство), и подпись встаёт ровно над ней. -->
+    <Border Style="{StaticResource Card}" Margin="14" Grid.IsSharedSizeScope="True">
+        <StackPanel>
+            <TextBlock Text="Damage by target" Style="{StaticResource CardTitleText}"/>
+
+            <!-- Шапка: каждая подпись — кнопка сортировки по своему столбцу. -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                <!-- Столбец названий: подцель можно переименовать, поэтому он пошире. -->
+                <Border Width="150">
+                    <!-- Без боковых отступов: подпись должна начинаться ровно там же,
+                         где содержимое столбца под ней. -->
+                    <Button DataContext="{Binding TitleColumn}"
+                            Content="{Binding Header}"
+                            Style="{StaticResource TableHeaderButton}"
+                            HorizontalAlignment="Left"
+                            Padding="0,2"
+                            ToolTip="Sort targets by name"
+                            Click="Sort_Click"/>
+                </Border>
+                <ItemsControl ItemsSource="{Binding CoinColumns}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Width="86">
+                                <Button Content="{Binding Header}"
+                                        Style="{StaticResource TableHeaderButton}"
+                                        ToolTip="Sort targets by this coin damage"
+                                        Click="Sort_Click"/>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Border Width="20"/>
+                <!-- Отбивка итога от монет. Отрицательный отступ снизу дотягивает черту
+                     до строк, чтобы линия шла сплошной, а не кусками. -->
+                <Border Width="1" Background="{DynamicResource OutlineBrush}"
+                        Margin="0,0,0,-6"/>
+                <Border Width="19"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="TotalLeading"/>
+                        <ColumnDefinition SharedSizeGroup="TotalEquation"/>
+                    </Grid.ColumnDefinitions>
+                    <!-- Отрицательные поля дают подписи выйти за узкий столбец: иначе,
+                         когда урон в одну-две цифры, ей не хватило бы места и она
+                         прижималась бы к левому краю вместо середины. В ширину столбца
+                         подпись при этом не считается. -->
+                    <Button Grid.ColumnSpan="2"
+                            DataContext="{Binding TotalColumn}"
+                            Content="{Binding Header}"
+                            Style="{StaticResource TableHeaderButton}"
+                            HorizontalAlignment="Center"
+                            Margin="-200,0"
+                            ToolTip="Sort targets by total damage"
+                            Click="Sort_Click"/>
+                </Grid>
+                <!-- Запас справа: подпись Total шире столбца и не должна упираться в край. -->
+                <Border Width="24"/>
+            </StackPanel>
+
+            <!-- Целей бывает много, поэтому список прокручивается. -->
+            <ScrollViewer MaxHeight="460" VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+                <ItemsControl ItemsSource="{Binding DamageByTarget}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="0,4">
+                                <Border Width="150" Padding="0,0,8,0">
+                                    <!-- Длинное название не должно разъезжать таблицу:
+                                         обрезаем, а целиком показываем подсказкой. -->
+                                    <TextBlock Text="{Binding Title}" VerticalAlignment="Center"
+                                               TextTrimming="CharacterEllipsis"
+                                               ToolTip="{Binding Title}"/>
+                                </Border>
+
+                                <ItemsControl ItemsSource="{Binding CoinDamage}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Width="86">
+                                                <TextBlock Text="{Binding}" HorizontalAlignment="Center"
+                                                           VerticalAlignment="Center"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <Border Width="20"/>
+                                <Border Width="1" Background="{DynamicResource OutlineBrush}"
+                                        Margin="0,-4"/>
+                                <Border Width="19"/>
+
+                                <!-- Итог по цели. С мораторием показываем разбор равенством. -->
+                                <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition SharedSizeGroup="TotalLeading"/>
+                                    <ColumnDefinition SharedSizeGroup="TotalEquation"/>
+                                </Grid.ColumnDefinitions>
+                                    <!-- Урон до моратория живёт в своём столбце: так красные
+                                         числа стоят друг под другом, сколько бы цифр в них ни было.
+                                         Выравнивание по левому краю — числа начинаются с одного места. -->
+                                    <TextBlock Grid.Column="0" FontWeight="Bold" VerticalAlignment="Center"
+                                               HorizontalAlignment="Left" TextAlignment="Left"
+                                               Text="{Binding LeadingText}">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                                <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ShowPlainAffected}" Value="True">
+                                                        <Setter Property="Foreground" Value="{DynamicResource MoratoriumTextBrush}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="&#215;" Margin="8,0,0,0" FontWeight="Bold"
+                                               Foreground="{DynamicResource TextBrush}"
+                                               VerticalAlignment="Center"
+                                               Visibility="{Binding ShowEquation, Converter={StaticResource BoolToVisibility}}"/>
+                                    <TextBlock Text="{Binding BuffText}" Margin="8,0,0,0" FontWeight="Bold"
+                                               Foreground="{DynamicResource MoratoriumTextBrush}"
+                                               VerticalAlignment="Center"
+                                               Visibility="{Binding ShowEquation, Converter={StaticResource BoolToVisibility}}"/>
+                                    <TextBlock Text="=" Margin="8,0,0,0" FontWeight="Bold"
+                                               Foreground="{DynamicResource TextBrush}"
+                                               VerticalAlignment="Center"
+                                               Visibility="{Binding ShowEquation, Converter={StaticResource BoolToVisibility}}"/>
+                                    <TextBlock Text="{Binding TotalText}" Margin="8,0,0,0" FontWeight="Bold"
+                                               Foreground="{DynamicResource MoratoriumTextBrush}"
+                                               VerticalAlignment="Center"
+                                               Visibility="{Binding ShowEquation, Converter={StaticResource BoolToVisibility}}"/>
+                                </StackPanel>
+                                </Grid>
+                                <Border Width="24"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </StackPanel>
+    </Border>
+</Window>

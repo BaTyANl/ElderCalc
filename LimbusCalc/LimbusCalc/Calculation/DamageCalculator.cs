@@ -42,10 +42,33 @@ public sealed class Coin
     public int Weight { get; set; } = 1;
 
     /// <summary>
-    /// Сопротивления дополнительных целей, начиная со второй. Чего в списке нет —
-    /// считается по основной цели.
+    /// Дополнительные цели, начиная со второй, со своими сопротивлениями и параметрами.
+    /// Чего в списке нет — считается по основной цели.
     /// </summary>
-    public List<ResistanceSet> SubtargetResistances { get; } = [];
+    public List<SubtargetOverride> Subtargets { get; } = [];
+}
+
+/// <summary>
+/// Дополнительная цель монеты: свои сопротивления и свой набор модификаторов.
+/// Заводится копией параметров основной цели, дальше правится независимо.
+/// </summary>
+public sealed class SubtargetOverride
+{
+    public ResistanceSet Resistances { get; } = new();
+
+    /// <summary>"Mod dyn" этой цели множителем: 1.63 соответствует +63%.</summary>
+    public double ModDyn { get; set; } = 1.0;
+
+    public double OffenseDefenseDiff { get; set; }
+
+    public bool HasCrit { get; set; }
+
+    /// <summary>Крит-модификатор долей единицы (0.2 = +20%).</summary>
+    public double Crit { get; set; }
+
+    public bool TimeMoratorium { get; set; }
+
+    public int TimeMoratoriumStacks { get; set; } = 1;
 }
 
 /// <summary>
@@ -73,7 +96,13 @@ public sealed class Skill
 /// <param name="BaseDamage">Тот же итог без Time Moratorium: его и показываем в таблице.</param>
 /// <param name="TargetDamage">
 /// Вклад каждой цели без Time Moratorium: нулевая — основная, дальше подцели.
-/// Совпадает по смыслу с <paramref name="BaseDamage"/>, чтобы подсказка сходилась с числом.
+/// Совпадает по смыслу с <paramref name="BaseDamage"/>.
+/// </param>
+/// <param name="TargetDamageFinal">Тот же вклад, но уже с Time Moratorium цели.</param>
+/// <param name="TargetMoratoriumBuff">
+/// Множитель Time Moratorium по каждой цели, каким он задан формулой; единица — моратория нет.
+/// Именно его показываем в разборе: отношение итогов после округления вниз даёт не то число,
+/// которое выставил пользователь (при уроне 2 и множителе 1.15 отношение выходит единицей).
 /// </param>
 public readonly record struct CoinBreakdown(
     int SkillIndex,
@@ -82,7 +111,9 @@ public readonly record struct CoinBreakdown(
     double ModStat,
     double Damage,
     double BaseDamage,
-    IReadOnlyList<double> TargetDamage);
+    IReadOnlyList<double> TargetDamage,
+    IReadOnlyList<double> TargetDamageFinal,
+    IReadOnlyList<double> TargetMoratoriumBuff);
 
 public sealed class DamageResult
 {
@@ -169,14 +200,45 @@ public static class DamageCalculator
         return 1.0 + crit + levelDiffModifier + (ClashCountModifier * clashCount) + resistanceModifier;
     }
 
+    /// <summary>Что применяется к конкретной цели: сопротивления и модификаторы.</summary>
+    private readonly record struct TargetParameters(
+        ResistanceSet Resistances,
+        double ModDyn,
+        double OffenseDefenseDiff,
+        bool HasCrit,
+        double Crit,
+        bool TimeMoratorium,
+        int TimeMoratoriumStacks);
+
     /// <summary>
-    /// Сопротивления цели с номером <paramref name="targetIndex"/> (0 — основная).
-    /// Для дополнительных целей без своих настроек берутся сопротивления основной.
+    /// Параметры цели с номером <paramref name="targetIndex"/> (0 — основная).
+    /// Дополнительные цели без своих настроек считаются как основная.
     /// </summary>
-    private static ResistanceSet TargetResistances(DamageInput input, Coin coin, int targetIndex) =>
-        targetIndex >= 1 && targetIndex - 1 < coin.SubtargetResistances.Count
-            ? coin.SubtargetResistances[targetIndex - 1]
-            : input.Resistances;
+    private static TargetParameters ParametersFor(DamageInput input, Coin coin, int targetIndex)
+    {
+        if (targetIndex >= 1 && targetIndex - 1 < coin.Subtargets.Count)
+        {
+            SubtargetOverride subtarget = coin.Subtargets[targetIndex - 1];
+
+            return new TargetParameters(
+                subtarget.Resistances,
+                subtarget.ModDyn,
+                subtarget.OffenseDefenseDiff,
+                subtarget.HasCrit,
+                subtarget.Crit,
+                subtarget.TimeMoratorium,
+                subtarget.TimeMoratoriumStacks);
+        }
+
+        return new TargetParameters(
+            input.Resistances,
+            coin.ModDyn,
+            coin.OffenseDefenseDiff,
+            coin.HasCrit,
+            coin.Crit,
+            input.TimeMoratorium,
+            input.TimeMoratoriumStacks);
+    }
 
     public static DamageResult Calculate(DamageInput input)
     {
@@ -207,14 +269,17 @@ public static class DamageCalculator
                 double coinDamage = 0.0;
                 double coinBaseDamage = 0.0;
                 List<double> targetDamage = [];
+                List<double> targetDamageFinal = [];
+                List<double> targetBuff = [];
 
                 for (int t = 0; t < coin.Weight; t++)
                 {
-                    ResistanceSet resistances = TargetResistances(input, coin, t);
+                    TargetParameters target = ParametersFor(input, coin, t);
+                    ResistanceSet resistances = target.Resistances;
 
                     double targetModStat = ModStat(
-                        coin.OffenseDefenseDiff,
-                        coin.HasCrit ? coin.Crit : 0.0,
+                        target.OffenseDefenseDiff,
+                        target.HasCrit ? target.Crit : 0.0,
                         coin.ClashCount,
                         ResistanceModifier(resistances[skill.Type])
                             + ResistanceModifier(resistances[skill.Sin]));
@@ -222,7 +287,7 @@ public static class DamageCalculator
                     // Ненабранный бросок не обнуляет монету: вместо расчёта берётся единица.
                     double core = roll <= 0.0
                         ? MinimumDamage
-                        : roll * coin.ModDyn * targetModStat;
+                        : roll * target.ModDyn * targetModStat;
 
                     double flatBonus = 0.0;
                     double percentBonus = 0.0;
@@ -244,23 +309,31 @@ public static class DamageCalculator
                     }
 
                     // Процентный бонус — прибавка, а не множитель: доля от основы, вниз.
-                    double perTarget = FloorWithTolerance(core)
+                    // Округляем по каждой цели: каждая получает целый урон, иначе
+                    // в разборе по целям вылезали бы дробные числа.
+                    double perTarget = FloorWithTolerance(
+                        FloorWithTolerance(core)
                         + FloorWithTolerance(core * percentBonus / 100.0)
-                        + flatBonus;
+                        + flatBonus);
 
                     // В таблице показываем урон без моратория, поэтому копим обе величины.
                     coinBaseDamage += perTarget;
                     targetDamage.Add(perTarget);
 
-                    if (input.TimeMoratorium)
-                    {
-                        // Урон уже посчитан по обычным правилам; сверху идёт прибавка за стаки,
-                        // а конверсия в sloth добавляет ещё и сопротивление цели к sloth.
-                        perTarget *= 1.0 + (TimeMoratoriumPerStack * input.TimeMoratoriumStacks);
-                        perTarget *= resistances[Element.Sloth];
-                    }
+                    // Урон уже посчитан по обычным правилам; сверху идёт прибавка за стаки,
+                    // а конверсия в sloth добавляет ещё и сопротивление цели к sloth.
+                    double buff = target.TimeMoratorium
+                        ? (1.0 + (TimeMoratoriumPerStack * target.TimeMoratoriumStacks))
+                            * resistances[Element.Sloth]
+                        : 1.0;
 
-                    coinDamage += perTarget;
+                    double perTargetFinal = target.TimeMoratorium
+                        ? FloorWithTolerance(perTarget * buff)
+                        : perTarget;
+
+                    coinDamage += perTargetFinal;
+                    targetDamageFinal.Add(perTargetFinal);
+                    targetBuff.Add(buff);
 
                     while (totalByTarget.Count <= t)
                     {
@@ -281,7 +354,9 @@ public static class DamageCalculator
                     ResistanceModifier(input.Resistances[skill.Type])
                         + ResistanceModifier(input.Resistances[skill.Sin]));
 
-                breakdown.Add(new CoinBreakdown(s, c, roll, modStat, damage, baseDamage, targetDamage));
+                breakdown.Add(new CoinBreakdown(
+                    s, c, roll, modStat, damage, baseDamage,
+                    targetDamage, targetDamageFinal, targetBuff));
                 sum += damage;
                 sumBase += baseDamage;
 

@@ -22,7 +22,8 @@ public static class ThemeManager
     /// <summary>DWMWA_USE_IMMERSIVE_DARK_MODE: тёмный заголовок окна в Windows 10/11.</summary>
     private const int UseImmersiveDarkModeAttribute = 20;
 
-    public static AppTheme Current { get; private set; } = AppTheme.Light;
+    /// <summary>Должна совпадать с темой, подключённой в App.xaml.</summary>
+    public static AppTheme Current { get; private set; } = ThemeSettings.Default;
 
     public static void Apply(AppTheme theme)
     {

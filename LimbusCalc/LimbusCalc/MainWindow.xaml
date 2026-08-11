@@ -343,6 +343,7 @@
 
                                             <Border Height="34">
                                                 <TextBox Margin="0,2" TextAlignment="Center"
+                                                         AutomationProperties.AutomationId="WeightField"
                                                          behaviors:NumericBox.IsInteger="True"
                                                          behaviors:NumericBox.Value="{Binding Weight}"/>
                                             </Border>
@@ -374,9 +375,7 @@
                                                 <TextBlock Style="{StaticResource ResultValueText}"
                                                            Text="{Binding ModStat, Converter={StaticResource Num}, ConverterParameter=F3, Mode=OneWay}"/>
                                             </Border>
-                                            <!-- Фон нужен, чтобы подсказка ловилась по всей клетке, а не по цифрам. -->
-                                            <Border Height="26" Background="Transparent"
-                                                    ToolTip="{Binding DamageTooltip}">
+                                            <Border Height="26">
                                                 <!-- 0.## отбрасывает нулевую дробную часть: 1.00 выводится как 1. -->
                                                 <TextBlock Style="{StaticResource ResultValueText}" FontWeight="SemiBold"
                                                            Text="{Binding Damage, Converter={StaticResource Num}, ConverterParameter=0.##, Mode=OneWay}"/>
@@ -394,32 +393,43 @@
 
         <!-- Итог: под колонками монет, а не во всю ширину окна. -->
         <Border Grid.Row="2" Grid.Column="1" Style="{StaticResource Card}" Margin="14,14,0,0">
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
-                        Background="Transparent" ToolTip="{Binding TotalTooltip}">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                 <TextBlock Text="Total damage" FontSize="15" Foreground="{DynamicResource SubtleTextBrush}"
                            VerticalAlignment="Center"/>
                 <!-- Урон до моратория — красным, он же и есть итог, когда мораторий выключен. -->
                 <TextBlock FontSize="24" FontWeight="Bold" Margin="14,0,0,0" VerticalAlignment="Center"
                            Foreground="{DynamicResource AccentBrush}"
-                           Text="{Binding TotalBase, Converter={StaticResource Num}, ConverterParameter=0.##, Mode=OneWay}"/>
+                           Text="{Binding TotalLeading, Converter={StaticResource Num}, ConverterParameter=0.##, Mode=OneWay}"/>
 
                 <!-- Остальная часть равенства появляется только при включённом мораторие. -->
                 <TextBlock FontSize="24" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center"
                            Text="&#215;"
                            Foreground="{DynamicResource TextBrush}"
-                           Visibility="{Binding TimeMoratorium, Converter={StaticResource BoolToVisibility}}"/>
+                           Visibility="{Binding ShowMoratoriumEquation, Converter={StaticResource BoolToVisibility}}"/>
                 <TextBlock FontSize="24" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center"
                            Foreground="{DynamicResource MoratoriumTextBrush}"
-                           Visibility="{Binding TimeMoratorium, Converter={StaticResource BoolToVisibility}}"
+                           Visibility="{Binding ShowMoratoriumEquation, Converter={StaticResource BoolToVisibility}}"
                            Text="{Binding MoratoriumBuff, Converter={StaticResource Num}, ConverterParameter=0.##, Mode=OneWay}"/>
                 <TextBlock FontSize="24" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center"
                            Text="="
                            Foreground="{DynamicResource TextBrush}"
-                           Visibility="{Binding TimeMoratorium, Converter={StaticResource BoolToVisibility}}"/>
+                           Visibility="{Binding ShowMoratoriumEquation, Converter={StaticResource BoolToVisibility}}"/>
                 <TextBlock FontSize="24" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center"
                            Foreground="{DynamicResource MoratoriumTextBrush}"
-                           Visibility="{Binding TimeMoratorium, Converter={StaticResource BoolToVisibility}}"
+                           Visibility="{Binding ShowMoratoriumEquation, Converter={StaticResource BoolToVisibility}}"
                            Text="{Binding Total, Converter={StaticResource Num}, ConverterParameter=0.##, Mode=OneWay}"/>
+
+                <!-- Распределение урона по целям; при одной цели распределять нечего. -->
+                <Button Width="30" Height="30" Padding="0" Margin="18,0,0,0"
+                        VerticalAlignment="Center"
+                        Style="{StaticResource IconTileButton}"
+                        AutomationProperties.AutomationId="DamageByTargetButton"
+                        IsEnabled="{Binding HasMultipleTargets}"
+                        ToolTip="Damage by target"
+                        Click="DamageByTarget_Click">
+                    <Image Source="Assets/Icons/targetAim.png" Width="20" Height="20"
+                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                </Button>
             </StackPanel>
         </Border>
     </Grid>

@@ -15,11 +15,18 @@ namespace LimbusCalc
 
         private SubtargetsWindow? _subtargetsWindow;
 
+        private DamageByTargetWindow? _damageByTargetWindow;
+
         public MainWindow()
         {
             InitializeComponent();
 
             DataContext = _viewModel;
+
+            // Восстанавливаем выбор пользователя до показа окна, чтобы тема не мигала.
+            AppTheme saved = ThemeSettings.Load();
+            ThemeManager.Apply(saved);
+            ThemeSwitch.IsChecked = saved == AppTheme.Dark;
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -32,7 +39,10 @@ namespace LimbusCalc
 
         private void ThemeSwitch_Changed(object sender, RoutedEventArgs e)
         {
-            ThemeManager.Apply(ThemeSwitch.IsChecked == true ? AppTheme.Dark : AppTheme.Light);
+            AppTheme theme = ThemeSwitch.IsChecked == true ? AppTheme.Dark : AppTheme.Light;
+
+            ThemeManager.Apply(theme);
+            ThemeSettings.Save(theme);
         }
 
         private void AddCoin_Click(object sender, RoutedEventArgs e) => _viewModel.AddCoin();
@@ -77,6 +87,18 @@ namespace LimbusCalc
             _subtargetsWindow = new SubtargetsWindow(coin) { Owner = this };
             _subtargetsWindow.Closed += (_, _) => _subtargetsWindow = null;
             _subtargetsWindow.Show();
+        }
+
+        /// <summary>
+        /// Окно распределения держим одно: оно обновляется живьём вместе с расчётом.
+        /// </summary>
+        private void DamageByTarget_Click(object sender, RoutedEventArgs e)
+        {
+            _damageByTargetWindow?.Close();
+
+            _damageByTargetWindow = new DamageByTargetWindow(_viewModel) { Owner = this };
+            _damageByTargetWindow.Closed += (_, _) => _damageByTargetWindow = null;
+            _damageByTargetWindow.Show();
         }
 
         private void AddFlatBonus_Click(object sender, RoutedEventArgs e) =>
