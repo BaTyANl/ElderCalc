@@ -17,9 +17,295 @@
         FontFamily="{StaticResource AppFontFamily}"
         Background="{DynamicResource AppBackgroundBrush}">
 
+    <Window.Resources>
+        <!-- Пункт меню с типом урона или грехом: иконка и подпись. -->
+        <DataTemplate x:Key="ElementMenuItemTemplate">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="{Binding IconPath}" Width="18" Height="18" Margin="0,0,8,0"
+                       RenderOptions.BitmapScalingMode="HighQuality"/>
+                <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+            </StackPanel>
+        </DataTemplate>
+
+        <!-- Клетки трёх видов: свободный текст, целое число и выбор из списка. -->
+        <DataTemplate x:Key="TextCellTemplate">
+            <TextBox Style="{StaticResource TableCellTextBox}"
+                     Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"/>
+        </DataTemplate>
+
+        <DataTemplate x:Key="IntegerCellTemplate">
+            <Grid>
+                <!-- Обводка показывает, откуда взялся урон: акцентом — выгруженный
+                     из калькулятора, приглушённым — вписанный руками, пусто — без рамки. -->
+                <Border Margin="2" CornerRadius="4" BorderThickness="1.5">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="BorderBrush" Value="Transparent"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Source}" Value="Manual">
+                                    <Setter Property="BorderBrush" Value="{DynamicResource SubtleTextBrush}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Source}" Value="Calculator">
+                                    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                </Border>
+
+                <!-- Урон слева, иконки справа: правый отступ поля оставляет им место. -->
+                <TextBox Style="{StaticResource TableCellTextBox}" TextAlignment="Left"
+                         Padding="8,4,40,4"
+                         behaviors:IntegerText.Enabled="True"
+                         IsReadOnly="{Binding HasSetup}"
+                         Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}">
+                    <TextBox.ContextMenu>
+                        <!-- Правой кнопкой по клетке урона задаются тип и грех скилла:
+                             по ним потом сортируется столбец. -->
+                        <!-- Меню зависит от того, откуда в клетке урон: у выгруженной
+                             из калькулятора — только работа с набором, у остальных —
+                             назначение типа и греха. -->
+                        <ContextMenu>
+                            <MenuItem Header="Export to ElderCalc"
+                                      Visibility="{Binding HasSetup, Converter={StaticResource BoolToVisibility}}"
+                                      Click="CellToCalculator_Click"/>
+                            <MenuItem Header="Manual edit"
+                                      Visibility="{Binding HasSetup, Converter={StaticResource BoolToVisibility}}"
+                                      ToolTip="Drop the stored setup and edit the number by hand"
+                                      Click="CellManualEdit_Click"/>
+
+                            <MenuItem Header="Skill type"
+                                      Visibility="{Binding CanEditMarks, Converter={StaticResource BoolToVisibility}}"
+                                      ItemsSource="{x:Static vm:ElementOptions.DamageTypes}"
+                                      ItemTemplate="{StaticResource ElementMenuItemTemplate}">
+                                <MenuItem.ItemContainerStyle>
+                                    <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+                                        <EventSetter Event="Click" Handler="SkillType_Click"/>
+                                    </Style>
+                                </MenuItem.ItemContainerStyle>
+                            </MenuItem>
+                            <MenuItem Header="Skill sin"
+                                      Visibility="{Binding CanEditMarks, Converter={StaticResource BoolToVisibility}}"
+                                      ItemsSource="{x:Static vm:ElementOptions.Sins}"
+                                      ItemTemplate="{StaticResource ElementMenuItemTemplate}">
+                                <MenuItem.ItemContainerStyle>
+                                    <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+                                        <EventSetter Event="Click" Handler="SkillSin_Click"/>
+                                    </Style>
+                                </MenuItem.ItemContainerStyle>
+                            </MenuItem>
+                            <Separator Visibility="{Binding CanEditMarks, Converter={StaticResource BoolToVisibility}}"/>
+                            <MenuItem Header="Clear type and sin"
+                                      Visibility="{Binding CanEditMarks, Converter={StaticResource BoolToVisibility}}"
+                                      Click="ClearSkillMarks_Click"/>
+                        </ContextMenu>
+                    </TextBox.ContextMenu>
+                </TextBox>
+
+                <!-- Иконки не перехватывают мышь: клик и правое меню достаются полю. -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
+                            VerticalAlignment="Center" Margin="0,0,4,0"
+                            IsHitTestVisible="False">
+                    <Image Source="{Binding SkillType.IconPath}" Width="15" Height="15"
+                           ToolTip="{Binding SkillType.Name}"
+                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                    <Image Source="{Binding SkillSin.IconPath}" Width="15" Height="15"
+                           Margin="2,0,0,0"
+                           ToolTip="{Binding SkillSin.Name}"
+                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="OptionsCellTemplate">
+            <ComboBox Style="{StaticResource TableCellComboBox}"
+                      ItemsSource="{Binding Column.Options}"
+                      SelectedItem="{Binding Value}"/>
+        </DataTemplate>
+
+        <!-- Справочная таблица: столбцы задаёт модель, поэтому разметка одна
+             и для ID, и для E.G.O. Обработчики кнопок живут в этом окне,
+             из-за чего шаблон и лежит здесь, а не в общем словаре стилей. -->
+        <DataTemplate x:Key="ReferenceTableTemplate">
+            <Border Style="{StaticResource Card}">
+                <DockPanel>
+                    <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                        <!-- Работа с файлом — у правого края, отдельно от правки строк. -->
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                            <Button Content="Import" Style="{StaticResource SmallButton}"
+                                    AutomationProperties.AutomationId="ImportButton"
+                                    ToolTip="Replace the table with an .xlsx or .json file"
+                                    Click="ImportTable_Click"/>
+                            <Button Content="Export" Margin="8,0,0,0"
+                                    Style="{StaticResource SmallButton}"
+                                    AutomationProperties.AutomationId="ExportButton"
+                                    ToolTip="Save the table as .xlsx or .json"
+                                    Click="ExportTable_Click"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Title}" FontSize="15" FontWeight="SemiBold"
+                                       VerticalAlignment="Center" Margin="0,0,14,0"/>
+                            <Button Content="Add row" Style="{StaticResource SmallButton}"
+                                    AutomationProperties.AutomationId="AddRowButton"
+                                    Click="AddRow_Click"/>
+                            <Button Content="Remove last row" Margin="8,0,0,0"
+                                    Style="{StaticResource SmallButton}"
+                                    AutomationProperties.AutomationId="RemoveRowButton"
+                                    IsEnabled="{Binding HasRows}"
+                                    Click="RemoveRow_Click"/>
+                        </StackPanel>
+                    </DockPanel>
+
+                    <TextBlock DockPanel.Dock="Top" Margin="2,0,0,0"
+                               Text="No rows yet — press “Add row”."
+                               Foreground="{DynamicResource SubtleTextBrush}"
+                               Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVisibility}}"/>
+
+                    <!-- Шапка вынесена из прокрутки строк и потому видна всегда.
+                         Вбок она едет вместе с ними: смещение переносится в коде. -->
+                    <Border DockPanel.Dock="Top"
+                            BorderBrush="{DynamicResource OutlineBrush}"
+                            BorderThickness="1,1,0,0"
+                            SnapsToDevicePixels="True">
+                        <ScrollViewer x:Name="HeaderScroll" Tag="TableHeader"
+                                      HorizontalScrollBarVisibility="Hidden"
+                                      VerticalScrollBarVisibility="Disabled">
+                                <Border BorderBrush="{DynamicResource SubtleTextBrush}"
+                                        BorderThickness="0,0,0,2"
+                                        HorizontalAlignment="Left">
+                                    <ItemsControl ItemsSource="{Binding Columns}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <!-- Левая кнопка сортирует по столбцу, правая
+                                                     на столбце скилла открывает приоритеты. -->
+                                                <Border Padding="8,6" Background="Transparent"
+                                                        Cursor="Hand"
+                                                        BorderBrush="{DynamicResource OutlineBrush}"
+                                                        BorderThickness="0,0,1,0"
+                                                        SnapsToDevicePixels="True"
+                                                        MouseLeftButtonUp="ColumnHeader_LeftClick"
+                                                        MouseRightButtonUp="ColumnHeader_RightClick">
+                                                    <Border.Width>
+                                                        <MultiBinding Converter="{StaticResource ColumnWidth}">
+                                                            <Binding/>
+                                                            <Binding Path="ViewportWidth" ElementName="TableScroll"/>
+                                                        </MultiBinding>
+                                                    </Border.Width>
+                                                    <!-- Подпись числового столбца стоит над своими
+                                                         числами, то есть по центру клетки. -->
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <StackPanel.Style>
+                                                            <Style TargetType="StackPanel">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding Kind}" Value="Integer">
+                                                                        <Setter Property="HorizontalAlignment" Value="Center"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </StackPanel.Style>
+                                                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold"
+                                                                   FontSize="15"/>
+                                                        <TextBlock Text="{Binding Indicator}" FontWeight="SemiBold"
+                                                                   FontSize="15" Margin="5,0,0,0"
+                                                                   Foreground="{DynamicResource AccentBrush}"/>
+                                                    </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Border>
+                        </ScrollViewer>
+                    </Border>
+
+                    <!-- Строки: своя прокрутка, левую рамку сетки держит она же. -->
+                    <ScrollViewer x:Name="TableScroll"
+                                  HorizontalScrollBarVisibility="Auto"
+                                  VerticalScrollBarVisibility="Auto"
+                                  ScrollChanged="TableScroll_ScrollChanged">
+                        <Border VerticalAlignment="Top" HorizontalAlignment="Left"
+                                BorderBrush="{DynamicResource OutlineBrush}"
+                                BorderThickness="1,0,0,0"
+                                SnapsToDevicePixels="True">
+                                <ItemsControl ItemsSource="{Binding Rows}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <ItemsControl ItemsSource="{Binding Cells}">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Border BorderBrush="{DynamicResource OutlineBrush}"
+                                                                BorderThickness="0,0,1,1"
+                                                                SnapsToDevicePixels="True">
+                                                            <Border.Width>
+                                                                <MultiBinding Converter="{StaticResource ColumnWidth}">
+                                                                    <Binding Path="Column"/>
+                                                                    <Binding Path="ViewportWidth" ElementName="TableScroll"/>
+                                                                </MultiBinding>
+                                                            </Border.Width>
+                                                            <!-- Чем заполняется клетка, задаёт её столбец. -->
+                                                            <ContentControl Content="{Binding}">
+                                                                <ContentControl.Style>
+                                                                    <Style TargetType="ContentControl">
+                                                                        <Setter Property="ContentTemplate"
+                                                                                Value="{StaticResource TextCellTemplate}"/>
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding Column.Kind}" Value="Integer">
+                                                                                <Setter Property="ContentTemplate"
+                                                                                        Value="{StaticResource IntegerCellTemplate}"/>
+                                                                            </DataTrigger>
+                                                                            <DataTrigger Binding="{Binding Column.Kind}" Value="Options">
+                                                                                <Setter Property="ContentTemplate"
+                                                                                        Value="{StaticResource OptionsCellTemplate}"/>
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </ContentControl.Style>
+                                                            </ContentControl>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                        </Border>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+        </DataTemplate>
+    </Window.Resources>
+
     <Grid Margin="16">
+
+        <!-- Переключатель темы встал в один ряд с вкладками: отдельная шапка ради
+             названия не нужна, оно и так в заголовке окна. -->
+        <ToggleButton x:Name="ThemeSwitch" Style="{StaticResource ThemeToggle}"
+                      HorizontalAlignment="Right" VerticalAlignment="Top"
+                      Margin="0,3,2,0" Panel.ZIndex="1"
+                      Checked="ThemeSwitch_Changed" Unchecked="ThemeSwitch_Changed"/>
+
+        <TabControl x:Name="Tabs" SelectedIndex="2">
+
+        <!-- Справочники: столбцы у них разные, разметка одна и та же. -->
+        <TabItem Header="ID">
+            <ContentPresenter Content="{Binding IdTable}"
+                              ContentTemplate="{StaticResource ReferenceTableTemplate}"/>
+        </TabItem>
+
+        <TabItem Header="E.G.O.">
+            <ContentPresenter Content="{Binding EgoTable}"
+                              ContentTemplate="{StaticResource ReferenceTableTemplate}"/>
+        </TabItem>
+
+        <TabItem Header="ElderCalc">
+        <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -28,21 +314,8 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Шапка -->
-        <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="2,0,2,14">
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <Image Source="Assets/elderjar.ico" Width="28" Height="28" Margin="0,0,10,0"
-                       RenderOptions.BitmapScalingMode="HighQuality"/>
-                <TextBlock Text="ElderCalc" FontSize="20" FontWeight="SemiBold"
-                           VerticalAlignment="Center"/>
-            </StackPanel>
-            <ToggleButton x:Name="ThemeSwitch" Style="{StaticResource ThemeToggle}"
-                          HorizontalAlignment="Right" VerticalAlignment="Center"
-                          Checked="ThemeSwitch_Changed" Unchecked="ThemeSwitch_Changed"/>
-        </Grid>
-
         <!-- Общие параметры: занимают всю высоту, включая ряд с итогом справа. -->
-        <Border Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" Style="{StaticResource Card}">
+        <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Style="{StaticResource Card}">
             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                 <StackPanel>
                     <TextBlock Text="Parameters" Style="{StaticResource CardTitleText}"/>
@@ -127,7 +400,7 @@
         </Border>
 
         <!-- Монеты: подписи слева, каждая монета — своя колонка -->
-        <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource Card}" Margin="14,0,0,0">
+        <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource Card}" Margin="14,0,0,0">
             <!-- Общая вертикальная прокрутка: подписи и монеты должны ехать вместе.
                  Прозрачный фон обязателен: без него пустые места не ловят мышь,
                  и колесо работает только над самими полями. -->
@@ -392,7 +665,32 @@
         </Border>
 
         <!-- Итог: под колонками монет, а не во всю ширину окна. -->
-        <Border Grid.Row="2" Grid.Column="1" Style="{StaticResource Card}" Margin="14,14,0,0">
+        <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource Card}" Margin="14,14,0,0">
+          <DockPanel>
+            <!-- Работа с файлом набора — у правого края строки итога. -->
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"
+                        VerticalAlignment="Center">
+                <Button Content="Export as JSON" Style="{StaticResource SmallButton}"
+                        AutomationProperties.AutomationId="ExportSetupButton"
+                        ToolTip="Save the whole calculator setup to a file"
+                        Click="ExportSetup_Click"/>
+                <Button Content="Import JSON" Margin="8,0,0,0"
+                        Style="{StaticResource SmallButton}"
+                        AutomationProperties.AutomationId="ImportSetupButton"
+                        ToolTip="Load a calculator setup from a file"
+                        Click="ImportSetup_Click"/>
+                <Button Content="Export to ID" Margin="8,0,0,0"
+                        Style="{StaticResource SmallButton}"
+                        AutomationProperties.AutomationId="ExportToIdButton"
+                        ToolTip="Put this setup into a cell of the ID table"
+                        Click="ExportToId_Click"/>
+                <Button Content="Export to E.G.O." Margin="8,0,0,0"
+                        Style="{StaticResource SmallButton}"
+                        AutomationProperties.AutomationId="ExportToEgoButton"
+                        IsEnabled="False"
+                        ToolTip="Not wired up yet"/>
+            </StackPanel>
+
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                 <TextBlock Text="Total damage" FontSize="15" Foreground="{DynamicResource SubtleTextBrush}"
                            VerticalAlignment="Center"/>
@@ -431,6 +729,38 @@
                            RenderOptions.BitmapScalingMode="HighQuality"/>
                 </Button>
             </StackPanel>
+          </DockPanel>
         </Border>
+        </Grid>
+        </TabItem>
+
+        </TabControl>
+
+        <!-- Приоритет сортировки скиллов: открывается правой кнопкой по заголовку. -->
+        <Popup x:Name="SortPriorityPopup" StaysOpen="False" AllowsTransparency="True"
+               Placement="Bottom" VerticalOffset="4">
+            <Border Style="{StaticResource Card}" Width="250" Margin="6">
+                <StackPanel>
+                    <TextBlock Text="Sort priority" Style="{StaticResource CardTitleText}"/>
+                    <TextBlock Text="Top rule is compared first."
+                               Foreground="{DynamicResource SubtleTextBrush}"
+                               FontSize="12" Margin="0,0,0,8"/>
+                    <ItemsControl ItemsSource="{Binding SortPriority}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Margin="0,3">
+                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center"
+                                               Width="130"/>
+                                    <Button Content="▲" Style="{StaticResource SmallButton}"
+                                            Click="PriorityUp_Click"/>
+                                    <Button Content="▼" Style="{StaticResource SmallButton}"
+                                            Margin="6,0,0,0" Click="PriorityDown_Click"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+        </Popup>
     </Grid>
 </Window>

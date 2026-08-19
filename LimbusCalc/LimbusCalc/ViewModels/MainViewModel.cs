@@ -41,6 +41,12 @@ public sealed class MainViewModel : ObservableObject
 
     public ObservableCollection<CoinViewModel> Coins { get; } = [];
 
+    /// <summary>Справочник личностей — вкладка ID. В расчёте пока не участвует.</summary>
+    public TableViewModel IdTable { get; } = TableViewModel.CreateIdTable();
+
+    /// <summary>Справочник E.G.O. — одноимённая вкладка.</summary>
+    public TableViewModel EgoTable { get; } = TableViewModel.CreateEgoTable();
+
     /// <summary>Строки бонусов: вид и цель общие для всех монет, значения — свои у каждой.</summary>
     public ObservableCollection<BonusRowViewModel> BonusRows { get; } = [];
 
