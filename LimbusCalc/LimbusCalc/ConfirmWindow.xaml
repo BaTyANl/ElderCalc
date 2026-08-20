@@ -1,0 +1,34 @@
+<Window x:Class="LimbusCalc.ConfirmWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Confirm"
+        Icon="Assets/elderjar.ico"
+        SizeToContent="Height"
+        Width="400"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        FontSize="13"
+        FontFamily="{StaticResource AppFontFamily}"
+        Background="{DynamicResource AppBackgroundBrush}">
+
+    <Border Style="{StaticResource Card}" Margin="14">
+        <StackPanel>
+            <TextBlock x:Name="HeaderText" Style="{StaticResource CardTitleText}"/>
+            <TextBlock x:Name="MessageText" TextWrapping="Wrap"
+                       Foreground="{DynamicResource SubtleTextBrush}"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
+                <Button x:Name="ConfirmButton" Width="110"
+                        AutomationProperties.AutomationId="ConfirmButton"
+                        Click="Confirm_Click"/>
+                <Button Content="Cancel" Width="90" Margin="10,0,0,0"
+                        Style="{StaticResource SecondaryButton}"
+                        AutomationProperties.AutomationId="CancelButton"
+                        IsCancel="True"/>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>

@@ -23,7 +23,7 @@ public static class ThemeManager
     private const int UseImmersiveDarkModeAttribute = 20;
 
     /// <summary>Должна совпадать с темой, подключённой в App.xaml.</summary>
-    public static AppTheme Current { get; private set; } = ThemeSettings.Default;
+    public static AppTheme Current { get; private set; } = AppSettings.DefaultTheme;
 
     public static void Apply(AppTheme theme)
     {

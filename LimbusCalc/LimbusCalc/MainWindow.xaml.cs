@@ -21,6 +21,9 @@ namespace LimbusCalc
     {
         private readonly MainViewModel _viewModel = new();
 
+        /// <summary>Настройки приложения: тема и обводка клеток.</summary>
+        private readonly SettingsViewModel _settings;
+
         /// <summary>Справочные таблицы и файлы, в которых они хранятся.</summary>
         private readonly Dictionary<TableViewModel, string> _tableFiles;
 
@@ -46,10 +49,11 @@ namespace LimbusCalc
 
             DataContext = _viewModel;
 
-            // Восстанавливаем выбор пользователя до показа окна, чтобы тема не мигала.
-            AppTheme saved = ThemeSettings.Load();
-            ThemeManager.Apply(saved);
-            ThemeSwitch.IsChecked = saved == AppTheme.Dark;
+            // Восстанавливаем выбор пользователя до показа окна, чтобы тема не мигала,
+            // и сразу ставим кисти обводки — иначе клетки нарисуются без них.
+            ThemeManager.Apply(AppSettings.LoadTheme());
+            _settings = new SettingsViewModel();
+            _settings.ApplyOutlines();
 
             _tableFiles = new Dictionary<TableViewModel, string>
             {
@@ -122,6 +126,30 @@ namespace LimbusCalc
             }
         }
 
+        /// <summary>
+        /// Очистка таблицы целиком. Отменить это нечем, поэтому сначала спрашиваем
+        /// и называем, сколько строк уйдёт.
+        /// </summary>
+        private void ClearTable_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not FrameworkElement { DataContext: TableViewModel table }
+                || table.Rows.Count == 0)
+            {
+                return;
+            }
+
+            bool confirmed = ConfirmWindow.Ask(
+                this,
+                $"Clear {table.Title}",
+                $"All {table.Rows.Count} rows will be removed, together with the setups stored in their cells. This cannot be undone.",
+                "Clear table");
+
+            if (confirmed)
+            {
+                table.Clear();
+            }
+        }
+
         private void RemoveRow_Click(object sender, RoutedEventArgs e)
         {
             if (sender is FrameworkElement { DataContext: TableViewModel table })
@@ -142,13 +170,12 @@ namespace LimbusCalc
             }
 
             // Шаблон таблицы разложен дважды, у ID и E.G.O., поэтому ищем не по имени,
-            // а рядом с собой: обе прокрутки лежат в одной панели.
+            // а рядом с собой: шапка и строка средних лежат в одной панели со строками.
             foreach (ScrollViewer viewer in Siblings<ScrollViewer>(body))
             {
-                if (viewer.Tag as string == "TableHeader")
+                if (viewer.Tag as string == "TableSyncScroll")
                 {
                     viewer.ScrollToHorizontalOffset(e.HorizontalOffset);
-                    return;
                 }
             }
         }
@@ -184,6 +211,31 @@ namespace LimbusCalc
                 {
                     yield return nested;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Открывает список фильтра. Какой именно — говорит сама кнопка: список лежит
+        /// у неё в Tag, поэтому окошко на все три одно.
+        /// </summary>
+        private void FilterList_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not FrameworkElement { Tag: FilterListViewModel list } element)
+            {
+                return;
+            }
+
+            FilterPopup.IsOpen = false;
+            FilterPopup.DataContext = list;
+            FilterPopup.PlacementTarget = element;
+            FilterPopup.IsOpen = true;
+        }
+
+        private void FilterReset_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is FrameworkElement { DataContext: TableFilterViewModel filter })
+            {
+                filter.Reset();
             }
         }
 
@@ -475,12 +527,15 @@ namespace LimbusCalc
             return null;
         }
 
-        private void ThemeSwitch_Changed(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Окно настроек. Модель одна на всё приложение: она же держит кисти обводки,
+        /// и её правки видны сразу, без повторного открытия окна.
+        /// </summary>
+        private void Settings_Click(object sender, RoutedEventArgs e)
         {
-            AppTheme theme = ThemeSwitch.IsChecked == true ? AppTheme.Dark : AppTheme.Light;
+            SettingsWindow window = new(_settings) { Owner = this };
 
-            ThemeManager.Apply(theme);
-            ThemeSettings.Save(theme);
+            window.ShowDialog();
         }
 
         private void AddCoin_Click(object sender, RoutedEventArgs e) => _viewModel.AddCoin();

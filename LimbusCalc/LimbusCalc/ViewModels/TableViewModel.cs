@@ -113,6 +113,7 @@ public sealed class TableCell : ObservableObject
     private string? _setup;
     private ElementOption? _skillType;
     private ElementOption? _skillSin;
+    private bool _isVisible = true;
 
     /// <summary>Столбец, которому клетка принадлежит: из него берётся ширина и вид.</summary>
     public required TableColumn Column { get; init; }
@@ -181,6 +182,16 @@ public sealed class TableCell : ObservableObject
 
     public bool IsEmpty => string.IsNullOrWhiteSpace(Value);
 
+    /// <summary>
+    /// Проходит ли значение через фильтр. Не прошедшая клетка остаётся пустой:
+    /// её урон не показывают и в среднее не берут.
+    /// </summary>
+    public bool IsVisible
+    {
+        get => _isVisible;
+        internal set => SetProperty(ref _isVisible, value);
+    }
+
     /// <summary>Число клетки или пусто, если там не число.</summary>
     public double? Number =>
         double.TryParse(Value, NumberStyles.Float, CultureInfo.InvariantCulture, out double parsed)
@@ -189,9 +200,18 @@ public sealed class TableCell : ObservableObject
 }
 
 /// <summary>Строка таблицы: по клетке на столбец, в том же порядке.</summary>
-public sealed class TableRowViewModel
+public sealed class TableRowViewModel : ObservableObject
 {
+    private bool _isVisible = true;
+
     public required IReadOnlyList<TableCell> Cells { get; init; }
+
+    /// <summary>Проходит ли строка через фильтр.</summary>
+    public bool IsVisible
+    {
+        get => _isVisible;
+        internal set => SetProperty(ref _isVisible, value);
+    }
 
     /// <summary>Клетка нужного столбца или пусто, если такого столбца нет.</summary>
     public TableCell? CellOf(TableColumn column)
@@ -226,6 +246,23 @@ public sealed class TableRowViewModel
 }
 
 /// <summary>
+/// Клетка итоговой строки под таблицей. Стоит в том же столбце, что и данные,
+/// поэтому ширину берёт оттуда же.
+/// </summary>
+public sealed class TableAverage : ObservableObject
+{
+    private string _text = string.Empty;
+
+    public required TableColumn Column { get; init; }
+
+    public string Text
+    {
+        get => _text;
+        internal set => SetProperty(ref _text, value);
+    }
+}
+
+/// <summary>
 /// Справочная таблица с заданным набором столбцов. Общая и для ID, и для E.G.O.:
 /// отличаются они только столбцами, поведение одно.
 /// </summary>
@@ -233,11 +270,23 @@ public sealed class TableViewModel : ObservableObject
 {
     private TableColumn? _sortColumn;
     private bool _sortDescending;
+    private IReadOnlyList<TableAverage>? _averages;
+    private int _bulkDepth;
+    private bool _bulkChanged;
 
     /// <summary>Подпись над таблицей.</summary>
     public required string Title { get; init; }
 
     public required IReadOnlyList<TableColumn> Columns { get; init; }
+
+    /// <summary>Отбор строк и значений; создаётся вместе с таблицей.</summary>
+    public required TableFilterViewModel Filter { get; init; }
+
+    /// <summary>Есть ли столбец грешника — от него зависит, показывать ли их список.</summary>
+    public bool HasSinners => Columns.Any(column => column.Title == "Sinner");
+
+    /// <summary>Есть ли столбец редкости — от него зависит, показывать ли её фильтр.</summary>
+    public bool HasRarity => Columns.Any(column => column.Title == "Rarity");
 
     public ObservableCollection<TableRowViewModel> Rows { get; } = [];
 
@@ -251,6 +300,24 @@ public sealed class TableViewModel : ObservableObject
         new SkillSortOption { Key = SkillSortKey.Type, Name = "Skill type" },
         new SkillSortOption { Key = SkillSortKey.Sin, Name = "Skill sin" },
     ];
+
+    /// <summary>
+    /// Строка под таблицей: средний урон по каждому столбцу скилла. Заводится по
+    /// столбцам один раз, дальше только пересчитывается — чтобы привязка не рвалась.
+    /// </summary>
+    public IReadOnlyList<TableAverage> Averages
+    {
+        get
+        {
+            if (_averages is null)
+            {
+                _averages = [.. Columns.Select(column => new TableAverage { Column = column })];
+                UpdateAverages();
+            }
+
+            return _averages;
+        }
+    }
 
     /// <summary>Есть ли что удалять — по этому свойству гаснет кнопка удаления.</summary>
     public bool HasRows => Rows.Count > 0;
@@ -398,14 +465,157 @@ public sealed class TableViewModel : ObservableObject
         }
     }
 
-    private void OnCellChanged(object? sender, PropertyChangedEventArgs e) =>
+    /// <summary>
+    /// Открывает пакетную правку: фильтр и средние пересчитываются один раз в конце,
+    /// а не после каждой клетки. На загрузке справочника это разница в десятки раз —
+    /// иначе каждая из тысяч правок заново обходит всю таблицу.
+    /// </summary>
+    public IDisposable BeginBulkChange()
+    {
+        _bulkDepth++;
+
+        return new BulkScope(this);
+    }
+
+    private void EndBulkChange()
+    {
+        if (--_bulkDepth > 0 || !_bulkChanged)
+        {
+            return;
+        }
+
+        _bulkChanged = false;
+        OnPropertyChanged(nameof(HasRows));
+        OnPropertyChanged(nameof(IsEmpty));
+        ApplyFilter();
         Changed?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void OnCellChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (_bulkDepth > 0)
+        {
+            _bulkChanged = true;
+            return;
+        }
+
+        // Правка метки или значения может вывести строку из-под фильтра.
+        ApplyFilter();
+        Changed?.Invoke(this, EventArgs.Empty);
+    }
 
     private void OnRowsChanged()
     {
+        if (_bulkDepth > 0)
+        {
+            _bulkChanged = true;
+            return;
+        }
+
         OnPropertyChanged(nameof(HasRows));
         OnPropertyChanged(nameof(IsEmpty));
+        ApplyFilter();
         Changed?.Invoke(this, EventArgs.Empty);
+    }
+
+    private sealed class BulkScope(TableViewModel table) : IDisposable
+    {
+        private bool _closed;
+
+        public void Dispose()
+        {
+            if (!_closed)
+            {
+                _closed = true;
+                table.EndBulkChange();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Прогоняет строки через фильтр: грешник отбирает строки целиком, тип и грех —
+    /// отдельные значения. Строка, у которой не осталось ни одного подходящего
+    /// значения, скрывается вся.
+    /// </summary>
+    public void ApplyFilter()
+    {
+        foreach (TableRowViewModel row in Rows)
+        {
+            // Грешник и редкость отбирают строку целиком, тип и грех — её значения.
+            bool rowOk = Filter.AllowsSinner(row.CellOf("Sinner")?.Value)
+                && Filter.AllowsRarity(row.CellOf("Rarity")?.Value);
+
+            bool anyValue = false;
+
+            foreach (TableCell cell in row.Cells)
+            {
+                if (cell.Column.Kind != TableCellKind.Integer)
+                {
+                    cell.IsVisible = true;
+                    continue;
+                }
+
+                cell.IsVisible = rowOk && Filter.AllowsMarks(cell.SkillType, cell.SkillSin);
+                anyValue |= cell.IsVisible && !cell.IsEmpty;
+            }
+
+            row.IsVisible = rowOk && (!Filter.FiltersMarks || anyValue);
+        }
+
+        UpdateAverages();
+    }
+
+    /// <summary>
+    /// Считает средний урон по столбцам скиллов. Пустые клетки в счёт не идут:
+    /// незаполненный скилл — это не нулевой урон, и занижать им среднее незачем.
+    /// </summary>
+    private void UpdateAverages()
+    {
+        if (_averages is null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < _averages.Count; i++)
+        {
+            TableAverage average = _averages[i];
+
+            if (i == 0)
+            {
+                average.Text = "Average";
+                continue;
+            }
+
+            if (average.Column.Kind != TableCellKind.Integer)
+            {
+                average.Text = string.Empty;
+                continue;
+            }
+
+            double sum = 0.0;
+            int count = 0;
+
+            foreach (TableRowViewModel row in Rows)
+            {
+                // Среднее считается по тому, что видно: скрытое фильтром в счёт не идёт.
+                if (!row.IsVisible)
+                {
+                    continue;
+                }
+
+                TableCell? cell = row.CellOf(average.Column);
+
+                if (cell is { IsVisible: true, Number: double value })
+                {
+                    sum += value;
+                    count++;
+                }
+            }
+
+            average.Text = count == 0
+                ? string.Empty
+                : (sum / count).ToString("0.##", CultureInfo.InvariantCulture);
+        }
     }
 
     /// <summary>Сравнение строк по одному столбцу с учётом приоритетов для скиллов.</summary>
@@ -534,7 +744,19 @@ public sealed class TableViewModel : ObservableObject
     {
         TableColumn.MeasureStretch(columns);
 
-        return new TableViewModel { Title = title, Columns = columns };
+        // Варианты редкости берём у самого столбца: фильтр не должен знать их отдельно.
+        IReadOnlyList<string> rarities =
+            columns.FirstOrDefault(column => column.Title == "Rarity")?.Options ?? [];
+
+        TableViewModel table = new()
+        {
+            Title = title,
+            Columns = columns,
+            Filter = new TableFilterViewModel(Sinners, rarities),
+        };
+
+        table.Filter.Changed += (_, _) => table.ApplyFilter();
+        return table;
     }
 
     /// <summary>Целочисленные столбцы одной ширины — их в таблицах большинство.</summary>

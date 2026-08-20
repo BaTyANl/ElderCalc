@@ -128,6 +128,10 @@ public static class ExcelFile
         }
 
         string[] headers = rows[0];
+
+        // Пакетом: пересчитывать фильтр и средние после каждой клетки незачем.
+        using IDisposable bulk = table.BeginBulkChange();
+
         table.Clear();
 
         foreach (string[] values in rows.Skip(1))

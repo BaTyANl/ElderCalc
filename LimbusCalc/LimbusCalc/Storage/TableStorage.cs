@@ -133,6 +133,9 @@ public static class TableStorage
 
     private static void LoadRows(TableViewModel table, JsonArray rows)
     {
+        // Загрузка идёт пакетом: фильтр и средние считаются один раз в конце.
+        using IDisposable bulk = table.BeginBulkChange();
+
         table.Clear();
 
         foreach (JsonNode? node in rows)

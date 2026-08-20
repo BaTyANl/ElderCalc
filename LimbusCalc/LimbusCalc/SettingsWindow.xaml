@@ -1,0 +1,108 @@
+<Window x:Class="LimbusCalc.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:LimbusCalc.ViewModels"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=vm:SettingsViewModel}"
+        Title="Settings"
+        Icon="Assets/elderjar.ico"
+        SizeToContent="Height"
+        Width="470"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        FontSize="13"
+        FontFamily="{StaticResource AppFontFamily}"
+        Background="{DynamicResource AppBackgroundBrush}">
+
+    <Window.Resources>
+        <!-- Настройка одной обводки: галочка, палитра, цвет строкой и густота. -->
+        <DataTemplate x:Key="OutlineSettingsTemplate">
+            <StackPanel Margin="0,0,0,14">
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox VerticalAlignment="Center"
+                              IsChecked="{Binding Enabled, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Text="{Binding Title}" Margin="8,0,0,0"
+                               FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    <Border Width="26" Height="18" Margin="10,0,0,0" CornerRadius="4"
+                            BorderThickness="1"
+                            BorderBrush="{DynamicResource OutlineBrush}"
+                            VerticalAlignment="Center">
+                        <Border.Background>
+                            <SolidColorBrush Color="{Binding Color}"
+                                             Opacity="{Binding OpacityPercent, Converter={StaticResource Percent}}"/>
+                        </Border.Background>
+                    </Border>
+                </StackPanel>
+
+                <ItemsControl ItemsSource="{Binding Source={x:Static vm:SettingsViewModel.Palette}}"
+                              Margin="0,10,0,0" IsEnabled="{Binding Enabled}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Width="26" Height="26" Margin="0,0,6,0" Padding="0"
+                                    Style="{StaticResource SwatchButton}"
+                                    Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                    Click="Swatch_Click">
+                                <Border CornerRadius="4" Margin="3">
+                                    <Border.Background>
+                                        <SolidColorBrush Color="{Binding Converter={StaticResource HexColor}}"/>
+                                    </Border.Background>
+                                </Border>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0"
+                            IsEnabled="{Binding Enabled}">
+                    <TextBlock Text="Color" VerticalAlignment="Center" Width="52"
+                               Foreground="{DynamicResource SubtleTextBrush}"/>
+                    <TextBox Width="92" Text="{Binding Hex, UpdateSourceTrigger=LostFocus}"/>
+
+                    <TextBlock Text="Opacity" VerticalAlignment="Center" Width="60"
+                               Margin="16,0,0,0"
+                               Foreground="{DynamicResource SubtleTextBrush}"/>
+                    <Slider Width="130" VerticalAlignment="Center"
+                            Minimum="0" Maximum="100" TickFrequency="5" IsSnapToTickEnabled="True"
+                            Value="{Binding OpacityPercent}"/>
+                    <TextBlock Text="{Binding OpacityPercent, StringFormat={}{0:0}%}"
+                               VerticalAlignment="Center" Width="42" TextAlignment="Right"/>
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
+
+    <Border Style="{StaticResource Card}" Margin="14">
+        <StackPanel>
+            <TextBlock Text="Settings" Style="{StaticResource CardTitleText}"/>
+
+            <StackPanel Orientation="Horizontal">
+                <CheckBox VerticalAlignment="Center"
+                          AutomationProperties.AutomationId="ThemeCheckBox"
+                          IsChecked="{Binding IsDark, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Dark theme" Margin="8,0,0,0" VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <Border Style="{StaticResource RowDivider}" Margin="0,16"/>
+
+            <TextBlock Text="Cell outlines in the ID table" FontWeight="SemiBold"
+                       Margin="0,0,0,4"/>
+            <TextBlock Text="Marks where the damage came from. Empty cells stay without a frame."
+                       Foreground="{DynamicResource SubtleTextBrush}"
+                       TextWrapping="Wrap" Margin="0,0,0,14"/>
+
+            <ContentPresenter Content="{Binding Manual}"
+                              ContentTemplate="{StaticResource OutlineSettingsTemplate}"/>
+            <ContentPresenter Content="{Binding Calculator}"
+                              ContentTemplate="{StaticResource OutlineSettingsTemplate}"/>
+
+            <Button Content="Close" Width="90" HorizontalAlignment="Right" Margin="0,6,0,0"
+                    Style="{StaticResource SecondaryButton}"
+                    IsCancel="True"/>
+        </StackPanel>
+    </Border>
+</Window>
