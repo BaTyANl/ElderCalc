@@ -1,0 +1,8009 @@
+[
+  {
+    "Rarity": "000",
+    "Sinner": "Yi Sang",
+    "ID Name": "Blade Lineage Salsu",
+    "S1-1": {
+      "damage": 21,
+      "type": "Slash",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 6,
+        "passiveModDynPercent": 0,
+        "skillType": "Slash",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 10,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 39,
+      "type": "Slash",
+      "sin": "Wrath",
+      "setup": {
+        "baseRoll": 7,
+        "passiveModDynPercent": 0,
+        "skillType": "Slash",
+        "skillSin": "Wrath",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 88,
+      "type": "Slash",
+      "sin": "Envy",
+      "setup": {
+        "baseRoll": 8,
+        "passiveModDynPercent": 0,
+        "skillType": "Slash",
+        "skillSin": "Envy",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 50,
+            "offenseDefenseDiff": 5,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": null,
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": {
+      "damage": 44,
+      "type": "Slash",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 11,
+        "passiveModDynPercent": 0,
+        "skillType": "Slash",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 8,
+            "modDynPercent": 70,
+            "offenseDefenseDiff": 5,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "C-2": null
+  },
+  {
+    "Rarity": "000",
+    "Sinner": "Don Quixote",
+    "ID Name": "Cinq Assoc. East Section 3",
+    "S1-1": {
+      "damage": 42,
+      "type": "Pierce",
+      "sin": "Gluttony",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 30,
+        "skillType": "Pierce",
+        "skillSin": "Gluttony",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 84,
+      "type": "Pierce",
+      "sin": "Wrath",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 30,
+        "skillType": "Pierce",
+        "skillSin": "Wrath",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 174,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 75,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 50,
+            "offenseDefenseDiff": 3,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": null,
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": null,
+    "C-2": null
+  },
+  {
+    "Rarity": "000",
+    "Sinner": "Hong Lu",
+    "ID Name": "Cinq Assoc. East Section 3",
+    "S1-1": {
+      "damage": 66,
+      "type": "Pierce",
+      "sin": "Gloom",
+      "setup": {
+        "baseRoll": 7,
+        "passiveModDynPercent": 30,
+        "skillType": "Pierce",
+        "skillSin": "Gloom",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 8,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 8,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 116,
+      "type": "Pierce",
+      "sin": "Wrath",
+      "setup": {
+        "baseRoll": 8,
+        "passiveModDynPercent": 30,
+        "skillType": "Pierce",
+        "skillSin": "Wrath",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 202,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 6,
+        "passiveModDynPercent": 30,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [
+          {
+            "kind": "Percent",
+            "target": "Wrath",
+            "values": [
+              0,
+              0,
+              0,
+              40
+            ]
+          }
+        ],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 8,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": null,
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": null,
+    "C-2": null
+  },
+  {
+    "Rarity": "00",
+    "Sinner": "Yi Sang",
+    "ID Name": "Dieci Assoc. South Section 4",
+    "S1-1": {
+      "damage": 19,
+      "type": "Pierce",
+      "sin": "Gluttony",
+      "setup": {
+        "baseRoll": 3,
+        "passiveModDynPercent": 0,
+        "skillType": "Pierce",
+        "skillSin": "Gluttony",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": -1,
+            "hasCrit": true,
+            "critPercent": 0,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": -1,
+            "hasCrit": true,
+            "critPercent": 0,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 33,
+      "type": "Blunt",
+      "sin": "Lust",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 0,
+        "skillType": "Blunt",
+        "skillSin": "Lust",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": -1,
+            "hasCrit": true,
+            "critPercent": 0,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": -1,
+            "hasCrit": true,
+            "critPercent": 0,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": -1,
+            "hasCrit": true,
+            "critPercent": 0,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 49,
+      "type": "Blunt",
+      "sin": "Sloth",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 0,
+        "skillType": "Blunt",
+        "skillSin": "Sloth",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": true,
+            "critPercent": 0,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": true,
+            "critPercent": 0,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": true,
+            "critPercent": 0,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": true,
+            "critPercent": 0,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": null,
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": null,
+    "C-2": null
+  },
+  {
+    "Rarity": "000",
+    "Sinner": "Yi Sang",
+    "ID Name": "Effloresced E.G.O::Spicebush",
+    "S1-1": {
+      "damage": 22,
+      "type": "Pierce",
+      "sin": "Gluttony",
+      "setup": {
+        "baseRoll": 3,
+        "passiveModDynPercent": 0,
+        "skillType": "Pierce",
+        "skillSin": "Gluttony",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 177,
+      "type": "Blunt",
+      "sin": "Sloth",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 30,
+        "skillType": "Blunt",
+        "skillSin": "Sloth",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 0,
+                "offenseDefenseDiff": 3,
+                "hasCrit": false,
+                "critPercent": 20
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 0,
+                "offenseDefenseDiff": 3,
+                "hasCrit": false,
+                "critPercent": 20
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 0,
+                "offenseDefenseDiff": 3,
+                "hasCrit": false,
+                "critPercent": 20
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 0,
+                "offenseDefenseDiff": 3,
+                "hasCrit": false,
+                "critPercent": 20
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 0,
+                "offenseDefenseDiff": 3,
+                "hasCrit": false,
+                "critPercent": 20
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 0,
+                "offenseDefenseDiff": 3,
+                "hasCrit": false,
+                "critPercent": 20
+              }
+            ]
+          }
+        ],
+        "targets": [
+          {
+            "name": "Subtarget 2",
+            "resistances": {
+              "Slash": 1,
+              "Pierce": 1,
+              "Blunt": 1,
+              "Wrath": 1,
+              "Lust": 1,
+              "Sloth": 1,
+              "Gluttony": 1,
+              "Gloom": 1,
+              "Pride": 1,
+              "Envy": 1
+            },
+            "timeMoratorium": false,
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 3",
+            "resistances": {
+              "Slash": 1,
+              "Pierce": 1,
+              "Blunt": 1,
+              "Wrath": 1,
+              "Lust": 1,
+              "Sloth": 1,
+              "Gluttony": 1,
+              "Gloom": 1,
+              "Pride": 1,
+              "Envy": 1
+            },
+            "timeMoratorium": false,
+            "timeMoratoriumStacks": 1
+          }
+        ]
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 56,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 6,
+        "passiveModDynPercent": 0,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [
+          {
+            "kind": "Percent",
+            "target": "True",
+            "values": [
+              0,
+              0,
+              40
+            ]
+          }
+        ],
+        "coins": [
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": null,
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": null,
+    "C-2": null
+  },
+  {
+    "Rarity": "000",
+    "Sinner": "Yi Sang",
+    "ID Name": "Heishou Pack - Wu Branch Adept",
+    "S1-1": {
+      "damage": 28,
+      "type": "Slash",
+      "sin": "Sloth",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 0,
+        "skillType": "Slash",
+        "skillSin": "Sloth",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 77,
+      "type": "Slash",
+      "sin": "Envy",
+      "setup": {
+        "baseRoll": 6,
+        "passiveModDynPercent": 100,
+        "skillType": "Slash",
+        "skillSin": "Envy",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 8,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 8,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 151,
+      "type": "Slash",
+      "sin": "Gluttony",
+      "setup": {
+        "baseRoll": 8,
+        "passiveModDynPercent": 130,
+        "skillType": "Slash",
+        "skillSin": "Gluttony",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": {
+      "damage": 402,
+      "type": "Slash",
+      "sin": "Gluttony",
+      "setup": {
+        "baseRoll": 6,
+        "passiveModDynPercent": 50,
+        "skillType": "Slash",
+        "skillSin": "Gluttony",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 7,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 0,
+                "offenseDefenseDiff": 7,
+                "hasCrit": false,
+                "critPercent": 20
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 0,
+                "offenseDefenseDiff": 7,
+                "hasCrit": false,
+                "critPercent": 20
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 7,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 0,
+                "offenseDefenseDiff": 7,
+                "hasCrit": false,
+                "critPercent": 20
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 0,
+                "offenseDefenseDiff": 7,
+                "hasCrit": false,
+                "critPercent": 20
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 7,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 0,
+                "offenseDefenseDiff": 7,
+                "hasCrit": false,
+                "critPercent": 20
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 0,
+                "offenseDefenseDiff": 7,
+                "hasCrit": false,
+                "critPercent": 20
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 7,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 0,
+                "offenseDefenseDiff": 7,
+                "hasCrit": false,
+                "critPercent": 20
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 0,
+                "offenseDefenseDiff": 7,
+                "hasCrit": false,
+                "critPercent": 20
+              }
+            ]
+          }
+        ],
+        "targets": [
+          {
+            "name": "Subtarget 2",
+            "resistances": {
+              "Slash": 1,
+              "Pierce": 1,
+              "Blunt": 1,
+              "Wrath": 1,
+              "Lust": 1,
+              "Sloth": 1,
+              "Gluttony": 1,
+              "Gloom": 1,
+              "Pride": 1,
+              "Envy": 1
+            },
+            "timeMoratorium": false,
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 3",
+            "resistances": {
+              "Slash": 1,
+              "Pierce": 1,
+              "Blunt": 1,
+              "Wrath": 1,
+              "Lust": 1,
+              "Sloth": 1,
+              "Gluttony": 1,
+              "Gloom": 1,
+              "Pride": 1,
+              "Envy": 1
+            },
+            "timeMoratorium": false,
+            "timeMoratoriumStacks": 1
+          }
+        ]
+      }
+    },
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": null,
+    "C-2": null
+  },
+  {
+    "Rarity": "0",
+    "Sinner": "Yi Sang",
+    "ID Name": "LCB Sinner",
+    "S1-1": {
+      "damage": 12,
+      "type": "Slash",
+      "sin": "Gloom",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 10,
+        "skillType": "Slash",
+        "skillSin": "Gloom",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 0,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 21,
+      "type": "Pierce",
+      "sin": "Envy",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 10,
+        "skillType": "Pierce",
+        "skillSin": "Envy",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 0,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 0,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 32,
+      "type": "Slash",
+      "sin": "Sloth",
+      "setup": {
+        "baseRoll": 6,
+        "passiveModDynPercent": 10,
+        "skillType": "Slash",
+        "skillSin": "Sloth",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 0,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 0,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 0,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": null,
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": null,
+    "C-2": null
+  },
+  {
+    "Rarity": "000",
+    "Sinner": "Yi Sang",
+    "ID Name": "LCE E.G.O::Dimension Shredder",
+    "S1-1": {
+      "damage": 66,
+      "type": "Slash",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 9,
+        "passiveModDynPercent": 40,
+        "skillType": "Slash",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 8,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 8,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 68,
+      "type": "Slash",
+      "sin": "Gluttony",
+      "setup": {
+        "baseRoll": 9,
+        "passiveModDynPercent": 40,
+        "skillType": "Slash",
+        "skillSin": "Gluttony",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [
+          {
+            "kind": "Percent",
+            "target": "Slash",
+            "values": [
+              0,
+              20
+            ]
+          }
+        ],
+        "coins": [
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 122,
+      "type": "Slash",
+      "sin": "Envy",
+      "setup": {
+        "baseRoll": 9,
+        "passiveModDynPercent": 40,
+        "skillType": "Slash",
+        "skillSin": "Envy",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [
+          {
+            "kind": "Flat",
+            "target": "Slash",
+            "values": [
+              0,
+              0,
+              20
+            ]
+          }
+        ],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": {
+      "damage": 298,
+      "type": "Slash",
+      "sin": "Envy",
+      "setup": {
+        "baseRoll": 9,
+        "passiveModDynPercent": 40,
+        "skillType": "Slash",
+        "skillSin": "Envy",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [
+          {
+            "kind": "Flat",
+            "target": "Slash",
+            "values": [
+              20,
+              20,
+              20,
+              20,
+              20
+            ]
+          }
+        ],
+        "coins": [
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 6,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 6,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 6,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 6,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 6,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": null,
+    "C-2": null
+  },
+  {
+    "Rarity": "00",
+    "Sinner": "Yi Sang",
+    "ID Name": "LCE E.G.O::Lantern",
+    "S1-1": {
+      "damage": 17,
+      "type": "Blunt",
+      "sin": "Sloth",
+      "setup": {
+        "baseRoll": 7,
+        "passiveModDynPercent": 0,
+        "skillType": "Blunt",
+        "skillSin": "Sloth",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 1,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 0,
+            "hasCrit": true,
+            "critPercent": 0,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 1,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 0,
+            "hasCrit": true,
+            "critPercent": 0,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 15,
+      "type": "Pierce",
+      "sin": "Envy",
+      "setup": {
+        "baseRoll": 14,
+        "passiveModDynPercent": 0,
+        "skillType": "Pierce",
+        "skillSin": "Envy",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 1,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 1,
+            "hasCrit": false,
+            "critPercent": 0,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 123,
+      "type": "Blunt",
+      "sin": "Gluttony",
+      "setup": {
+        "baseRoll": 20,
+        "passiveModDynPercent": 79.2,
+        "skillType": "Blunt",
+        "skillSin": "Gluttony",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": false,
+            "power": -5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 0,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": false,
+            "power": -5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 0,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": false,
+            "power": -5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 0,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": null,
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": {
+      "damage": 22,
+      "type": "Blunt",
+      "sin": "Gluttony",
+      "setup": {
+        "baseRoll": 14,
+        "passiveModDynPercent": 0,
+        "skillType": "Blunt",
+        "skillSin": "Gluttony",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 0,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "C-2": null
+  },
+  {
+    "Rarity": "000",
+    "Sinner": "Yi Sang",
+    "ID Name": "Liu Assoc. South Section 3",
+    "S1-1": {
+      "damage": 32,
+      "type": "Slash",
+      "sin": "Sloth",
+      "setup": {
+        "baseRoll": 3,
+        "passiveModDynPercent": 30,
+        "skillType": "Slash",
+        "skillSin": "Sloth",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 66,
+      "type": "Slash",
+      "sin": "Wrath",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 0,
+        "skillType": "Slash",
+        "skillSin": "Wrath",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 60,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 142,
+      "type": "Slash",
+      "sin": "Envy",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 30,
+        "skillType": "Slash",
+        "skillSin": "Envy",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [
+          {
+            "kind": "Flat",
+            "target": "Wrath",
+            "values": [
+              0,
+              0,
+              0,
+              30
+            ]
+          }
+        ],
+        "coins": [
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 60,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": null,
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": null,
+    "C-2": null
+  },
+  {
+    "Rarity": "000",
+    "Sinner": "Yi Sang",
+    "ID Name": "Lobotomy E.G.O::Solemn Lament",
+    "S1-1": {
+      "damage": 24,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 0,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 33,
+      "type": "Pierce",
+      "sin": "Gloom",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 0,
+        "skillType": "Pierce",
+        "skillSin": "Gloom",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 8,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 8,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 146,
+      "type": "Pierce",
+      "sin": "Sloth",
+      "setup": {
+        "baseRoll": 8,
+        "passiveModDynPercent": 0,
+        "skillType": "Pierce",
+        "skillSin": "Sloth",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [
+          {
+            "kind": "Flat",
+            "target": "Gloom",
+            "values": [
+              0,
+              0,
+              0,
+              30
+            ]
+          }
+        ],
+        "coins": [
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 80,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": null,
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": null,
+    "C-2": null
+  },
+  {
+    "Rarity": "00",
+    "Sinner": "Yi Sang",
+    "ID Name": "Molar Office Fixer",
+    "S1-1": {
+      "damage": 19,
+      "type": "Pierce",
+      "sin": "Lust",
+      "setup": {
+        "baseRoll": 3,
+        "passiveModDynPercent": 0,
+        "skillType": "Pierce",
+        "skillSin": "Lust",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": -2,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": -2,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 17,
+      "type": "Blunt",
+      "sin": "Sloth",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 0,
+        "skillType": "Blunt",
+        "skillSin": "Sloth",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 12,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 52,
+      "type": "Blunt",
+      "sin": "Wrath",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 0,
+        "skillType": "Blunt",
+        "skillSin": "Wrath",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 10,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 10,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": null,
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": null,
+    "C-2": null
+  },
+  {
+    "Rarity": "000",
+    "Sinner": "Yi Sang",
+    "ID Name": "N Corp. E.G.O::Fell Bullet",
+    "S1-1": {
+      "damage": 41,
+      "type": "Blunt",
+      "sin": "Wrath",
+      "setup": {
+        "baseRoll": 7,
+        "passiveModDynPercent": 18,
+        "skillType": "Blunt",
+        "skillSin": "Wrath",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 8,
+            "modDynPercent": 105,
+            "offenseDefenseDiff": 1,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 92,
+      "type": "Pierce",
+      "sin": "Lust",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 18,
+        "skillType": "Pierce",
+        "skillSin": "Lust",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 8,
+            "modDynPercent": 105,
+            "offenseDefenseDiff": 3,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 8,
+            "modDynPercent": 105,
+            "offenseDefenseDiff": 3,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 606,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 6,
+        "passiveModDynPercent": 18,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 9,
+            "modDynPercent": 109,
+            "offenseDefenseDiff": 5,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 0,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 9,
+            "modDynPercent": 500,
+            "offenseDefenseDiff": 5,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 500,
+                "offenseDefenseDiff": 5,
+                "hasCrit": true,
+                "critPercent": 20
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 500,
+                "offenseDefenseDiff": 5,
+                "hasCrit": true,
+                "critPercent": 20
+              }
+            ]
+          }
+        ],
+        "targets": [
+          {
+            "name": "Subtarget 2",
+            "resistances": {
+              "Slash": 1,
+              "Pierce": 1,
+              "Blunt": 1,
+              "Wrath": 1,
+              "Lust": 1,
+              "Sloth": 1,
+              "Gluttony": 1,
+              "Gloom": 1,
+              "Pride": 1,
+              "Envy": 1
+            },
+            "timeMoratorium": false,
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 3",
+            "resistances": {
+              "Slash": 1,
+              "Pierce": 1,
+              "Blunt": 1,
+              "Wrath": 1,
+              "Lust": 1,
+              "Sloth": 1,
+              "Gluttony": 1,
+              "Gloom": 1,
+              "Pride": 1,
+              "Envy": 1
+            },
+            "timeMoratorium": false,
+            "timeMoratoriumStacks": 1
+          }
+        ]
+      }
+    },
+    "S3-2": null,
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": {
+      "damage": 24,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 18,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 11,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "C-2": null
+  },
+  {
+    "Rarity": "00",
+    "Sinner": "Yi Sang",
+    "ID Name": "Seven Assoc. South Section 6",
+    "S1-1": {
+      "damage": 15,
+      "type": "Pierce",
+      "sin": "Gloom",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 30,
+        "skillType": "Pierce",
+        "skillSin": "Gloom",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 0,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 27,
+      "type": "Pierce",
+      "sin": "Gluttony",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 30,
+        "skillType": "Pierce",
+        "skillSin": "Gluttony",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 0,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 0,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 35,
+      "type": "Blunt",
+      "sin": "Sloth",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 10,
+        "skillType": "Blunt",
+        "skillSin": "Sloth",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 0,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 0,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 0,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": null,
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": null,
+    "C-2": null
+  },
+  {
+    "Rarity": "000",
+    "Sinner": "Yi Sang",
+    "ID Name": "The House of Spiders: The Index Nursefather",
+    "S1-1": {
+      "damage": 96,
+      "type": "Blunt",
+      "sin": "Gluttony",
+      "setup": {
+        "baseRoll": 3,
+        "passiveModDynPercent": 110,
+        "skillType": "Blunt",
+        "skillSin": "Gluttony",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 50,
+            "offenseDefenseDiff": 12,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 60,
+            "offenseDefenseDiff": 12,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 197,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 110,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 13,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 40,
+            "offenseDefenseDiff": 13,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 50,
+            "offenseDefenseDiff": 13,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 324,
+      "type": "Slash",
+      "sin": "Gloom",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 110,
+        "skillType": "Slash",
+        "skillSin": "Gloom",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 60,
+            "offenseDefenseDiff": 14,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 70,
+            "offenseDefenseDiff": 14,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 95,
+            "offenseDefenseDiff": 14,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 155,
+            "offenseDefenseDiff": 14,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": {
+      "damage": 780,
+      "type": "Slash",
+      "sin": "Wrath",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 110,
+        "skillType": "Slash",
+        "skillSin": "Wrath",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 25,
+            "offenseDefenseDiff": 13,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 35,
+            "offenseDefenseDiff": 13,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 60,
+            "offenseDefenseDiff": 13,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 60,
+            "offenseDefenseDiff": 13,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 60,
+            "offenseDefenseDiff": 13,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 60,
+            "offenseDefenseDiff": 13,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 60,
+            "offenseDefenseDiff": 13,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 60,
+            "offenseDefenseDiff": 13,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 150,
+            "offenseDefenseDiff": 13,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": null,
+    "C-2": null
+  },
+  {
+    "Rarity": "00",
+    "Sinner": "Yi Sang",
+    "ID Name": "The Pequod First Mate",
+    "S1-1": {
+      "damage": 22,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 3,
+        "passiveModDynPercent": 0,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 100,
+      "type": "Pierce",
+      "sin": "Envy",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 0,
+        "skillType": "Pierce",
+        "skillSin": "Envy",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 36,
+      "type": "Pierce",
+      "sin": "Gluttony",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 0,
+        "skillType": "Pierce",
+        "skillSin": "Gluttony",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": null,
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": null,
+    "C-2": null
+  },
+  {
+    "Rarity": "000",
+    "Sinner": "Yi Sang",
+    "ID Name": "The Ring Pointillist Student",
+    "S1-1": {
+      "damage": 30,
+      "type": "Pierce",
+      "sin": "Gloom",
+      "setup": {
+        "baseRoll": 2,
+        "passiveModDynPercent": 0,
+        "skillType": "Pierce",
+        "skillSin": "Gloom",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 11,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 11,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 11,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 108,
+      "type": "Pierce",
+      "sin": "Lust",
+      "setup": {
+        "baseRoll": 8,
+        "passiveModDynPercent": 0,
+        "skillType": "Pierce",
+        "skillSin": "Lust",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 10,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 11,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 10,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 11,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 10,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 11,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 116,
+      "type": "Pierce",
+      "sin": "Sloth",
+      "setup": {
+        "baseRoll": 3,
+        "passiveModDynPercent": 0,
+        "skillType": "Pierce",
+        "skillSin": "Sloth",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 11,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 11,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 11,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 125,
+            "offenseDefenseDiff": 11,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": null,
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": null,
+    "C-2": null
+  },
+  {
+    "Rarity": "000",
+    "Sinner": "Yi Sang",
+    "ID Name": "W Corp. L3 Cleanup Agent",
+    "S1-1": {
+      "damage": 14,
+      "type": "Slash",
+      "sin": "Sloth",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 0,
+        "skillType": "Slash",
+        "skillSin": "Sloth",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 8,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 30,
+      "type": "Pierce",
+      "sin": "Gluttony",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 0,
+        "skillType": "Pierce",
+        "skillSin": "Gluttony",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 57,
+      "type": "Pierce",
+      "sin": "Gloom",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 0,
+        "skillType": "Pierce",
+        "skillSin": "Gloom",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": null,
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": null,
+    "C-2": null
+  },
+  {
+    "Rarity": "0",
+    "Sinner": "Faust",
+    "ID Name": "LCB Sinner",
+    "S1-1": {
+      "damage": 11,
+      "type": "Blunt",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 10,
+        "skillType": "Blunt",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": -1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 22,
+      "type": "Blunt",
+      "sin": "Sloth",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 10,
+        "skillType": "Blunt",
+        "skillSin": "Sloth",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": -1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": -1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 20,
+      "type": "Pierce",
+      "sin": "Gluttony",
+      "setup": {
+        "baseRoll": 7,
+        "passiveModDynPercent": 10,
+        "skillType": "Pierce",
+        "skillSin": "Gluttony",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": -1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": -1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": null,
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": null,
+    "C-2": null
+  },
+  {
+    "Rarity": "00",
+    "Sinner": "Faust",
+    "ID Name": "W Corp. L2 Cleanup Agent",
+    "S1-1": {
+      "damage": 11,
+      "type": "Blunt",
+      "sin": "Envy",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 0,
+        "skillType": "Blunt",
+        "skillSin": "Envy",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 8,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": -1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 22,
+      "type": "Blunt",
+      "sin": "Gloom",
+      "setup": {
+        "baseRoll": 6,
+        "passiveModDynPercent": 0,
+        "skillType": "Blunt",
+        "skillSin": "Gloom",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": -1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": -1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 33,
+      "type": "Blunt",
+      "sin": "Wrath",
+      "setup": {
+        "baseRoll": 6,
+        "passiveModDynPercent": 0,
+        "skillType": "Blunt",
+        "skillSin": "Wrath",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": -1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": -1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": -1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": null,
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": null,
+    "C-2": null
+  },
+  {
+    "Rarity": "00",
+    "Sinner": "Faust",
+    "ID Name": "Lobotomy Corp. Remnant",
+    "S1-1": {
+      "damage": 14,
+      "type": "Slash",
+      "sin": "Lust",
+      "setup": {
+        "baseRoll": 3,
+        "passiveModDynPercent": 0,
+        "skillType": "Slash",
+        "skillSin": "Lust",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 8,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 42,
+      "type": "Pierce",
+      "sin": "Gloom",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 0,
+        "skillType": "Pierce",
+        "skillSin": "Gloom",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 52,
+      "type": "Slash",
+      "sin": "Envy",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 0,
+        "skillType": "Slash",
+        "skillSin": "Envy",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 11,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 11,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": null,
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": null,
+    "C-2": null
+  },
+  {
+    "Rarity": "00",
+    "Sinner": "Faust",
+    "ID Name": "Zwei Assoc. South Section 4",
+    "S1-1": {
+      "damage": 16,
+      "type": "Pierce",
+      "sin": "Envy",
+      "setup": {
+        "baseRoll": 3,
+        "passiveModDynPercent": 0,
+        "skillType": "Pierce",
+        "skillSin": "Envy",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": -1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": -1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 27,
+      "type": "Slash",
+      "sin": "Gloom",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 0,
+        "skillType": "Slash",
+        "skillSin": "Gloom",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": -1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": -1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": -1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 28,
+      "type": "Slash",
+      "sin": "Lust",
+      "setup": {
+        "baseRoll": 6,
+        "passiveModDynPercent": 0,
+        "skillType": "Slash",
+        "skillSin": "Lust",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": -1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": -1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": null,
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": null,
+    "C-2": null
+  },
+  {
+    "Rarity": "00",
+    "Sinner": "Faust",
+    "ID Name": "Wuthering Heights Butler",
+    "S1-1": {
+      "damage": 21,
+      "type": "Slash",
+      "sin": "Gloom",
+      "setup": {
+        "baseRoll": 3,
+        "passiveModDynPercent": 0,
+        "skillType": "Slash",
+        "skillSin": "Gloom",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 27,
+      "type": "Blunt",
+      "sin": "Lust",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 0,
+        "skillType": "Blunt",
+        "skillSin": "Lust",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 62,
+      "type": "Slash",
+      "sin": "Wrath",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 0,
+        "skillType": "Slash",
+        "skillSin": "Wrath",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": null,
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": null,
+    "C-2": null
+  },
+  {
+    "Rarity": "000",
+    "Sinner": "Faust",
+    "ID Name": "The One Who Grips",
+    "S1-1": {
+      "damage": 28,
+      "type": "Pierce",
+      "sin": "Envy",
+      "setup": {
+        "baseRoll": 6,
+        "passiveModDynPercent": 20,
+        "skillType": "Pierce",
+        "skillSin": "Envy",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 56,
+      "type": "Pierce",
+      "sin": "Lust",
+      "setup": {
+        "baseRoll": 6,
+        "passiveModDynPercent": 20,
+        "skillType": "Pierce",
+        "skillSin": "Lust",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 59,
+      "type": "Blunt",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 8,
+        "passiveModDynPercent": 20,
+        "skillType": "Blunt",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 70,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": null,
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": null,
+    "C-2": null
+  },
+  {
+    "Rarity": "000",
+    "Sinner": "Faust",
+    "ID Name": "Seven Assoc. South Section 4",
+    "S1-1": {
+      "damage": 35,
+      "type": "Slash",
+      "sin": "Envy",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 0,
+        "skillType": "Slash",
+        "skillSin": "Envy",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1.2,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 70,
+      "type": "Slash",
+      "sin": "Gloom",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 0,
+        "skillType": "Slash",
+        "skillSin": "Gloom",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1.2,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 86,
+      "type": "Slash",
+      "sin": "Gluttony",
+      "setup": {
+        "baseRoll": 6,
+        "passiveModDynPercent": 50,
+        "skillType": "Slash",
+        "skillSin": "Gluttony",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1.2,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": null,
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": null,
+    "C-2": null
+  },
+  {
+    "Rarity": "000",
+    "Sinner": "Faust",
+    "ID Name": "Lobotomy E.G.O::Regret",
+    "S1-1": {
+      "damage": 15,
+      "type": "Blunt",
+      "sin": "Sloth",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 0,
+        "skillType": "Blunt",
+        "skillSin": "Sloth",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 9,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 96,
+      "type": "Blunt",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 0,
+        "skillType": "Blunt",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 9,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 2,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 0,
+                "offenseDefenseDiff": 9,
+                "hasCrit": false,
+                "critPercent": 20
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 9,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 2,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 0,
+                "offenseDefenseDiff": 9,
+                "hasCrit": false,
+                "critPercent": 20
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 9,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 2,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 0,
+                "offenseDefenseDiff": 9,
+                "hasCrit": false,
+                "critPercent": 20
+              }
+            ]
+          }
+        ],
+        "targets": [
+          {
+            "name": "Subtarget 2",
+            "resistances": {
+              "Slash": 1,
+              "Pierce": 1,
+              "Blunt": 1,
+              "Wrath": 1,
+              "Lust": 1,
+              "Sloth": 1,
+              "Gluttony": 1,
+              "Gloom": 1,
+              "Pride": 1,
+              "Envy": 1
+            },
+            "timeMoratorium": false,
+            "timeMoratoriumStacks": 1
+          }
+        ]
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 384,
+      "type": "Blunt",
+      "sin": "Wrath",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 0,
+        "skillType": "Blunt",
+        "skillSin": "Wrath",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [
+          {
+            "kind": "Flat",
+            "target": "Wrath",
+            "values": [
+              20,
+              20,
+              20
+            ]
+          }
+        ],
+        "coins": [
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 9,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 30,
+                "offenseDefenseDiff": 9,
+                "hasCrit": false,
+                "critPercent": 20
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 30,
+                "offenseDefenseDiff": 9,
+                "hasCrit": false,
+                "critPercent": 20
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 9,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 30,
+                "offenseDefenseDiff": 9,
+                "hasCrit": false,
+                "critPercent": 20
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 30,
+                "offenseDefenseDiff": 9,
+                "hasCrit": false,
+                "critPercent": 20
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 9,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 30,
+                "offenseDefenseDiff": 9,
+                "hasCrit": false,
+                "critPercent": 20
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 30,
+                "offenseDefenseDiff": 9,
+                "hasCrit": false,
+                "critPercent": 20
+              }
+            ]
+          }
+        ],
+        "targets": [
+          {
+            "name": "Subtarget 2",
+            "resistances": {
+              "Slash": 1,
+              "Pierce": 1,
+              "Blunt": 1,
+              "Wrath": 1,
+              "Lust": 1,
+              "Sloth": 1,
+              "Gluttony": 1,
+              "Gloom": 1,
+              "Pride": 1,
+              "Envy": 1
+            },
+            "timeMoratorium": false,
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 3",
+            "resistances": {
+              "Slash": 1,
+              "Pierce": 1,
+              "Blunt": 1,
+              "Wrath": 1,
+              "Lust": 1,
+              "Sloth": 1,
+              "Gluttony": 1,
+              "Gloom": 1,
+              "Pride": 1,
+              "Envy": 1
+            },
+            "timeMoratorium": false,
+            "timeMoratoriumStacks": 1
+          }
+        ]
+      }
+    },
+    "S3-2": null,
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": {
+      "damage": 19,
+      "type": "Blunt",
+      "sin": "Gloom",
+      "setup": {
+        "baseRoll": 10,
+        "passiveModDynPercent": 0,
+        "skillType": "Blunt",
+        "skillSin": "Gloom",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 7,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "C-2": null
+  },
+  {
+    "Rarity": "000",
+    "Sinner": "Faust",
+    "ID Name": "Blade Lineage Salsu",
+    "S1-1": {
+      "damage": 42,
+      "type": "Slash",
+      "sin": "Sloth",
+      "setup": {
+        "baseRoll": 3,
+        "passiveModDynPercent": 0,
+        "skillType": "Slash",
+        "skillSin": "Sloth",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 2,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 27,
+            "offenseDefenseDiff": 3,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 27,
+            "offenseDefenseDiff": 3,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 51,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 0,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 60,
+            "offenseDefenseDiff": 2,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 27,
+            "offenseDefenseDiff": 3,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 79,
+      "type": "Slash",
+      "sin": "Gloom",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 0,
+        "skillType": "Slash",
+        "skillSin": "Gloom",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 9,
+            "modDynPercent": 60,
+            "offenseDefenseDiff": 2,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 9,
+            "modDynPercent": 70,
+            "offenseDefenseDiff": 3,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": null,
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": null,
+    "C-2": null
+  },
+  {
+    "Rarity": "000",
+    "Sinner": "Faust",
+    "ID Name": "MultiCrack Office Rep",
+    "S1-1": {
+      "damage": 34,
+      "type": "Slash",
+      "sin": "Lust",
+      "setup": {
+        "baseRoll": 3,
+        "passiveModDynPercent": 40,
+        "skillType": "Slash",
+        "skillSin": "Lust",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 132,
+      "type": "Blunt",
+      "sin": "Envy",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 40,
+        "skillType": "Blunt",
+        "skillSin": "Envy",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 20,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 20,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 200,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 145,
+      "type": "Blunt",
+      "sin": "Gloom",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 40,
+        "skillType": "Blunt",
+        "skillSin": "Gloom",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 40,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": null,
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": null,
+    "C-2": null
+  },
+  {
+    "Rarity": "000",
+    "Sinner": "Faust",
+    "ID Name": "LCE E.G.O::Ardor Blossom Star",
+    "S1-1": {
+      "damage": 30,
+      "type": "Blunt",
+      "sin": "Sloth",
+      "setup": {
+        "baseRoll": 3,
+        "passiveModDynPercent": 0,
+        "skillType": "Blunt",
+        "skillSin": "Sloth",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 10,
+            "offenseDefenseDiff": 6,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 10,
+            "offenseDefenseDiff": 6,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 69,
+      "type": "Blunt",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 0,
+        "skillType": "Blunt",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 20,
+            "offenseDefenseDiff": 8,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 20,
+            "offenseDefenseDiff": 8,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 20,
+            "offenseDefenseDiff": 8,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 107,
+      "type": "Blunt",
+      "sin": "Wrath",
+      "setup": {
+        "baseRoll": 7,
+        "passiveModDynPercent": 0,
+        "skillType": "Blunt",
+        "skillSin": "Wrath",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 50,
+            "offenseDefenseDiff": 9,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 50,
+            "offenseDefenseDiff": 9,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 50,
+            "offenseDefenseDiff": 9,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": {
+      "damage": 655,
+      "type": "Blunt",
+      "sin": "Wrath",
+      "setup": {
+        "baseRoll": 7,
+        "passiveModDynPercent": 0,
+        "skillType": "Blunt",
+        "skillSin": "Wrath",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 50,
+            "offenseDefenseDiff": 10,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 5,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 50,
+                "offenseDefenseDiff": 10,
+                "hasCrit": false,
+                "critPercent": 20
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 50,
+                "offenseDefenseDiff": 10,
+                "hasCrit": false,
+                "critPercent": 20
+              },
+              {
+                "name": "Subtarget 4",
+                "modDynPercent": 50,
+                "offenseDefenseDiff": 10,
+                "hasCrit": false,
+                "critPercent": 20
+              },
+              {
+                "name": "Subtarget 5",
+                "modDynPercent": 50,
+                "offenseDefenseDiff": 10,
+                "hasCrit": false,
+                "critPercent": 20
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 50,
+            "offenseDefenseDiff": 10,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 5,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 50,
+                "offenseDefenseDiff": 10,
+                "hasCrit": false,
+                "critPercent": 20
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 50,
+                "offenseDefenseDiff": 10,
+                "hasCrit": false,
+                "critPercent": 20
+              },
+              {
+                "name": "Subtarget 4",
+                "modDynPercent": 50,
+                "offenseDefenseDiff": 10,
+                "hasCrit": false,
+                "critPercent": 20
+              },
+              {
+                "name": "Subtarget 5",
+                "modDynPercent": 50,
+                "offenseDefenseDiff": 10,
+                "hasCrit": false,
+                "critPercent": 20
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 80,
+            "offenseDefenseDiff": 10,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 5,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 80,
+                "offenseDefenseDiff": 10,
+                "hasCrit": false,
+                "critPercent": 20
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 80,
+                "offenseDefenseDiff": 10,
+                "hasCrit": false,
+                "critPercent": 20
+              },
+              {
+                "name": "Subtarget 4",
+                "modDynPercent": 80,
+                "offenseDefenseDiff": 10,
+                "hasCrit": false,
+                "critPercent": 20
+              },
+              {
+                "name": "Subtarget 5",
+                "modDynPercent": 80,
+                "offenseDefenseDiff": 10,
+                "hasCrit": false,
+                "critPercent": 20
+              }
+            ]
+          }
+        ],
+        "targets": [
+          {
+            "name": "Subtarget 2",
+            "resistances": {
+              "Slash": 1,
+              "Pierce": 1,
+              "Blunt": 1,
+              "Wrath": 1,
+              "Lust": 1,
+              "Sloth": 1,
+              "Gluttony": 1,
+              "Gloom": 1,
+              "Pride": 1,
+              "Envy": 1
+            },
+            "timeMoratorium": false,
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 3",
+            "resistances": {
+              "Slash": 1,
+              "Pierce": 1,
+              "Blunt": 1,
+              "Wrath": 1,
+              "Lust": 1,
+              "Sloth": 1,
+              "Gluttony": 1,
+              "Gloom": 1,
+              "Pride": 1,
+              "Envy": 1
+            },
+            "timeMoratorium": false,
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 4",
+            "resistances": {
+              "Slash": 1,
+              "Pierce": 1,
+              "Blunt": 1,
+              "Wrath": 1,
+              "Lust": 1,
+              "Sloth": 1,
+              "Gluttony": 1,
+              "Gloom": 1,
+              "Pride": 1,
+              "Envy": 1
+            },
+            "timeMoratorium": false,
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 5",
+            "resistances": {
+              "Slash": 1,
+              "Pierce": 1,
+              "Blunt": 1,
+              "Wrath": 1,
+              "Lust": 1,
+              "Sloth": 1,
+              "Gluttony": 1,
+              "Gloom": 1,
+              "Pride": 1,
+              "Envy": 1
+            },
+            "timeMoratorium": false,
+            "timeMoratoriumStacks": 1
+          }
+        ]
+      }
+    },
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": null,
+    "C-2": null
+  },
+  {
+    "Rarity": "000",
+    "Sinner": "Faust",
+    "ID Name": "Heishou Pack - Mao Branch Adept",
+    "S1-1": {
+      "damage": 60,
+      "type": "Slash",
+      "sin": "Sloth",
+      "setup": {
+        "baseRoll": 3,
+        "passiveModDynPercent": 10,
+        "skillType": "Slash",
+        "skillSin": "Sloth",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 1,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 1,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 1,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 77,
+      "type": "Slash",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 10,
+        "skillType": "Slash",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 8,
+            "modDynPercent": 50,
+            "offenseDefenseDiff": 2,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 8,
+            "modDynPercent": 100,
+            "offenseDefenseDiff": 2,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 208,
+      "type": "Slash",
+      "sin": "Gluttony",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 20,
+        "skillType": "Slash",
+        "skillSin": "Gluttony",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 50,
+            "offenseDefenseDiff": 3,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 50,
+            "offenseDefenseDiff": 3,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 80,
+            "offenseDefenseDiff": 3,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 80,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": {
+      "damage": 252,
+      "type": "Slash",
+      "sin": "Gluttony",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 20,
+        "skillType": "Slash",
+        "skillSin": "Gluttony",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 8,
+            "modDynPercent": 50,
+            "offenseDefenseDiff": 4,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 8,
+            "modDynPercent": 50,
+            "offenseDefenseDiff": 4,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 8,
+            "modDynPercent": 80,
+            "offenseDefenseDiff": 4,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 8,
+            "modDynPercent": 80,
+            "offenseDefenseDiff": 4,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": {
+      "damage": 44,
+      "type": "Slash",
+      "sin": "Gluttony",
+      "setup": {
+        "baseRoll": 7,
+        "passiveModDynPercent": 20,
+        "skillType": "Slash",
+        "skillSin": "Gluttony",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 8,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 8,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "C-2": null
+  },
+  {
+    "Rarity": "000",
+    "Sinner": "Faust",
+    "ID Name": "Shi Assoc. East Section 3",
+    "S1-1": {
+      "damage": 45,
+      "type": "Slash",
+      "sin": "Wrath",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 30,
+        "skillType": "Slash",
+        "skillSin": "Wrath",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 7,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 7,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 121,
+      "type": "Slash",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 30,
+        "skillType": "Slash",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 88,
+            "offenseDefenseDiff": 8,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 88,
+            "offenseDefenseDiff": 8,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 88,
+            "offenseDefenseDiff": 8,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 220,
+      "type": "Slash",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 30,
+        "skillType": "Slash",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 88,
+            "offenseDefenseDiff": 9,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 88,
+            "offenseDefenseDiff": 9,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 88,
+            "offenseDefenseDiff": 9,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 88,
+            "offenseDefenseDiff": 9,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": {
+      "damage": 319,
+      "type": "Pierce",
+      "sin": "Lust",
+      "setup": {
+        "baseRoll": 18,
+        "passiveModDynPercent": 10,
+        "skillType": "Pierce",
+        "skillSin": "Lust",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 19,
+            "modDynPercent": 488,
+            "offenseDefenseDiff": 8,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": null,
+    "C-2": null
+  },
+  {
+    "Rarity": "000",
+    "Sinner": "Faust",
+    "ID Name": "The Index Proselyte [Paper Slip]",
+    "S1-1": {
+      "damage": 48,
+      "type": "Slash",
+      "sin": "Sloth",
+      "setup": {
+        "baseRoll": 3,
+        "passiveModDynPercent": 30,
+        "skillType": "Slash",
+        "skillSin": "Sloth",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 20,
+            "offenseDefenseDiff": 5,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 20,
+            "offenseDefenseDiff": 5,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": null,
+    "S2-1": {
+      "damage": 89,
+      "type": "Slash",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 30,
+        "skillType": "Slash",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 161,
+      "type": "Slash",
+      "sin": "Gloom",
+      "setup": {
+        "baseRoll": 6,
+        "passiveModDynPercent": 30,
+        "skillType": "Slash",
+        "skillSin": "Gloom",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 60,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 60,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 120,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": null,
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": {
+      "damage": 83,
+      "type": "Slash",
+      "sin": "Gloom",
+      "setup": {
+        "baseRoll": 7,
+        "passiveModDynPercent": 30,
+        "skillType": "Slash",
+        "skillSin": "Gloom",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 5,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 5,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 5,
+            "hasCrit": true,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "C-2": null
+  },
+  {
+    "Rarity": "000",
+    "Sinner": "Faust",
+    "ID Name": "The House of Spiders: The Ring Apprentice",
+    "S1-1": {
+      "damage": 29,
+      "type": "Slash",
+      "sin": "Gluttony",
+      "setup": {
+        "baseRoll": 6,
+        "passiveModDynPercent": 10,
+        "skillType": "Slash",
+        "skillSin": "Gluttony",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": {
+      "damage": 54,
+      "type": "Slash",
+      "sin": "Gluttony",
+      "setup": {
+        "baseRoll": 8,
+        "passiveModDynPercent": 40,
+        "skillType": "Slash",
+        "skillSin": "Gluttony",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-1": {
+      "damage": 68,
+      "type": "Slash",
+      "sin": "Envy",
+      "setup": {
+        "baseRoll": 9,
+        "passiveModDynPercent": 20,
+        "skillType": "Slash",
+        "skillSin": "Envy",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": {
+      "damage": 109,
+      "type": "Slash",
+      "sin": "Envy",
+      "setup": {
+        "baseRoll": 10,
+        "passiveModDynPercent": 50,
+        "skillType": "Slash",
+        "skillSin": "Envy",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-1": {
+      "damage": 174,
+      "type": "Slash",
+      "sin": "Lust",
+      "setup": {
+        "baseRoll": 11,
+        "passiveModDynPercent": 20,
+        "skillType": "Slash",
+        "skillSin": "Lust",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 75,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 75,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 75,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 105,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": {
+      "damage": 471,
+      "type": "Slash",
+      "sin": "Lust",
+      "setup": {
+        "baseRoll": 11,
+        "passiveModDynPercent": 50,
+        "skillType": "Slash",
+        "skillSin": "Lust",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 25,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 25,
+                "offenseDefenseDiff": 5,
+                "hasCrit": false,
+                "critPercent": 20
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 25,
+                "offenseDefenseDiff": 5,
+                "hasCrit": false,
+                "critPercent": 20
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 25,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 25,
+                "offenseDefenseDiff": 5,
+                "hasCrit": false,
+                "critPercent": 20
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 25,
+                "offenseDefenseDiff": 5,
+                "hasCrit": false,
+                "critPercent": 20
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 25,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 25,
+                "offenseDefenseDiff": 5,
+                "hasCrit": false,
+                "critPercent": 20
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 25,
+                "offenseDefenseDiff": 5,
+                "hasCrit": false,
+                "critPercent": 20
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 55,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 55,
+                "offenseDefenseDiff": 5,
+                "hasCrit": false,
+                "critPercent": 20
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 55,
+                "offenseDefenseDiff": 5,
+                "hasCrit": false,
+                "critPercent": 20
+              }
+            ]
+          }
+        ],
+        "targets": [
+          {
+            "name": "Subtarget 2",
+            "resistances": {
+              "Slash": 1,
+              "Pierce": 1,
+              "Blunt": 1,
+              "Wrath": 1,
+              "Lust": 1,
+              "Sloth": 1,
+              "Gluttony": 1,
+              "Gloom": 1,
+              "Pride": 1,
+              "Envy": 1
+            },
+            "timeMoratorium": false,
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 3",
+            "resistances": {
+              "Slash": 1,
+              "Pierce": 1,
+              "Blunt": 1,
+              "Wrath": 1,
+              "Lust": 1,
+              "Sloth": 1,
+              "Gluttony": 1,
+              "Gloom": 1,
+              "Pride": 1,
+              "Envy": 1
+            },
+            "timeMoratorium": false,
+            "timeMoratoriumStacks": 1
+          }
+        ]
+      }
+    },
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": null,
+    "C-2": {
+      "damage": 63,
+      "type": "Slash",
+      "sin": "Lust",
+      "setup": {
+        "baseRoll": 6,
+        "passiveModDynPercent": 50,
+        "skillType": "Slash",
+        "skillSin": "Lust",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 6,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 6,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    }
+  },
+  {
+    "Rarity": "000",
+    "Sinner": "Faust",
+    "ID Name": "Dawn Office Fixer",
+    "S1-1": {
+      "damage": 54,
+      "type": "Slash",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 6,
+        "passiveModDynPercent": 0,
+        "skillType": "Slash",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [
+          {
+            "kind": "Flat",
+            "target": "Wrath",
+            "values": [
+              0,
+              0,
+              10
+            ]
+          }
+        ],
+        "coins": [
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 2,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S1-2": {
+      "damage": 37,
+      "type": "Slash",
+      "sin": "Gluttony",
+      "setup": {
+        "baseRoll": 7,
+        "passiveModDynPercent": 0,
+        "skillType": "Slash",
+        "skillSin": "Gluttony",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 60,
+            "offenseDefenseDiff": 1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 3,
+            "modDynPercent": 60,
+            "offenseDefenseDiff": 1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-1": {
+      "damage": 116,
+      "type": "Slash",
+      "sin": "Sloth",
+      "setup": {
+        "baseRoll": 7,
+        "passiveModDynPercent": 0,
+        "skillType": "Slash",
+        "skillSin": "Sloth",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [
+          {
+            "kind": "Flat",
+            "target": "Wrath",
+            "values": [
+              0,
+              0,
+              10,
+              10
+            ]
+          }
+        ],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 3,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S2-2": null,
+    "S3-1": {
+      "damage": 178,
+      "type": "Slash",
+      "sin": "Wrath",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 15,
+        "skillType": "Slash",
+        "skillSin": "Wrath",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [
+          {
+            "kind": "Flat",
+            "target": "Wrath",
+            "values": [
+              0,
+              0,
+              10,
+              10,
+              10
+            ]
+          }
+        ],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 4,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-2": {
+      "damage": 222,
+      "type": "Slash",
+      "sin": "Wrath",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 30,
+        "skillType": "Slash",
+        "skillSin": "Wrath",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [
+          {
+            "kind": "Flat",
+            "target": "Wrath",
+            "values": [
+              0,
+              0,
+              10,
+              10,
+              10
+            ]
+          }
+        ],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 20,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 20,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 20,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "S3-3": null,
+    "S3-4": null,
+    "C-1": {
+      "damage": 28,
+      "type": "Slash",
+      "sin": "Wrath",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 0,
+        "skillType": "Slash",
+        "skillSin": "Wrath",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 0,
+            "offenseDefenseDiff": 1,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    },
+    "C-2": {
+      "damage": 316,
+      "type": "Slash",
+      "sin": "Wrath",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 30,
+        "skillType": "Slash",
+        "skillSin": "Wrath",
+        "clashCount": 0,
+        "timeMoratorium": false,
+        "timeMoratoriumStacks": 1,
+        "resistances": {
+          "Slash": 1,
+          "Pierce": 1,
+          "Blunt": 1,
+          "Wrath": 1,
+          "Lust": 1,
+          "Sloth": 1,
+          "Gluttony": 1,
+          "Gloom": 1,
+          "Pride": 1,
+          "Envy": 1
+        },
+        "bonuses": [
+          {
+            "kind": "Flat",
+            "target": "Wrath",
+            "values": [
+              0,
+              0,
+              10,
+              10,
+              10
+            ]
+          }
+        ],
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 70,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 70,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 90,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 90,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 90,
+            "offenseDefenseDiff": 5,
+            "hasCrit": false,
+            "critPercent": 20,
+            "weight": 1,
+            "subtargets": []
+          }
+        ],
+        "targets": []
+      }
+    }
+  }
+]
