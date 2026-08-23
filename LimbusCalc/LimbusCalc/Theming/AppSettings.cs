@@ -47,6 +47,18 @@ public static class AppSettings
         Opacity = 1.0,
     };
 
+    /// <summary>Иконки типа и греха в клетках справочника показываем, пока не сказано иное.</summary>
+    public const bool DefaultShowSkillIcons = true;
+
+    public static bool LoadShowSkillIcons()
+    {
+        JsonObject? stored = Read();
+
+        return stored?["ShowSkillIcons"] is JsonNode node
+            ? Flag(node, DefaultShowSkillIcons)
+            : DefaultShowSkillIcons;
+    }
+
     public static AppTheme LoadTheme()
     {
         JsonObject? stored = Read();
@@ -77,7 +89,11 @@ public static class AppSettings
     }
 
     /// <summary>Пишет настройки целиком: файл маленький, собирать его по частям незачем.</summary>
-    public static void Save(AppTheme theme, OutlineSettings manual, OutlineSettings calculator)
+    public static void Save(
+        AppTheme theme,
+        OutlineSettings manual,
+        OutlineSettings calculator,
+        bool showSkillIcons)
     {
         ArgumentNullException.ThrowIfNull(manual);
         ArgumentNullException.ThrowIfNull(calculator);
@@ -94,6 +110,7 @@ public static class AppSettings
             JsonObject root = new()
             {
                 ["Theme"] = theme.ToString(),
+                ["ShowSkillIcons"] = showSkillIcons,
                 ["ManualOutline"] = Write(manual),
                 ["CalculatorOutline"] = Write(calculator),
             };

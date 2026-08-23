@@ -89,6 +89,19 @@
 
             <Border Style="{StaticResource RowDivider}" Margin="0,16"/>
 
+            <StackPanel Orientation="Horizontal">
+                <CheckBox VerticalAlignment="Center"
+                          AutomationProperties.AutomationId="SkillIconsCheckBox"
+                          IsChecked="{Binding ShowSkillIcons, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Skill type and sin icons in tables" Margin="8,0,0,0"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+            <TextBlock Text="Without them the damage stands in the middle of the cell."
+                       Foreground="{DynamicResource SubtleTextBrush}"
+                       TextWrapping="Wrap" Margin="26,4,0,0"/>
+
+            <Border Style="{StaticResource RowDivider}" Margin="0,16"/>
+
             <TextBlock Text="Cell outlines in the ID table" FontWeight="SemiBold"
                        Margin="0,0,0,4"/>
             <TextBlock Text="Marks where the damage came from. Empty cells stay without a frame."

@@ -6,6 +6,7 @@
         xmlns:conv="clr-namespace:LimbusCalc.Converters"
         xmlns:behaviors="clr-namespace:LimbusCalc.Behaviors"
         xmlns:vm="clr-namespace:LimbusCalc.ViewModels"
+        xmlns:views="clr-namespace:LimbusCalc.Views"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
         Title="ElderCalc"
@@ -36,102 +37,165 @@
             </StackPanel>
         </DataTemplate>
 
-        <!-- Клетки трёх видов: свободный текст, целое число и выбор из списка. -->
-        <DataTemplate x:Key="TextCellTemplate">
+        <!-- Меню клетки урона одно на всё окно и создаётся при первом открытии.
+             Раньше оно висело в шаблоне клетки: на каждую клетку заводилось своё
+             меню с десятком пунктов и картинками, и прокрутка этим и тормозила. -->
+        <ContextMenu x:Key="CellMenu">
+            <MenuItem Header="Export to ElderCalc"
+                      Visibility="{Binding HasSetup, Converter={StaticResource BoolToVisibility}}"
+                      Click="CellToCalculator_Click"/>
+            <MenuItem Header="Manual edit"
+                      Visibility="{Binding HasSetup, Converter={StaticResource BoolToVisibility}}"
+                      ToolTip="Drop the stored setup and edit the number by hand"
+                      Click="CellManualEdit_Click"/>
+
+            <MenuItem Header="Skill type"
+                      Visibility="{Binding CanEditMarks, Converter={StaticResource BoolToVisibility}}"
+                      ItemsSource="{x:Static vm:ElementOptions.DamageTypes}"
+                      ItemTemplate="{StaticResource ElementMenuItemTemplate}">
+                <MenuItem.ItemContainerStyle>
+                    <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+                        <EventSetter Event="Click" Handler="SkillType_Click"/>
+                    </Style>
+                </MenuItem.ItemContainerStyle>
+            </MenuItem>
+            <MenuItem Header="Skill sin"
+                      Visibility="{Binding CanEditMarks, Converter={StaticResource BoolToVisibility}}"
+                      ItemsSource="{x:Static vm:ElementOptions.Sins}"
+                      ItemTemplate="{StaticResource ElementMenuItemTemplate}">
+                <MenuItem.ItemContainerStyle>
+                    <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+                        <EventSetter Event="Click" Handler="SkillSin_Click"/>
+                    </Style>
+                </MenuItem.ItemContainerStyle>
+            </MenuItem>
+            <Separator Visibility="{Binding CanEditMarks, Converter={StaticResource BoolToVisibility}}"/>
+            <MenuItem Header="Clear type and sin"
+                      Visibility="{Binding CanEditMarks, Converter={StaticResource BoolToVisibility}}"
+                      Click="ClearSkillMarks_Click"/>
+        </ContextMenu>
+
+        <!-- Меню строки. Висит на клетках, которые описывают саму строку — редкость,
+             грешник, название: у клеток с уроном своё меню, и мешать их незачем. -->
+        <ContextMenu x:Key="RowMenu">
+            <MenuItem Header="Delete row"
+                      AutomationProperties.AutomationId="DeleteRowItem"
+                      Click="DeleteRow_Click"/>
+        </ContextMenu>
+
+        <!-- Редактор клетки: заводится по клику и живёт один на таблицу.
+             В самих клетках полей ввода нет — на экране их было бы под три сотни,
+             и прокрутка упиралась именно в них. -->
+        <DataTemplate x:Key="TextEditorTemplate">
             <TextBox Style="{StaticResource TableCellTextBox}"
+                     LostFocus="CellEditor_LostFocus"
                      Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"/>
         </DataTemplate>
 
+        <DataTemplate x:Key="IntegerEditorTemplate">
+            <TextBox Style="{StaticResource TableCellTextBox}"
+                     TextAlignment="{DynamicResource CellDamageAlignment}"
+                     Padding="{DynamicResource CellDamagePadding}"
+                     behaviors:IntegerText.Enabled="True"
+                     IsReadOnly="{Binding HasSetup}"
+                     LostFocus="CellEditor_LostFocus"
+                     Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"/>
+        </DataTemplate>
+
+        <DataTemplate x:Key="OptionsEditorTemplate">
+            <ComboBox Style="{StaticResource TableCellComboBox}"
+                      ItemsSource="{Binding Column.Options}"
+                      LostFocus="CellEditor_LostFocus"
+                      SelectedItem="{Binding Value}"/>
+        </DataTemplate>
+
+        <!-- Обводка показывает, откуда взялся урон: акцентом — выгруженный
+             из калькулятора, приглушённым — вписанный руками, пусто — без рамки. -->
+        <Style x:Key="CellOutline" TargetType="Border">
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Source}" Value="Manual">
+                    <Setter Property="BorderBrush" Value="{DynamicResource ManualOutlineBrush}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Source}" Value="Calculator">
+                    <Setter Property="BorderBrush" Value="{DynamicResource CalculatorOutlineBrush}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Клетки трёх видов: свободный текст, целое число и выбор из списка.
+             Каждая сама себе рамка сетки: лишняя обёртка на клетку — это лишние
+             две с половиной тысячи элементов на таблицу. -->
+        <DataTemplate x:Key="TextCellTemplate">
+            <Border Width="{Binding Column.ActualWidth}" MinHeight="28"
+                    Background="Transparent"
+                    BorderBrush="{DynamicResource OutlineBrush}"
+                    BorderThickness="0,0,1,1"
+                    SnapsToDevicePixels="True"
+                    MouseLeftButtonDown="Cell_BeginEdit"
+                    ContextMenuOpening="Row_ContextMenuOpening">
+                <TextBlock Text="{Binding Value}" Margin="8,4" VerticalAlignment="Center"
+                           TextTrimming="CharacterEllipsis"/>
+            </Border>
+        </DataTemplate>
+
         <DataTemplate x:Key="IntegerCellTemplate">
-            <!-- Не прошедшая фильтр клетка остаётся пустой: сетка на месте, значения нет. -->
-            <Grid Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibility}}">
-                <!-- Обводка показывает, откуда взялся урон: акцентом — выгруженный
-                     из калькулятора, приглушённым — вписанный руками, пусто — без рамки. -->
-                <Border Margin="2" CornerRadius="4" BorderThickness="1.5">
-                    <Border.Style>
-                        <Style TargetType="Border">
-                            <Setter Property="BorderBrush" Value="Transparent"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Source}" Value="Manual">
-                                    <Setter Property="BorderBrush" Value="{DynamicResource ManualOutlineBrush}"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Source}" Value="Calculator">
-                                    <Setter Property="BorderBrush" Value="{DynamicResource CalculatorOutlineBrush}"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Border.Style>
-                </Border>
+            <Border Width="{Binding Column.ActualWidth}" MinHeight="28"
+                    BorderBrush="{DynamicResource OutlineBrush}"
+                    BorderThickness="0,0,1,1"
+                    SnapsToDevicePixels="True">
+                <!-- Не прошедшая фильтр клетка остаётся пустой: сетка на месте, значения нет. -->
+                <Grid Background="Transparent"
+                      Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibility}}"
+                      MouseLeftButtonDown="Cell_BeginEdit"
+                      ContextMenuOpening="Cell_ContextMenuOpening">
+                    <Border Style="{StaticResource CellOutline}"/>
 
-                <!-- Урон слева, иконки справа: правый отступ поля оставляет им место. -->
-                <TextBox Style="{StaticResource TableCellTextBox}" TextAlignment="Left"
-                         Padding="8,4,40,4"
-                         behaviors:IntegerText.Enabled="True"
-                         IsReadOnly="{Binding HasSetup}"
-                         Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}">
-                    <TextBox.ContextMenu>
-                        <!-- Правой кнопкой по клетке урона задаются тип и грех скилла:
-                             по ним потом сортируется столбец. -->
-                        <!-- Меню зависит от того, откуда в клетке урон: у выгруженной
-                             из калькулятора — только работа с набором, у остальных —
-                             назначение типа и греха. -->
-                        <ContextMenu>
-                            <MenuItem Header="Export to ElderCalc"
-                                      Visibility="{Binding HasSetup, Converter={StaticResource BoolToVisibility}}"
-                                      Click="CellToCalculator_Click"/>
-                            <MenuItem Header="Manual edit"
-                                      Visibility="{Binding HasSetup, Converter={StaticResource BoolToVisibility}}"
-                                      ToolTip="Drop the stored setup and edit the number by hand"
-                                      Click="CellManualEdit_Click"/>
+                    <!-- Урон слева, иконки справа: правый отступ оставляет им место.
+                         Иконки можно выключить в настройках — тогда урон встаёт
+                         по центру клетки, а отступы становятся ровными. -->
+                    <TextBlock Text="{Binding Value}" VerticalAlignment="Center"
+                               Margin="{DynamicResource CellDamagePadding}"
+                               TextAlignment="{DynamicResource CellDamageAlignment}"/>
 
-                            <MenuItem Header="Skill type"
-                                      Visibility="{Binding CanEditMarks, Converter={StaticResource BoolToVisibility}}"
-                                      ItemsSource="{x:Static vm:ElementOptions.DamageTypes}"
-                                      ItemTemplate="{StaticResource ElementMenuItemTemplate}">
-                                <MenuItem.ItemContainerStyle>
-                                    <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
-                                        <EventSetter Event="Click" Handler="SkillType_Click"/>
-                                    </Style>
-                                </MenuItem.ItemContainerStyle>
-                            </MenuItem>
-                            <MenuItem Header="Skill sin"
-                                      Visibility="{Binding CanEditMarks, Converter={StaticResource BoolToVisibility}}"
-                                      ItemsSource="{x:Static vm:ElementOptions.Sins}"
-                                      ItemTemplate="{StaticResource ElementMenuItemTemplate}">
-                                <MenuItem.ItemContainerStyle>
-                                    <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
-                                        <EventSetter Event="Click" Handler="SkillSin_Click"/>
-                                    </Style>
-                                </MenuItem.ItemContainerStyle>
-                            </MenuItem>
-                            <Separator Visibility="{Binding CanEditMarks, Converter={StaticResource BoolToVisibility}}"/>
-                            <MenuItem Header="Clear type and sin"
-                                      Visibility="{Binding CanEditMarks, Converter={StaticResource BoolToVisibility}}"
-                                      Click="ClearSkillMarks_Click"/>
-                        </ContextMenu>
-                    </TextBox.ContextMenu>
-                </TextBox>
-
-                <!-- Иконки не перехватывают мышь: клик и правое меню достаются полю. -->
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
-                            VerticalAlignment="Center" Margin="0,0,4,0"
-                            IsHitTestVisible="False">
                     <Image Source="{Binding SkillType.IconPath}" Width="15" Height="15"
-                           ToolTip="{Binding SkillType.Name}"
+                           HorizontalAlignment="Right" VerticalAlignment="Center"
+                           Margin="0,0,21,0" IsHitTestVisible="False"
+                           Visibility="{DynamicResource SkillIconVisibility}"
                            RenderOptions.BitmapScalingMode="HighQuality"/>
                     <Image Source="{Binding SkillSin.IconPath}" Width="15" Height="15"
-                           Margin="2,0,0,0"
-                           ToolTip="{Binding SkillSin.Name}"
+                           HorizontalAlignment="Right" VerticalAlignment="Center"
+                           Margin="0,0,4,0" IsHitTestVisible="False"
+                           Visibility="{DynamicResource SkillIconVisibility}"
                            RenderOptions.BitmapScalingMode="HighQuality"/>
-                </StackPanel>
-            </Grid>
+                </Grid>
+            </Border>
         </DataTemplate>
 
         <DataTemplate x:Key="OptionsCellTemplate">
-            <ComboBox Style="{StaticResource TableCellComboBox}"
-                      ItemsSource="{Binding Column.Options}"
-                      SelectedItem="{Binding Value}"/>
+            <Border Width="{Binding Column.ActualWidth}" MinHeight="28"
+                    Background="Transparent" Cursor="Hand"
+                    BorderBrush="{DynamicResource OutlineBrush}"
+                    BorderThickness="0,0,1,1"
+                    SnapsToDevicePixels="True"
+                    MouseLeftButtonDown="Cell_BeginEdit"
+                    ContextMenuOpening="Row_ContextMenuOpening">
+                <Grid>
+                    <TextBlock Text="{Binding Value}" Margin="8,0,22,0" VerticalAlignment="Center"/>
+                    <Path Data="M0,0 L4,4 L8,0" Stroke="{DynamicResource SubtleTextBrush}"
+                          StrokeThickness="1.4" Margin="0,0,8,0"
+                          HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
         </DataTemplate>
+
+        <views:CellTemplateSelector x:Key="CellTemplates"
+                                    Text="{StaticResource TextCellTemplate}"
+                                    Integer="{StaticResource IntegerCellTemplate}"
+                                    Options="{StaticResource OptionsCellTemplate}"/>
 
         <!-- Справочная таблица: столбцы задаёт модель, поэтому разметка одна
              и для ID, и для E.G.O. Обработчики кнопок живут в этом окне,
@@ -159,11 +223,6 @@
                             <Button Content="Add row" Style="{StaticResource SmallButton}"
                                     AutomationProperties.AutomationId="AddRowButton"
                                     Click="AddRow_Click"/>
-                            <Button Content="Remove last row" Margin="8,0,0,0"
-                                    Style="{StaticResource SmallButton}"
-                                    AutomationProperties.AutomationId="RemoveRowButton"
-                                    IsEnabled="{Binding HasRows}"
-                                    Click="RemoveRow_Click"/>
                             <Button Content="Clear table" Margin="8,0,0,0"
                                     Style="{StaticResource SmallButton}"
                                     AutomationProperties.AutomationId="ClearTableButton"
@@ -207,10 +266,23 @@
                                              Converter={StaticResource BoolToVisibility}}"
                                 Click="FilterList_Click"/>
 
-                        <Button Content="Reset filter" Margin="8,0,0,0"
+                        <!-- Поиск по названию — такой же отбор, поэтому стоит в одном
+                             ряду с фильтрами, но чуть на отлёте: он не список с галочками. -->
+                        <TextBlock Text="Search" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource SubtleTextBrush}"
+                                   Margin="24,0,8,0"/>
+                        <TextBox Width="220" VerticalAlignment="Center"
+                                 AutomationProperties.AutomationId="SearchBox"
+                                 ToolTip="Show only rows whose name contains this"
+                                 Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <!-- Сброс стоит на отлёте от отбора: он его не задаёт,
+                             а снимает разом. Пока ничего не задано, нажимать нечего. -->
+                        <Button Content="Clear filters" Margin="24,0,0,0"
                                 Style="{StaticResource SmallButton}"
                                 AutomationProperties.AutomationId="FilterResetButton"
-                                Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}"
+                                ToolTip="Drop every filter on this table"
+                                IsEnabled="{Binding IsActive}"
                                 Click="FilterReset_Click"/>
                     </StackPanel>
 
@@ -240,18 +312,13 @@
                                                 <!-- Левая кнопка сортирует по столбцу, правая
                                                      на столбце скилла открывает приоритеты. -->
                                                 <Border Padding="8,6" Background="Transparent"
+                                                        Width="{Binding ActualWidth}"
                                                         Cursor="Hand"
                                                         BorderBrush="{DynamicResource OutlineBrush}"
                                                         BorderThickness="0,0,1,0"
                                                         SnapsToDevicePixels="True"
                                                         MouseLeftButtonUp="ColumnHeader_LeftClick"
                                                         MouseRightButtonUp="ColumnHeader_RightClick">
-                                                    <Border.Width>
-                                                        <MultiBinding Converter="{StaticResource ColumnWidth}">
-                                                            <Binding/>
-                                                            <Binding Path="ViewportWidth" ElementName="TableScroll"/>
-                                                        </MultiBinding>
-                                                    </Border.Width>
                                                     <!-- Подпись числового столбца стоит над своими
                                                          числами, то есть по центру клетки. -->
                                                     <StackPanel Orientation="Horizontal">
@@ -298,22 +365,19 @@
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <Border Padding="8,6"
+                                                    Width="{Binding Column.ActualWidth}"
                                                     BorderBrush="{DynamicResource OutlineBrush}"
                                                     BorderThickness="0,0,1,0"
                                                     SnapsToDevicePixels="True">
-                                                <Border.Width>
-                                                    <MultiBinding Converter="{StaticResource ColumnWidth}">
-                                                        <Binding Path="Column"/>
-                                                        <Binding Path="ViewportWidth" ElementName="TableScroll"/>
-                                                    </MultiBinding>
-                                                </Border.Width>
                                                 <TextBlock Text="{Binding Text}" FontWeight="SemiBold"
                                                            Foreground="{DynamicResource SubtleTextBrush}">
                                                     <TextBlock.Style>
                                                         <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
                                                             <Style.Triggers>
+                                                                <!-- Среднее стоит так же, как урон над ним. -->
                                                                 <DataTrigger Binding="{Binding Column.Kind}" Value="Integer">
-                                                                    <Setter Property="HorizontalAlignment" Value="Left"/>
+                                                                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                                                    <Setter Property="TextAlignment" Value="{DynamicResource CellDamageAlignment}"/>
                                                                     <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
                                                                 </DataTrigger>
                                                             </Style.Triggers>
@@ -328,16 +392,39 @@
                         </ScrollViewer>
                     </Border>
 
-                    <!-- Строки: своя прокрутка, левую рамку сетки держит она же. -->
-                    <ScrollViewer x:Name="TableScroll"
-                                  HorizontalScrollBarVisibility="Auto"
-                                  VerticalScrollBarVisibility="Auto"
-                                  ScrollChanged="TableScroll_ScrollChanged">
-                        <Border VerticalAlignment="Top" HorizontalAlignment="Left"
-                                BorderBrush="{DynamicResource OutlineBrush}"
-                                BorderThickness="1,0,0,0"
-                                SnapsToDevicePixels="True">
-                                <ItemsControl ItemsSource="{Binding Rows}">
+                    <!-- Строки. Список виртуализирован: создаются только видимые строки,
+                         иначе двести айди — это две с половиной тысячи клеток разом.
+                         Прокрутка живёт внутри списка, иначе виртуализация не работает. -->
+                    <Border BorderBrush="{DynamicResource OutlineBrush}"
+                            BorderThickness="1,0,0,0"
+                            SnapsToDevicePixels="True">
+                        <Grid>
+                                <ItemsControl ItemsSource="{Binding Rows}"
+                                              VirtualizingPanel.IsVirtualizing="True"
+                                              VirtualizingPanel.VirtualizationMode="Recycling"
+                                              VirtualizingPanel.ScrollUnit="Pixel"
+                                              ScrollViewer.CanContentScroll="True">
+                                    <ItemsControl.Template>
+                                        <ControlTemplate TargetType="ItemsControl">
+                                            <!-- Ползунок тянут быстро, а перерисовка каждой
+                                                 промежуточной строки в это время никому не нужна:
+                                                 строки встают на место, когда ползунок отпустили. -->
+                                            <ScrollViewer x:Name="TableScroll"
+                                                          CanContentScroll="True"
+                                                          IsDeferredScrollingEnabled="True"
+                                                          HorizontalScrollBarVisibility="Auto"
+                                                          VerticalScrollBarVisibility="Auto"
+                                                          ScrollChanged="TableScroll_ScrollChanged"
+                                                          SizeChanged="TableScroll_SizeChanged">
+                                                <ItemsPresenter/>
+                                            </ScrollViewer>
+                                        </ControlTemplate>
+                                    </ItemsControl.Template>
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <VirtualizingStackPanel Orientation="Vertical"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemContainerStyle>
                                         <Style TargetType="ContentPresenter">
                                             <Setter Property="Visibility"
@@ -346,49 +433,28 @@
                                     </ItemsControl.ItemContainerStyle>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <ItemsControl ItemsSource="{Binding Cells}">
+                                            <!-- Чем заполняется клетка, задаёт её столбец. -->
+                                            <ItemsControl ItemsSource="{Binding Cells}"
+                                                          ItemTemplateSelector="{StaticResource CellTemplates}">
                                                 <ItemsControl.ItemsPanel>
                                                     <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
                                                 </ItemsControl.ItemsPanel>
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <Border BorderBrush="{DynamicResource OutlineBrush}"
-                                                                BorderThickness="0,0,1,1"
-                                                                SnapsToDevicePixels="True">
-                                                            <Border.Width>
-                                                                <MultiBinding Converter="{StaticResource ColumnWidth}">
-                                                                    <Binding Path="Column"/>
-                                                                    <Binding Path="ViewportWidth" ElementName="TableScroll"/>
-                                                                </MultiBinding>
-                                                            </Border.Width>
-                                                            <!-- Чем заполняется клетка, задаёт её столбец. -->
-                                                            <ContentControl Content="{Binding}">
-                                                                <ContentControl.Style>
-                                                                    <Style TargetType="ContentControl">
-                                                                        <Setter Property="ContentTemplate"
-                                                                                Value="{StaticResource TextCellTemplate}"/>
-                                                                        <Style.Triggers>
-                                                                            <DataTrigger Binding="{Binding Column.Kind}" Value="Integer">
-                                                                                <Setter Property="ContentTemplate"
-                                                                                        Value="{StaticResource IntegerCellTemplate}"/>
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Column.Kind}" Value="Options">
-                                                                                <Setter Property="ContentTemplate"
-                                                                                        Value="{StaticResource OptionsCellTemplate}"/>
-                                                                            </DataTrigger>
-                                                                        </Style.Triggers>
-                                                                    </Style>
-                                                                </ContentControl.Style>
-                                                            </ContentControl>
-                                                        </Border>
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
                                             </ItemsControl>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
-                        </Border>
-                    </ScrollViewer>
+
+                            <!-- Слой правки: поле ввода встаёт поверх той клетки,
+                                 по которой щёлкнули, и закрывается при прокрутке. -->
+                            <Canvas Tag="CellEditorLayer" ClipToBounds="True">
+                                <!-- Фон непрозрачный: под полем ввода лежит подпись клетки. -->
+                                <Border Tag="CellEditorHost" Visibility="Collapsed"
+                                        Background="{DynamicResource SurfaceBrush}">
+                                    <ContentControl Tag="CellEditorContent"/>
+                                </Border>
+                            </Canvas>
+                        </Grid>
+                    </Border>
                 </DockPanel>
             </Border>
         </DataTemplate>
@@ -916,3 +982,6 @@
         </Popup>
     </Grid>
 </Window>
+
+
+

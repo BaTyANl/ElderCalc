@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+
 namespace LimbusCalc.ViewModels;
 
 /// <summary>Строка справочника как пункт выпадающего списка.</summary>
@@ -18,10 +20,31 @@ public sealed class ExportToTableViewModel : ObservableObject
 {
     private ExportTargetViewModel? _selectedTarget;
     private TableColumn? _selectedSkill;
+    private string _search = string.Empty;
 
-    public required IReadOnlyList<ExportTargetViewModel> Targets { get; init; }
+    /// <summary>Все именованные строки справочника; список сужается поиском.</summary>
+    public required IReadOnlyList<ExportTargetViewModel> AllTargets { get; init; }
+
+    /// <summary>Что показывать в списке сейчас.</summary>
+    public ObservableCollection<ExportTargetViewModel> Targets { get; } = [];
 
     public required IReadOnlyList<TableColumn> Skills { get; init; }
+
+    /// <summary>
+    /// Поиск по подписи пункта. В ней и название айди, и грешник, поэтому набрать
+    /// можно любое из двух — в справочнике на сотню строк иначе не найтись.
+    /// </summary>
+    public string Search
+    {
+        get => _search;
+        set
+        {
+            if (SetProperty(ref _search, value ?? string.Empty))
+            {
+                ApplySearch();
+            }
+        }
+    }
 
     public ExportTargetViewModel? SelectedTarget
     {
@@ -49,6 +72,9 @@ public sealed class ExportToTableViewModel : ObservableObject
 
     /// <summary>Пока не выбраны и айди, и скилл, сохранять некуда.</summary>
     public bool CanSave => SelectedTarget is not null && SelectedSkill is not null;
+
+    /// <summary>Ничего не нашлось: список пуст не потому, что справочник пуст.</summary>
+    public bool NothingFound => Targets.Count == 0 && AllTargets.Count > 0;
 
     /// <summary>Клетка, в которую пойдёт выгрузка.</summary>
     public TableCell? TargetCell =>
@@ -83,10 +109,42 @@ public sealed class ExportToTableViewModel : ObservableObject
             });
         }
 
-        return new ExportToTableViewModel
+        ExportToTableViewModel model = new()
         {
-            Targets = targets,
+            AllTargets = targets,
             Skills = [.. table.Columns.Where(column => column.Kind == TableCellKind.Integer)],
         };
+
+        model.ApplySearch();
+        return model;
+    }
+
+    /// <summary>
+    /// Пересобирает показанный список. Выбранный айди сохраняем, если он прошёл поиск:
+    /// иначе набранная буква сбрасывала бы уже сделанный выбор.
+    /// </summary>
+    private void ApplySearch()
+    {
+        ExportTargetViewModel? chosen = SelectedTarget;
+
+        Targets.Clear();
+
+        foreach (ExportTargetViewModel target in AllTargets)
+        {
+            if (_search.Length == 0
+                || target.Display.Contains(_search, StringComparison.CurrentCultureIgnoreCase))
+            {
+                Targets.Add(target);
+            }
+        }
+
+        // Осталась одна подсказка — выбирать между чем-то уже не из чего, и заставлять
+        // ткнуть в единственную строку незачем. Прежний выбор держим, пока он подходит.
+        SelectedTarget =
+            chosen is not null && Targets.Contains(chosen) ? chosen
+            : _search.Length > 0 && Targets.Count == 1 ? Targets[0]
+            : null;
+
+        OnPropertyChanged(nameof(NothingFound));
     }
 }

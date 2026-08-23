@@ -50,6 +50,7 @@ public sealed class SkillSortOption
 public sealed class TableColumn : ObservableObject
 {
     private string _indicator = string.Empty;
+    private double? _actualWidth;
 
     public required string Title { get; init; }
 
@@ -88,6 +89,24 @@ public sealed class TableColumn : ObservableObject
     {
         get => _indicator;
         internal set => SetProperty(ref _indicator, value);
+    }
+
+    /// <summary>
+    /// Ширина, с которой столбец рисуется сейчас: у растяжимого она зависит от окна.
+    /// Клетки берут её отсюда — так шапка, строки и строка средних всегда согласованы,
+    /// откуда бы ни считалась ширина видимой области.
+    /// </summary>
+    public double ActualWidth
+    {
+        get => _actualWidth ?? Width;
+        internal set
+        {
+            if (_actualWidth != value)
+            {
+                _actualWidth = value;
+                OnPropertyChanged();
+            }
+        }
     }
 
     internal static void MeasureStretch(IReadOnlyList<TableColumn> columns)
@@ -348,27 +367,31 @@ public sealed class TableViewModel : ObservableObject
         return row;
     }
 
-    public void RemoveLastRow()
+    /// <summary>Убирает строку целиком вместе с наборами, что лежали в её клетках.</summary>
+    public void Remove(TableRowViewModel row)
     {
-        if (Rows.Count == 0)
+        ArgumentNullException.ThrowIfNull(row);
+
+        if (!Rows.Remove(row))
         {
             return;
         }
 
-        foreach (TableCell cell in Rows[^1].Cells)
+        foreach (TableCell cell in row.Cells)
         {
             cell.PropertyChanged -= OnCellChanged;
         }
 
-        Rows.RemoveAt(Rows.Count - 1);
         OnRowsChanged();
     }
 
     public void Clear()
     {
+        using IDisposable bulk = BeginBulkChange();
+
         while (Rows.Count > 0)
         {
-            RemoveLastRow();
+            Remove(Rows[^1]);
         }
     }
 
@@ -410,6 +433,23 @@ public sealed class TableViewModel : ObservableObject
         if (_sortColumn?.Kind == TableCellKind.Integer)
         {
             ApplySort();
+        }
+    }
+
+    /// <summary>
+    /// Пересчитывает ширины столбцов под видимую область: растяжимый забирает остаток.
+    /// Вызывается при изменении размера — шапка, строки и средние берут ширины отсюда,
+    /// поэтому остаются согласованными.
+    /// </summary>
+    public void UpdateColumnWidths(double viewportWidth)
+    {
+        foreach (TableColumn column in Columns)
+        {
+            // Единица — на внешнюю рамку таблицы, иначе строка вылезает за неё
+            // и появляется лишняя горизонтальная прокрутка.
+            column.ActualWidth = column.Stretch && viewportWidth > 0.0
+                ? Math.Max(column.Width, viewportWidth - column.OtherWidth - 1.0)
+                : column.Width;
         }
     }
 
@@ -493,6 +533,14 @@ public sealed class TableViewModel : ObservableObject
 
     private void OnCellChanged(object? sender, PropertyChangedEventArgs e)
     {
+        // Видимость клетке ставит сам фильтр. Это не правка данных: ни пересчитывать
+        // фильтр заново, ни сохранять файл не нужно — а на тысяче клеток такой
+        // повторный обход стоил секунд.
+        if (e.PropertyName == nameof(TableCell.IsVisible))
+        {
+            return;
+        }
+
         if (_bulkDepth > 0)
         {
             _bulkChanged = true;
@@ -541,8 +589,10 @@ public sealed class TableViewModel : ObservableObject
     {
         foreach (TableRowViewModel row in Rows)
         {
-            // Грешник и редкость отбирают строку целиком, тип и грех — её значения.
-            bool rowOk = Filter.AllowsSinner(row.CellOf("Sinner")?.Value)
+            // Грешник, редкость и поиск отбирают строку целиком, тип и грех — её значения.
+            // Столбец названия у ID и E.G.O. называется по-разному, но откликается на «Name».
+            bool rowOk = Filter.AllowsName(row.CellOf("Name")?.Value)
+                && Filter.AllowsSinner(row.CellOf("Sinner")?.Value)
                 && Filter.AllowsRarity(row.CellOf("Rarity")?.Value);
 
             bool anyValue = false;

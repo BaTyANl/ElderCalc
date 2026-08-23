@@ -63,6 +63,8 @@ public sealed class FilterListViewModel : ObservableObject
 /// </summary>
 public sealed class TableFilterViewModel : ObservableObject
 {
+    private string _search = string.Empty;
+
     public TableFilterViewModel(IReadOnlyList<string> sinners, IReadOnlyList<string> rarities)
     {
         ArgumentNullException.ThrowIfNull(sinners);
@@ -112,10 +114,33 @@ public sealed class TableFilterViewModel : ObservableObject
     /// <summary>Фильтр изменился — таблицу нужно пересобрать.</summary>
     public event EventHandler? Changed;
 
+    /// <summary>
+    /// Поиск по названию: строка остаётся, если название содержит набранное.
+    /// Регистр не важен — искать «salsu» и «Salsu» одинаково законно.
+    /// </summary>
+    public string Search
+    {
+        get => _search;
+        set
+        {
+            if (SetProperty(ref _search, value ?? string.Empty))
+            {
+                OnPropertyChanged(nameof(IsActive));
+                Changed?.Invoke(this, EventArgs.Empty);
+            }
+        }
+    }
+
     /// <summary>Заданы ли метки: по ним отбираются отдельные значения, а не только строки.</summary>
     public bool FiltersMarks => TypeList.Any || SinList.Any;
 
-    public bool IsActive => FiltersMarks || SinnerList.Any || RarityList.Any;
+    public bool IsActive =>
+        FiltersMarks || SinnerList.Any || RarityList.Any || _search.Length > 0;
+
+    /// <summary>Подходит ли название строки под поиск.</summary>
+    public bool AllowsName(string? name) =>
+        _search.Length == 0
+        || (name is not null && name.Contains(_search, StringComparison.CurrentCultureIgnoreCase));
 
     public bool AllowsSinner(string? name) => Allows(SinnerList, name);
 
@@ -137,6 +162,8 @@ public sealed class TableFilterViewModel : ObservableObject
         {
             list.Clear();
         }
+
+        Search = string.Empty;
     }
 
     private IEnumerable<FilterListViewModel> Lists => [TypeList, SinList, SinnerList, RarityList];

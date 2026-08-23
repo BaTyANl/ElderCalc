@@ -16,6 +16,35 @@
         FontFamily="{StaticResource AppFontFamily}"
         Background="{DynamicResource AppBackgroundBrush}">
 
+    <Window.Resources>
+        <!-- Подсказка в списке выглядит как пункт выпадающего списка: окно одно,
+             а привычка нажимать на такие строки у пользователя уже есть. -->
+        <Style x:Key="SuggestionItem" TargetType="ListBoxItem">
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="Root" CornerRadius="4" Background="Transparent"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="{DynamicResource SurfaceAltBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="{DynamicResource AccentBrush}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource OnAccentBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
     <Border Style="{StaticResource Card}" Margin="14">
         <StackPanel>
             <TextBlock Text="Export to ID" Style="{StaticResource CardTitleText}"/>
@@ -23,11 +52,39 @@
                        Foreground="{DynamicResource SubtleTextBrush}"
                        TextWrapping="Wrap" Margin="0,0,0,6"/>
 
+            <!-- Айди выбирается набором: в справочнике легко за сотню строк, и листать
+                 их до нужной дольше, чем набрать пару букв названия. Подходящие
+                 показываются тут же под полем. -->
             <TextBlock Text="Identity" Style="{StaticResource FieldLabelText}"/>
-            <ComboBox AutomationProperties.AutomationId="ExportTargetBox"
-                      ItemsSource="{Binding Targets}"
-                      SelectedItem="{Binding SelectedTarget}"
-                      ItemTemplate="{StaticResource PlainTextItemTemplate}"/>
+            <TextBox x:Name="IdentityBox"
+                     AutomationProperties.AutomationId="ExportSearchBox"
+                     ToolTip="Type a few letters of the identity name or its sinner"
+                     Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}"
+                     TextChanged="Identity_TextChanged"
+                     PreviewKeyDown="Identity_KeyDown"/>
+
+            <Popup x:Name="Suggestions" Placement="Bottom" AllowsTransparency="True"
+                   PlacementTarget="{Binding ElementName=IdentityBox}"
+                   Width="{Binding ActualWidth, ElementName=IdentityBox}"
+                   StaysOpen="False">
+                <Border Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource OutlineBrush}"
+                        BorderThickness="1" CornerRadius="6" Padding="3" Margin="0,4,0,4">
+                    <ListBox x:Name="SuggestionList" MaxHeight="240"
+                             Background="Transparent" BorderThickness="0"
+                             AutomationProperties.AutomationId="ExportSuggestionList"
+                             ItemsSource="{Binding Targets}"
+                             SelectedItem="{Binding SelectedTarget}"
+                             ItemTemplate="{StaticResource PlainTextItemTemplate}"
+                             ItemContainerStyle="{StaticResource SuggestionItem}"
+                             PreviewMouseLeftButtonUp="Suggestion_Click"/>
+                </Border>
+            </Popup>
+
+            <TextBlock Text="Nothing matches this name."
+                       Foreground="{DynamicResource SubtleTextBrush}"
+                       Margin="0,4,0,0"
+                       Visibility="{Binding NothingFound, Converter={StaticResource BoolToVisibility}}"/>
 
             <TextBlock Text="Skill" Style="{StaticResource FieldLabelText}"/>
             <ComboBox AutomationProperties.AutomationId="ExportSkillBox"

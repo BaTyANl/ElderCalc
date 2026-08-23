@@ -106,10 +106,12 @@ public sealed class OutlineSettingsViewModel : ObservableObject
 public sealed class SettingsViewModel : ObservableObject
 {
     private bool _isDark;
+    private bool _showSkillIcons;
 
     public SettingsViewModel()
     {
         _isDark = ThemeManager.Current == AppTheme.Dark;
+        _showSkillIcons = AppSettings.LoadShowSkillIcons();
 
         Manual = new OutlineSettingsViewModel(
             "Manual entry",
@@ -127,6 +129,15 @@ public sealed class SettingsViewModel : ObservableObject
     public const string ManualOutlineKey = "ManualOutlineBrush";
 
     public const string CalculatorOutlineKey = "CalculatorOutlineBrush";
+
+    /// <summary>Показывать ли иконки типа и греха в клетках справочника.</summary>
+    public const string SkillIconVisibilityKey = "SkillIconVisibility";
+
+    /// <summary>Отступы урона в клетке: справа они держат место под иконки.</summary>
+    public const string DamagePaddingKey = "CellDamagePadding";
+
+    /// <summary>Куда прижат урон: без иконок ему незачем стоять слева.</summary>
+    public const string DamageAlignmentKey = "CellDamageAlignment";
 
     public OutlineSettingsViewModel Manual { get; }
 
@@ -152,16 +163,48 @@ public sealed class SettingsViewModel : ObservableObject
         }
     }
 
-    /// <summary>Ставит кисти обводки в ресурсы — вызывается один раз при запуске.</summary>
-    public void ApplyOutlines()
+    /// <summary>
+    /// Иконки типа и греха в клетках справочника. Без них урону незачем жаться
+    /// к левому краю — он встаёт по центру клетки.
+    /// </summary>
+    public bool ShowSkillIcons
+    {
+        get => _showSkillIcons;
+        set
+        {
+            if (SetProperty(ref _showSkillIcons, value))
+            {
+                ApplySkillIcons();
+                Save();
+            }
+        }
+    }
+
+    /// <summary>Ставит настройки в ресурсы приложения — вызывается при запуске.</summary>
+    public void Apply()
     {
         Manual.Apply();
         Calculator.Apply();
+        ApplySkillIcons();
+    }
+
+    /// <summary>
+    /// Кладёт вид клетки в ресурсы приложения. Клетки берут это через DynamicResource,
+    /// поэтому таблица перестраивается сразу, без пересборки строк.
+    /// </summary>
+    private void ApplySkillIcons()
+    {
+        ResourceDictionary resources = Application.Current.Resources;
+
+        resources[SkillIconVisibilityKey] = _showSkillIcons ? Visibility.Visible : Visibility.Collapsed;
+        resources[DamagePaddingKey] = _showSkillIcons ? new Thickness(8, 4, 40, 4) : new Thickness(8, 4, 8, 4);
+        resources[DamageAlignmentKey] = _showSkillIcons ? TextAlignment.Left : TextAlignment.Center;
     }
 
     private void Save() =>
         AppSettings.Save(
             IsDark ? AppTheme.Dark : AppTheme.Light,
             Manual.ToModel(),
-            Calculator.ToModel());
+            Calculator.ToModel(),
+            ShowSkillIcons);
 }

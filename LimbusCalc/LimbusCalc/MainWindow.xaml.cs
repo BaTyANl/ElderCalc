@@ -53,7 +53,7 @@ namespace LimbusCalc
             // и сразу ставим кисти обводки — иначе клетки нарисуются без них.
             ThemeManager.Apply(AppSettings.LoadTheme());
             _settings = new SettingsViewModel();
-            _settings.ApplyOutlines();
+            _settings.Apply();
 
             _tableFiles = new Dictionary<TableViewModel, string>
             {
@@ -150,11 +150,75 @@ namespace LimbusCalc
             }
         }
 
-        private void RemoveRow_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Меню строки открывается по правой кнопке над клетками, которые её описывают.
+        /// Строку и таблицу берём из дерева: у клетки в привязке только она сама.
+        /// </summary>
+        private void Row_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
-            if (sender is FrameworkElement { DataContext: TableViewModel table })
+            if (sender is not FrameworkElement element
+                || DataOf<TableRowViewModel>(element) is not TableRowViewModel row
+                || DataOf<TableViewModel>(element) is not TableViewModel table)
             {
-                table.RemoveLastRow();
+                return;
+            }
+
+            ContextMenu menu = (ContextMenu)FindResource("RowMenu");
+
+            menu.DataContext = row;
+            menu.Tag = table;
+            menu.PlacementTarget = element;
+            menu.IsOpen = true;
+
+            e.Handled = true;
+        }
+
+        /// <summary>Ближайшая вверх по дереву привязка нужного вида.</summary>
+        private static T? DataOf<T>(DependencyObject start)
+            where T : class
+        {
+            for (DependencyObject? node = start; node is not null; node = VisualTreeHelper.GetParent(node))
+            {
+                if (node is FrameworkElement { DataContext: T found })
+                {
+                    return found;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Удаление строки. Вместе с ней уходят наборы, лежавшие в её клетках,
+        /// и вернуть их нечем — поэтому сначала спрашиваем и называем, что удаляем.
+        /// </summary>
+        private void DeleteRow_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not MenuItem
+                {
+                    Parent: ContextMenu { DataContext: TableRowViewModel row, Tag: TableViewModel table },
+                })
+            {
+                return;
+            }
+
+            string name = row.CellOf("Name")?.Value.Trim() ?? string.Empty;
+            string sinner = row.CellOf("Sinner")?.Value.Trim() ?? string.Empty;
+
+            string label =
+                name.Length == 0 ? "This row"
+                : sinner.Length == 0 ? $"“{name}”"
+                : $"“{sinner} — {name}”";
+
+            bool confirmed = ConfirmWindow.Ask(
+                this,
+                "Delete row",
+                $"{label} will be removed, together with the setups stored in its cells. This cannot be undone.",
+                "Delete row");
+
+            if (confirmed)
+            {
+                table.Remove(row);
             }
         }
 
@@ -162,20 +226,70 @@ namespace LimbusCalc
         /// Шапка таблицы стоит вне прокрутки строк, поэтому вбок её нужно двигать вручную —
         /// иначе при горизонтальной прокрутке подписи разъедутся со своими столбцами.
         /// </summary>
+        /// <summary>
+        /// Ширина видимой области поменялась — пересчитываем растяжимый столбец.
+        /// Одного ScrollChanged мало: при первой раскладке он приходит раньше,
+        /// чем становится известна настоящая ширина.
+        /// </summary>
+        private void TableScroll_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (sender is ScrollViewer { DataContext: TableViewModel table } viewer)
+            {
+                viewer.Dispatcher.BeginInvoke(
+                    System.Windows.Threading.DispatcherPriority.Loaded,
+                    () => table.UpdateColumnWidths(VisibleWidth(viewer)));
+            }
+        }
+
+        /// <summary>
+        /// Сколько ширины достаётся столбцам. ViewportWidth у прокрутки с виртуализацией
+        /// показывает не всю доступную ширину, поэтому берём размер самой области
+        /// и вычитаем полосу прокрутки, когда она есть.
+        /// </summary>
+        private static double VisibleWidth(ScrollViewer viewer)
+        {
+            double scrollbar = viewer.ComputedVerticalScrollBarVisibility == Visibility.Visible
+                ? SystemParameters.VerticalScrollBarWidth
+                : 0.0;
+
+            return viewer.ActualWidth - scrollbar;
+        }
+
         private void TableScroll_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
-            if (e.HorizontalChange == 0.0 || sender is not DependencyObject body)
+            if (sender is not DependencyObject body)
+            {
+                return;
+            }
+
+            // Ширину растяжимого столбца считаем от видимой области строк: у шапки
+            // и строки средних она своя, и по ней столбцы разъехались бы на ширину
+            // вертикальной полосы прокрутки.
+            if (e.ViewportWidthChange != 0.0
+                && sender is ScrollViewer { DataContext: TableViewModel table } viewer)
+            {
+                table.UpdateColumnWidths(VisibleWidth(viewer));
+            }
+
+            // Поле ввода стоит поверх клетки и вместе с ней не едет: при прокрутке
+            // оно оказалось бы над чужой. Закрываем — значение уже записано.
+            if (e.VerticalChange != 0.0 || e.HorizontalChange != 0.0)
+            {
+                EndEdit();
+            }
+
+            if (e.HorizontalChange == 0.0)
             {
                 return;
             }
 
             // Шаблон таблицы разложен дважды, у ID и E.G.O., поэтому ищем не по имени,
             // а рядом с собой: шапка и строка средних лежат в одной панели со строками.
-            foreach (ScrollViewer viewer in Siblings<ScrollViewer>(body))
+            foreach (ScrollViewer paired in Siblings<ScrollViewer>(body))
             {
-                if (viewer.Tag as string == "TableSyncScroll")
+                if (paired.Tag as string == "TableSyncScroll")
                 {
-                    viewer.ScrollToHorizontalOffset(e.HorizontalOffset);
+                    paired.ScrollToHorizontalOffset(e.HorizontalOffset);
                 }
             }
         }
@@ -183,9 +297,11 @@ namespace LimbusCalc
         private static IEnumerable<T> Siblings<T>(DependencyObject element)
             where T : DependencyObject
         {
+            // Ищем именно панель самой таблицы: над строками есть и свои обёртки,
+            // а шапка со строкой средних лежат уровнем выше, в общем доке.
             DependencyObject? parent = VisualTreeHelper.GetParent(element);
 
-            while (parent is not null and not Panel)
+            while (parent is not null and not DockPanel)
             {
                 parent = VisualTreeHelper.GetParent(parent);
             }
@@ -273,6 +389,198 @@ namespace LimbusCalc
             cell.SkillSin = _viewModel.SkillSin;
             cell.Setup = SetupFile.ToJson(_viewModel).ToJsonString();
         }
+
+        /// <summary>
+        /// Меню клетки открываем сами и одно на всех: в шаблоне клетки оно заводилось
+        /// для каждой клетки отдельно вместе с подменю и картинками, и на прокрутке
+        /// это было самой дорогой частью строки.
+        /// </summary>
+        private void Cell_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            if (sender is not FrameworkElement { DataContext: TableCell cell } element)
+            {
+                return;
+            }
+
+            ContextMenu menu = (ContextMenu)FindResource("CellMenu");
+
+            menu.DataContext = cell;
+            menu.PlacementTarget = element;
+            menu.IsOpen = true;
+
+            e.Handled = true;
+        }
+
+        /// <summary>Клетка, которую сейчас правят, и слой с её полем ввода.</summary>
+        private TableCell? _editingCell;
+
+        private Border? _editorHost;
+
+        /// <summary>
+        /// По клику над клеткой встаёт поле ввода. Раньше поле лежало в каждой клетке,
+        /// и прокрутка упиралась именно в них: на экране их под три сотни, а нужно одно.
+        /// </summary>
+        private void Cell_BeginEdit(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is not FrameworkElement { DataContext: TableCell cell } element)
+            {
+                return;
+            }
+
+            if (ReferenceEquals(_editingCell, cell))
+            {
+                return;
+            }
+
+            EndEdit();
+
+            if (EditorLayer(element) is not Canvas layer
+                || Tagged<Border>(layer, "CellEditorHost") is not Border host
+                || Tagged<ContentControl>(host, "CellEditorContent") is not ContentControl slot)
+            {
+                return;
+            }
+
+            string template = cell.Column.Kind switch
+            {
+                TableCellKind.Integer => "IntegerEditorTemplate",
+                TableCellKind.Options => "OptionsEditorTemplate",
+                _ => "TextEditorTemplate",
+            };
+
+            Rect box = element.TransformToVisual(layer)
+                .TransformBounds(new Rect(element.RenderSize));
+
+            Canvas.SetLeft(host, box.X);
+            Canvas.SetTop(host, box.Y);
+            host.Width = box.Width;
+            host.Height = box.Height;
+
+            slot.ContentTemplate = (DataTemplate)FindResource(template);
+            slot.Content = cell;
+            host.Visibility = Visibility.Visible;
+
+            _editingCell = cell;
+            _editorHost = host;
+
+            // Поле появится, когда пройдёт раскладка; тогда же отдаём ему ввод.
+            Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(() => FocusEditor(slot)));
+        }
+
+        /// <summary>Отдаёт ввод только что поставленному полю.</summary>
+        private void FocusEditor(DependencyObject slot)
+        {
+            switch (FirstChild<Control>(slot))
+            {
+                case TextBox box:
+                    box.Focus();
+                    box.SelectAll();
+                    break;
+
+                case ComboBox chooser:
+                    chooser.Focus();
+
+                    // Раскрывать до того, как список встал на место, нельзя: всплывашка
+                    // цепляет мышь и тут же закрывается обратно.
+                    Dispatcher.BeginInvoke(
+                        DispatcherPriority.Input,
+                        new Action(() => chooser.IsDropDownOpen = true));
+                    break;
+            }
+        }
+
+        /// <summary>Первый подходящий элемент вглубь дерева.</summary>
+        private static T? FirstChild<T>(DependencyObject root)
+            where T : DependencyObject
+        {
+            int count = VisualTreeHelper.GetChildrenCount(root);
+
+            for (int index = 0; index < count; index++)
+            {
+                DependencyObject child = VisualTreeHelper.GetChild(root, index);
+
+                if (child is T found)
+                {
+                    return found;
+                }
+
+                if (FirstChild<T>(child) is T deeper)
+                {
+                    return deeper;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>Убирает поле ввода: правка закончилась.</summary>
+        private void EndEdit()
+        {
+            if (_editorHost is not null)
+            {
+                _editorHost.Visibility = Visibility.Collapsed;
+
+                if (Tagged<ContentControl>(_editorHost, "CellEditorContent") is ContentControl slot)
+                {
+                    slot.Content = null;
+                }
+            }
+
+            _editingCell = null;
+            _editorHost = null;
+        }
+
+        /// <summary>Ищет слой правки той таблицы, в которой лежит клетка.</summary>
+        private static Canvas? EditorLayer(DependencyObject cell)
+        {
+            for (DependencyObject? node = cell; node is not null; node = VisualTreeHelper.GetParent(node))
+            {
+                if (node is Grid grid && Tagged<Canvas>(grid, "CellEditorLayer") is Canvas layer)
+                {
+                    return layer;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Ищет помеченный элемент прямо под указанным. Вглубь не идём нарочно:
+        /// под строками таблицы лежат тысячи элементов, а слой правки — на виду.
+        /// </summary>
+        private static T? Tagged<T>(DependencyObject root, string tag)
+            where T : FrameworkElement
+        {
+            int count = VisualTreeHelper.GetChildrenCount(root);
+
+            for (int index = 0; index < count; index++)
+            {
+                if (VisualTreeHelper.GetChild(root, index) is T found
+                    && (string?)found.Tag == tag)
+                {
+                    return found;
+                }
+            }
+
+            return null;
+        }
+
+
+        /// <summary>
+        /// Ушли из поля ввода — оно больше не нужно. Решаем не сразу: при переходе
+        /// щелчком на соседнюю клетку поле переезжает туда, и старое теряет ввод уже
+        /// после того, как новое встало на место. Смотрим, где ввод оказался в итоге.
+        /// </summary>
+        private void CellEditor_LostFocus(object sender, RoutedEventArgs e) =>
+            Dispatcher.BeginInvoke(
+                DispatcherPriority.Input,
+                new Action(() =>
+                {
+                    if (_editorHost is not null && !_editorHost.IsKeyboardFocusWithin)
+                    {
+                        EndEdit();
+                    }
+                }));
 
         /// <summary>Возвращает набор из клетки в калькулятор и переключает на его вкладку.</summary>
         private void CellToCalculator_Click(object sender, RoutedEventArgs e)
