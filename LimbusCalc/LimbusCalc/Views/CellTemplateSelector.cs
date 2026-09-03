@@ -17,6 +17,8 @@ public sealed class CellTemplateSelector : DataTemplateSelector
 
     public DataTemplate? Options { get; set; }
 
+    public DataTemplate? Computed { get; set; }
+
     public override DataTemplate? SelectTemplate(object item, DependencyObject container) =>
         item is not TableCell cell
             ? base.SelectTemplate(item, container)
@@ -24,6 +26,7 @@ public sealed class CellTemplateSelector : DataTemplateSelector
             {
                 TableCellKind.Integer => Integer,
                 TableCellKind.Options => Options,
+                TableCellKind.Computed => Computed,
                 _ => Text,
             };
 }

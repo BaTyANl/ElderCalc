@@ -22,6 +22,9 @@ public sealed class ExportToTableViewModel : ObservableObject
     private TableColumn? _selectedSkill;
     private string _search = string.Empty;
 
+    /// <summary>Заголовок окна: в какую именно таблицу выгружаем.</summary>
+    public required string Caption { get; init; }
+
     /// <summary>Все именованные строки справочника; список сужается поиском.</summary>
     public required IReadOnlyList<ExportTargetViewModel> AllTargets { get; init; }
 
@@ -91,7 +94,7 @@ public sealed class ExportToTableViewModel : ObservableObject
 
         foreach (TableRowViewModel row in table.Rows)
         {
-            string name = row.CellOf("ID Name")?.Value.Trim() ?? string.Empty;
+            string name = row.CellOf("Name")?.Value.Trim() ?? string.Empty;
 
             if (name.Length == 0)
             {
@@ -111,8 +114,9 @@ public sealed class ExportToTableViewModel : ObservableObject
 
         ExportToTableViewModel model = new()
         {
+            Caption = $"Export to {table.Title}",
             AllTargets = targets,
-            Skills = [.. table.Columns.Where(column => column.Kind == TableCellKind.Integer)],
+            Skills = [.. table.Columns.Where(column => column.AcceptsSetup)],
         };
 
         model.ApplySearch();

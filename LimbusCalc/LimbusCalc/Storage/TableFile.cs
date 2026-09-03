@@ -11,9 +11,12 @@ namespace LimbusCalc.Storage;
 /// </summary>
 public static class TableFile
 {
-    /// <summary>Фильтр для диалогов сохранения и открытия.</summary>
+    /// <summary>
+    /// Фильтр для диалогов сохранения и открытия. JSON стоит первым: он и есть
+    /// родной формат таблицы, а книга Excel нужна, когда её открывают глазами.
+    /// </summary>
     public const string DialogFilter =
-        "Excel workbook (*.xlsx)|*.xlsx|JSON file (*.json)|*.json";
+        "JSON file (*.json)|*.json|Excel workbook (*.xlsx)|*.xlsx";
 
     public static void Export(TableViewModel table, string path)
     {

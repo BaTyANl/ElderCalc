@@ -15,6 +15,9 @@ public enum TableCellKind
 
     /// <summary>Выбор из готового списка значений.</summary>
     Options,
+
+    /// <summary>Считается по соседним клеткам; руками не правится.</summary>
+    Computed,
 }
 
 /// <summary>Откуда в клетке взялся урон.</summary>
@@ -52,12 +55,35 @@ public sealed class TableColumn : ObservableObject
     private string _indicator = string.Empty;
     private double? _actualWidth;
 
+    private string? _key;
+
     public required string Title { get; init; }
+
+    /// <summary>
+    /// Под этим именем столбец лежит в файле и находится по названию. Обычно совпадает
+    /// с подписью, но у DPSC подпись одна на четыре столбца, а ключи разные.
+    /// </summary>
+    public string Key
+    {
+        get => _key ?? Title;
+        init => _key = value;
+    }
 
     /// <summary>Ширина столбца; у растяжимого — наименьшая допустимая.</summary>
     public required double Width { get; init; }
 
     public TableCellKind Kind { get; init; } = TableCellKind.Text;
+
+    /// <summary>
+    /// Принимает ли столбец выгрузку из калькулятора. Заодно значит, что в клетке
+    /// лежит урон: тип и грех назначают только таким.
+    /// </summary>
+    public bool AcceptsSetup { get; init; }
+
+    /// <summary>Что делится и на что — у <see cref="TableCellKind.Computed"/>.</summary>
+    public string? DividendKey { get; init; }
+
+    public string? DivisorKey { get; init; }
 
     /// <summary>Варианты для <see cref="TableCellKind.Options"/>; у прочих пусто.</summary>
     public IReadOnlyList<string> Options { get; init; } = [];
@@ -70,7 +96,7 @@ public sealed class TableColumn : ObservableObject
 
     /// <summary>Отзывается ли столбец на это название — своё или прежнее.</summary>
     public bool Matches(string title) =>
-        Title == title || Aliases.Contains(title);
+        Key == title || Title == title || Aliases.Contains(title);
 
     /// <summary>Столбец попадает в выпадающие списки, и там его подписывают этим.</summary>
     public override string ToString() => Title;
@@ -137,6 +163,12 @@ public sealed class TableCell : ObservableObject
     /// <summary>Столбец, которому клетка принадлежит: из него берётся ширина и вид.</summary>
     public required TableColumn Column { get; init; }
 
+    /// <summary>
+    /// Строка, в которой клетка стоит. Нужна счётным столбцам: они берут значения
+    /// у соседей по строке, а искать строку перебором на каждую правку дорого.
+    /// </summary>
+    internal TableRowViewModel? Row { get; set; }
+
     public string Value
     {
         get => _value;
@@ -171,10 +203,10 @@ public sealed class TableCell : ObservableObject
     public bool HasSetup => !string.IsNullOrEmpty(Setup);
 
     /// <summary>
-    /// Можно ли назначать тип и грех вручную. У клетки с набором они приезжают
-    /// из калькулятора вместе с уроном, и править их отдельно нечего.
+    /// Можно ли назначать тип и грех вручную. Они есть только у урона, а у клетки
+    /// с набором приезжают из калькулятора — править их отдельно нечего.
     /// </summary>
-    public bool CanEditMarks => !HasSetup;
+    public bool CanEditMarks => Column.AcceptsSetup && !HasSetup;
 
     /// <summary>
     /// Откуда взялся урон. Клетку с набором руками не правят: иначе число и набор
@@ -359,6 +391,7 @@ public sealed class TableViewModel : ObservableObject
 
         foreach (TableCell cell in row.Cells)
         {
+            cell.Row = row;
             cell.PropertyChanged += OnCellChanged;
         }
 
@@ -525,6 +558,10 @@ public sealed class TableViewModel : ObservableObject
         }
 
         _bulkChanged = false;
+
+        // Во время пакета правки не отзывались, поэтому считаем всё разом здесь.
+        RecomputeAll();
+
         OnPropertyChanged(nameof(HasRows));
         OnPropertyChanged(nameof(IsEmpty));
         ApplyFilter();
@@ -541,6 +578,14 @@ public sealed class TableViewModel : ObservableObject
             return;
         }
 
+        // Правка обычной клетки могла поменять то, что считается по ней. Счётные
+        // клетки при этом не пересчитывают сами себя — на них обход и заканчивается.
+        if (sender is TableCell { Row: TableRowViewModel row } changed
+            && changed.Column.Kind != TableCellKind.Computed)
+        {
+            Recompute(row);
+        }
+
         if (_bulkDepth > 0)
         {
             _bulkChanged = true;
@@ -550,6 +595,40 @@ public sealed class TableViewModel : ObservableObject
         // Правка метки или значения может вывести строку из-под фильтра.
         ApplyFilter();
         Changed?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>
+    /// Пересчитывает счётные клетки строки. Делить не на что или нечего — клетка
+    /// остаётся пустой: ноль тут значил бы «посчитано и вышло ноль».
+    /// </summary>
+    private static void Recompute(TableRowViewModel row)
+    {
+        foreach (TableCell cell in row.Cells)
+        {
+            if (cell.Column.Kind != TableCellKind.Computed)
+            {
+                continue;
+            }
+
+            double? dividend = Value(row, cell.Column.DividendKey);
+            double? divisor = Value(row, cell.Column.DivisorKey);
+
+            cell.Value = dividend is double top && divisor is double bottom && bottom != 0.0
+                ? (top / bottom).ToString("0.##", CultureInfo.InvariantCulture)
+                : string.Empty;
+        }
+    }
+
+    private static double? Value(TableRowViewModel row, string? columnKey) =>
+        columnKey is null ? null : row.CellOf(columnKey)?.Number;
+
+    /// <summary>Пересчитывает счётные клетки во всей таблице — после чтения файла.</summary>
+    private void RecomputeAll()
+    {
+        foreach (TableRowViewModel row in Rows)
+        {
+            Recompute(row);
+        }
     }
 
     private void OnRowsChanged()
@@ -636,7 +715,7 @@ public sealed class TableViewModel : ObservableObject
                 continue;
             }
 
-            if (average.Column.Kind != TableCellKind.Integer)
+            if (average.Column.Kind is not (TableCellKind.Integer or TableCellKind.Computed))
             {
                 average.Text = string.Empty;
                 continue;
@@ -688,6 +767,8 @@ public sealed class TableViewModel : ObservableObject
             {
                 TableCellKind.Options => IndexOfOption(left).CompareTo(IndexOfOption(right)),
                 TableCellKind.Integer => CompareSkills(left, right),
+                // У счётного столбца меток нет — сравнивать нечего, кроме числа.
+                TableCellKind.Computed => (left.Number ?? 0.0).CompareTo(right.Number ?? 0.0),
                 _ => string.Compare(left.Value, right.Value, StringComparison.OrdinalIgnoreCase),
             };
         }
@@ -779,16 +860,66 @@ public sealed class TableViewModel : ObservableObject
             Stretch = true,
             Aliases = ["Name"],
         },
-        .. NumberColumns("S1-1", "S1-2", "S2-1", "S2-2", "S3-1", "S3-2", "S3-3", "S3-4", "C-1", "C-2"),
+        .. SkillColumns("S1-1", "S1-2", "S2-1", "S2-2", "S3-1", "S3-2", "S3-3", "S3-4", "C-1", "C-2"),
     ]);
 
-    /// <summary>Столбцы таблицы E.G.O.</summary>
+    /// <summary>Столбцы таблицы E.G.O. За каждым уроном идёт свой DPSC.</summary>
     public static TableViewModel CreateEgoTable() => Create("E.G.O.",
     [
-        .. NumberColumns(130, "Danger Level"),
-        new TableColumn { Title = "Name", Width = 280, Stretch = true },
-        .. NumberColumns(130, "Awakening", "Corrosion"),
+        new TableColumn
+        {
+            Title = "Danger Level",
+            Width = 130,
+            Kind = TableCellKind.Options,
+            // Порядок — от младшего к старшему: по нему столбец и сортируется.
+            Options = ["ZAYIN", "TETH", "HE", "WAW", "ALEPH"],
+        },
+        new TableColumn
+        {
+            Title = "Sinner",
+            Width = 140,
+            Kind = TableCellKind.Options,
+            Options = Sinners,
+        },
+        new TableColumn
+        {
+            Title = "Type",
+            Width = 120,
+            Kind = TableCellKind.Options,
+            Options = ["Awakening", "Corrosion"],
+        },
+        new TableColumn { Title = "Name", Width = 220, Stretch = true },
+        new TableColumn { Title = "Sin Cost", Width = 92, Kind = TableCellKind.Integer },
+        .. DamageWithCost("1T Damage"),
+        .. DamageWithCost("3T Damage"),
+        .. DamageWithCost("7T Damage"),
+        .. DamageWithCost("Max T Damage"),
     ]);
+
+    /// <summary>
+    /// Урон и его цена за грех: DPSC считается сам и руками не правится. Подпись у всех
+    /// четырёх одна, а храниться им надо порознь — отсюда отдельный ключ.
+    /// </summary>
+    private static IEnumerable<TableColumn> DamageWithCost(string title)
+    {
+        yield return new TableColumn
+        {
+            Title = title,
+            Width = 110,
+            Kind = TableCellKind.Integer,
+            AcceptsSetup = true,
+        };
+
+        yield return new TableColumn
+        {
+            Key = $"{title} DPSC",
+            Title = "DPSC",
+            Width = 76,
+            Kind = TableCellKind.Computed,
+            DividendKey = title,
+            DivisorKey = "Sin Cost",
+        };
+    }
 
     private static TableViewModel Create(string title, IReadOnlyList<TableColumn> columns)
     {
@@ -809,15 +940,13 @@ public sealed class TableViewModel : ObservableObject
         return table;
     }
 
-    /// <summary>Целочисленные столбцы одной ширины — их в таблицах большинство.</summary>
-    private static IEnumerable<TableColumn> NumberColumns(params string[] titles) =>
-        NumberColumns(92, titles);
-
-    private static IEnumerable<TableColumn> NumberColumns(double width, params string[] titles) =>
+    /// <summary>Столбцы скиллов: целое число с выгрузкой из калькулятора.</summary>
+    private static IEnumerable<TableColumn> SkillColumns(params string[] titles) =>
         titles.Select(title => new TableColumn
         {
             Title = title,
-            Width = width,
+            Width = 92,
             Kind = TableCellKind.Integer,
+            AcceptsSetup = true,
         });
 }

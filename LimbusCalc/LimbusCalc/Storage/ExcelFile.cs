@@ -157,7 +157,7 @@ public static class ExcelFile
     }
 
     private static object? ValueOf(TableCell cell) =>
-        cell.Column.Kind == TableCellKind.Integer ? cell.Number : cell.Value;
+        cell.Column.Kind is TableCellKind.Integer or TableCellKind.Computed ? cell.Number : cell.Value;
 
     private static XElement BuildRow(int number, IReadOnlyList<object?> values)
     {

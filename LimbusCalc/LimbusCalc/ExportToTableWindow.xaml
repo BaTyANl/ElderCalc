@@ -6,7 +6,7 @@
         xmlns:vm="clr-namespace:LimbusCalc.ViewModels"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=vm:ExportToTableViewModel}"
-        Title="Export to ID"
+        Title="{Binding Caption}"
         Icon="Assets/elderjar.ico"
         SizeToContent="Height"
         Width="420"
@@ -47,18 +47,18 @@
 
     <Border Style="{StaticResource Card}" Margin="14">
         <StackPanel>
-            <TextBlock Text="Export to ID" Style="{StaticResource CardTitleText}"/>
+            <TextBlock Text="{Binding Caption}" Style="{StaticResource CardTitleText}"/>
             <TextBlock Text="The current setup and its total damage go into the chosen cell."
                        Foreground="{DynamicResource SubtleTextBrush}"
                        TextWrapping="Wrap" Margin="0,0,0,6"/>
 
-            <!-- Айди выбирается набором: в справочнике легко за сотню строк, и листать
+            <!-- Строка выбирается набором: в справочнике легко за сотню строк, и листать
                  их до нужной дольше, чем набрать пару букв названия. Подходящие
                  показываются тут же под полем. -->
-            <TextBlock Text="Identity" Style="{StaticResource FieldLabelText}"/>
+            <TextBlock Text="Name" Style="{StaticResource FieldLabelText}"/>
             <TextBox x:Name="IdentityBox"
                      AutomationProperties.AutomationId="ExportSearchBox"
-                     ToolTip="Type a few letters of the identity name or its sinner"
+                     ToolTip="Type a few letters of the name or its sinner"
                      Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}"
                      TextChanged="Identity_TextChanged"
                      PreviewKeyDown="Identity_KeyDown"/>
@@ -86,7 +86,7 @@
                        Margin="0,4,0,0"
                        Visibility="{Binding NothingFound, Converter={StaticResource BoolToVisibility}}"/>
 
-            <TextBlock Text="Skill" Style="{StaticResource FieldLabelText}"/>
+            <TextBlock Text="Cell" Style="{StaticResource FieldLabelText}"/>
             <ComboBox AutomationProperties.AutomationId="ExportSkillBox"
                       ItemsSource="{Binding Skills}"
                       SelectedItem="{Binding SelectedSkill}"

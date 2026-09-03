@@ -192,10 +192,27 @@
             </Border>
         </DataTemplate>
 
+        <!-- Счётная клетка: значение берётся у соседей, править его нечем, поэтому
+             ни поля ввода, ни меню, ни обводки «откуда взялось» у неё нет. -->
+        <DataTemplate x:Key="ComputedCellTemplate">
+            <Border Width="{Binding Column.ActualWidth}" MinHeight="28"
+                    BorderBrush="{DynamicResource OutlineBrush}"
+                    BorderThickness="0,0,1,1"
+                    SnapsToDevicePixels="True">
+                <!-- Иконок у счётной клетки не бывает, поэтому её число стоит
+                     по центру всегда — независимо от настройки иконок. -->
+                <TextBlock Text="{Binding Value}" VerticalAlignment="Center"
+                           Margin="6,4" TextAlignment="Center"
+                           Foreground="{DynamicResource SubtleTextBrush}"
+                           Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibility}}"/>
+            </Border>
+        </DataTemplate>
+
         <views:CellTemplateSelector x:Key="CellTemplates"
                                     Text="{StaticResource TextCellTemplate}"
                                     Integer="{StaticResource IntegerCellTemplate}"
-                                    Options="{StaticResource OptionsCellTemplate}"/>
+                                    Options="{StaticResource OptionsCellTemplate}"
+                                    Computed="{StaticResource ComputedCellTemplate}"/>
 
         <!-- Справочная таблица: столбцы задаёт модель, поэтому разметка одна
              и для ID, и для E.G.O. Обработчики кнопок живут в этом окне,
@@ -328,6 +345,9 @@
                                                                     <DataTrigger Binding="{Binding Kind}" Value="Integer">
                                                                         <Setter Property="HorizontalAlignment" Value="Center"/>
                                                                     </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding Kind}" Value="Computed">
+                                                                        <Setter Property="HorizontalAlignment" Value="Center"/>
+                                                                    </DataTrigger>
                                                                 </Style.Triggers>
                                                             </Style>
                                                         </StackPanel.Style>
@@ -379,6 +399,10 @@
                                                                     <Setter Property="HorizontalAlignment" Value="Stretch"/>
                                                                     <Setter Property="TextAlignment" Value="{DynamicResource CellDamageAlignment}"/>
                                                                     <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Column.Kind}" Value="Computed">
+                                                                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                                                    <Setter Property="TextAlignment" Value="Center"/>
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
@@ -487,7 +511,6 @@
                               ContentTemplate="{StaticResource ReferenceTableTemplate}"/>
         </TabItem>
 
-        <!-- Вкладка E.G.O. пока выключена: таблицу под неё ещё не наполняли. -->
         <TabItem Header="E.G.O." IsEnabled="False" ToolTip="Not ready yet">
             <ContentPresenter Content="{Binding EgoTable}"
                               ContentTemplate="{StaticResource ReferenceTableTemplate}"/>
@@ -878,7 +901,7 @@
                         Style="{StaticResource SmallButton}"
                         AutomationProperties.AutomationId="ExportToEgoButton"
                         IsEnabled="False"
-                        ToolTip="Not wired up yet"/>
+                        ToolTip="Not ready yet"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">

@@ -359,16 +359,26 @@ namespace LimbusCalc
         /// Кладёт текущий набор калькулятора в клетку справочника: пользователь выбирает
         /// айди и скилл, в клетку идёт итоговый урон, а набор остаётся при ней.
         /// </summary>
-        private void ExportToId_Click(object sender, RoutedEventArgs e)
-        {
-            ExportToTableViewModel selection = ExportToTableViewModel.Create(_viewModel.IdTable);
+        private void ExportToId_Click(object sender, RoutedEventArgs e) =>
+            ExportToTable(_viewModel.IdTable);
 
-            if (selection.Targets.Count == 0)
+        private void ExportToEgo_Click(object sender, RoutedEventArgs e) =>
+            ExportToTable(_viewModel.EgoTable);
+
+        /// <summary>
+        /// Кладёт текущий набор в клетку справочника: пользователь выбирает строку
+        /// по названию и столбец, куда это уходит.
+        /// </summary>
+        private void ExportToTable(TableViewModel table)
+        {
+            ExportToTableViewModel selection = ExportToTableViewModel.Create(table);
+
+            if (selection.AllTargets.Count == 0)
             {
                 MessageBox.Show(
                     this,
-                    "The ID table has no named rows yet. Add a row and fill in ID Name first.",
-                    "Export to ID",
+                    $"The {table.Title} table has no named rows yet. Add a row and fill in Name first.",
+                    selection.Caption,
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
                 return;
@@ -399,6 +409,14 @@ namespace LimbusCalc
         {
             if (sender is not FrameworkElement { DataContext: TableCell cell } element)
             {
+                return;
+            }
+
+            // Клетке вроде Sin Cost предложить нечего: ни набора, ни меток. Показываем
+            // меню строки — пустое меню под правой кнопкой выглядело бы поломкой.
+            if (!cell.HasSetup && !cell.CanEditMarks)
+            {
+                Row_ContextMenuOpening(sender, e);
                 return;
             }
 
@@ -522,7 +540,11 @@ namespace LimbusCalc
 
                 if (Tagged<ContentControl>(_editorHost, "CellEditorContent") is ContentControl slot)
                 {
+                    // Разметку убираем вместе со значением. Иначе на клетку того же вида
+                    // поле достанется прежнее: список редкости открывался бы с грешниками
+                    // или с высотой не под своё число строк.
                     slot.Content = null;
+                    slot.ContentTemplate = null;
                 }
             }
 
@@ -684,7 +706,7 @@ namespace LimbusCalc
                 Title = $"Export {table.Title}",
                 Filter = TableFile.DialogFilter,
                 FileName = Path.GetFileNameWithoutExtension(_tableFiles[table]),
-                DefaultExt = ".xlsx",
+                DefaultExt = ".json",
                 AddExtension = true,
             };
 

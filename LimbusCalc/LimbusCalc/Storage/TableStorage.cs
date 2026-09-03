@@ -93,7 +93,7 @@ public static class TableStorage
 
             foreach (TableCell cell in row.Cells)
             {
-                stored[cell.Column.Title] = SaveCell(cell);
+                stored[cell.Column.Key] = SaveCell(cell);
             }
 
             rows.Add(stored);
@@ -108,7 +108,7 @@ public static class TableStorage
     /// </summary>
     private static JsonNode? SaveCell(TableCell cell)
     {
-        if (cell.Column.Kind != TableCellKind.Integer)
+        if (cell.Column.Kind is not TableCellKind.Integer and not TableCellKind.Computed)
         {
             return JsonValue.Create(cell.Value);
         }
@@ -175,33 +175,32 @@ public static class TableStorage
 
     /// <summary>
     /// Значение клетки текстом. В файле оно могло оказаться и числом, и строкой —
-    /// например, после выгрузки из таблицы или правки руками.
+    /// например, после выгрузки из таблицы или правки руками. Узел спрашиваем через
+    /// TryGetValue: разобранный из файла и собранный в памяти устроены по-разному,
+    /// и приведение к JsonElement на втором просто падает.
     /// </summary>
     private static string ReadText(JsonNode value)
     {
-        JsonElement element = value.GetValue<JsonElement>();
-
-        return element.ValueKind switch
+        if (value is JsonValue json)
         {
-            JsonValueKind.String => element.GetString() ?? string.Empty,
-            JsonValueKind.Number => element.GetDouble().ToString(CultureInfo.InvariantCulture),
-            JsonValueKind.Null => string.Empty,
-            _ => value.ToJsonString(),
-        };
-    }
+            if (json.TryGetValue(out string? text))
+            {
+                return text ?? string.Empty;
+            }
 
-    private static ElementOption? ReadElement(JsonNode? value)
-    {
-        if (value is null)
-        {
-            return null;
+            if (json.TryGetValue(out double number))
+            {
+                return number.ToString(CultureInfo.InvariantCulture);
+            }
         }
 
-        JsonElement element = value.GetValue<JsonElement>();
-
-        return element.ValueKind == JsonValueKind.String
-            && Enum.TryParse(element.GetString(), out Element parsed)
-            ? ElementOptions.For(parsed)
-            : null;
+        return value.ToJsonString();
     }
+
+    private static ElementOption? ReadElement(JsonNode? value) =>
+        value is JsonValue json
+            && json.TryGetValue(out string? name)
+            && Enum.TryParse(name, out Element parsed)
+                ? ElementOptions.For(parsed)
+                : null;
 }
