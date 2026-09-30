@@ -101,6 +101,15 @@ public sealed class TableColumn : ObservableObject
     /// <summary>Столбец попадает в выпадающие списки, и там его подписывают этим.</summary>
     public override string ToString() => Title;
 
+    /// <summary>Размер шрифта строк таблицы — тот же, что у всего окна.</summary>
+    public const double DefaultFontSize = 13;
+
+    /// <summary>
+    /// Шрифт клеток столбца. Мельче обычного там, где длинным названиям тесно:
+    /// у E.G.O. они бывают с оригинальным написанием в скобках.
+    /// </summary>
+    public double FontSize { get; init; } = DefaultFontSize;
+
     /// <summary>Столбец забирает всю ширину, не занятую остальными.</summary>
     public bool Stretch { get; init; }
 
@@ -338,6 +347,9 @@ public sealed class TableViewModel : ObservableObject
 
     /// <summary>Есть ли столбец редкости — от него зависит, показывать ли её фильтр.</summary>
     public bool HasRarity => Columns.Any(column => column.Title == "Rarity");
+
+    /// <summary>Есть ли столбец вида E.G.O. — от него зависит, показывать ли его фильтр.</summary>
+    public bool HasEgoType => Columns.Any(column => column.Title == "Type");
 
     public ObservableCollection<TableRowViewModel> Rows { get; } = [];
 
@@ -668,17 +680,21 @@ public sealed class TableViewModel : ObservableObject
     {
         foreach (TableRowViewModel row in Rows)
         {
-            // Грешник, редкость и поиск отбирают строку целиком, тип и грех — её значения.
+            // Грешник, редкость, вид E.G.O. и поиск отбирают строку целиком,
+            // тип урона и грех — её значения.
             // Столбец названия у ID и E.G.O. называется по-разному, но откликается на «Name».
             bool rowOk = Filter.AllowsName(row.CellOf("Name")?.Value)
                 && Filter.AllowsSinner(row.CellOf("Sinner")?.Value)
-                && Filter.AllowsRarity(row.CellOf("Rarity")?.Value);
+                && Filter.AllowsRarity(row.CellOf("Rarity")?.Value)
+                && Filter.AllowsEgoType(row.CellOf("Type")?.Value);
 
             bool anyValue = false;
 
             foreach (TableCell cell in row.Cells)
             {
-                if (cell.Column.Kind != TableCellKind.Integer)
+                // По типу урона и греху отбирается только урон. Sin Cost и прочие числа
+                // без меток остаются видны, иначе фильтр гасил бы их вместе с уроном.
+                if (!cell.Column.AcceptsSetup)
                 {
                     cell.IsVisible = true;
                     continue;
@@ -869,7 +885,7 @@ public sealed class TableViewModel : ObservableObject
         new TableColumn
         {
             Title = "Danger Level",
-            Width = 130,
+            Width = 116,
             Kind = TableCellKind.Options,
             // Порядок — от младшего к старшему: по нему столбец и сортируется.
             Options = ["ZAYIN", "TETH", "HE", "WAW", "ALEPH"],
@@ -877,34 +893,37 @@ public sealed class TableViewModel : ObservableObject
         new TableColumn
         {
             Title = "Sinner",
-            Width = 140,
+            Width = 118,
             Kind = TableCellKind.Options,
             Options = Sinners,
         },
         new TableColumn
         {
             Title = "Type",
-            Width = 120,
+            Width = 106,
             Kind = TableCellKind.Options,
             Options = ["Awakening", "Corrosion"],
         },
-        new TableColumn { Title = "Name", Width = 220, Stretch = true },
+        // Ширина, снятая с трёх узких столбцов слева, отдана названию.
+        new TableColumn { Title = "Name", Width = 270, Stretch = true, FontSize = 12 },
         new TableColumn { Title = "Sin Cost", Width = 92, Kind = TableCellKind.Integer },
         .. DamageWithCost("1T Damage"),
         .. DamageWithCost("3T Damage"),
         .. DamageWithCost("7T Damage"),
-        .. DamageWithCost("Max T Damage"),
+        .. DamageWithCost("Max Damage", aliases: ["Max T Damage"]),
     ]);
 
     /// <summary>
     /// Урон и его цена за грех: DPSC считается сам и руками не правится. Подпись у всех
     /// четырёх одна, а храниться им надо порознь — отсюда отдельный ключ.
     /// </summary>
-    private static IEnumerable<TableColumn> DamageWithCost(string title)
+    private static IEnumerable<TableColumn> DamageWithCost(string title, IReadOnlyList<string>? aliases = null)
     {
         yield return new TableColumn
         {
             Title = title,
+            // Прежнее название держим, чтобы старые файлы читались без потерь.
+            Aliases = aliases ?? [],
             Width = 110,
             Kind = TableCellKind.Integer,
             AcceptsSetup = true,
@@ -929,11 +948,14 @@ public sealed class TableViewModel : ObservableObject
         IReadOnlyList<string> rarities =
             columns.FirstOrDefault(column => column.Title == "Rarity")?.Options ?? [];
 
+        IReadOnlyList<string> egoTypes =
+            columns.FirstOrDefault(column => column.Title == "Type")?.Options ?? [];
+
         TableViewModel table = new()
         {
             Title = title,
             Columns = columns,
-            Filter = new TableFilterViewModel(Sinners, rarities),
+            Filter = new TableFilterViewModel(Sinners, rarities, egoTypes),
         };
 
         table.Filter.Changed += (_, _) => table.ApplyFilter();

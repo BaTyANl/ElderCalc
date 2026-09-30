@@ -31,18 +31,21 @@ public static class AppSettings
         "ElderCalc",
         "settings.json");
 
-    /// <summary>Цвет обводки клеток, заполненных руками, — приглушённый серый.</summary>
+    /// <summary>
+    /// Обводка клеток, заполненных руками, — приглушённый серый. По умолчанию выключена:
+    /// обводки включают в настройках, когда нужно видеть, откуда взялся урон.
+    /// </summary>
     public static OutlineSettings DefaultManualOutline() => new()
     {
-        Enabled = true,
+        Enabled = false,
         Color = Color.FromRgb(0x98, 0xA0, 0xAD),
         Opacity = 1.0,
     };
 
-    /// <summary>Цвет обводки клеток из калькулятора — акцентный красный.</summary>
+    /// <summary>Обводка клеток из калькулятора — акцентный красный; тоже выключена поначалу.</summary>
     public static OutlineSettings DefaultCalculatorOutline() => new()
     {
-        Enabled = true,
+        Enabled = false,
         Color = Color.FromRgb(0xDE, 0x50, 0x40),
         Opacity = 1.0,
     };

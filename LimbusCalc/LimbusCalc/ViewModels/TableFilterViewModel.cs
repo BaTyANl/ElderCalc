@@ -65,14 +65,19 @@ public sealed class TableFilterViewModel : ObservableObject
 {
     private string _search = string.Empty;
 
-    public TableFilterViewModel(IReadOnlyList<string> sinners, IReadOnlyList<string> rarities)
+    public TableFilterViewModel(
+        IReadOnlyList<string> sinners,
+        IReadOnlyList<string> rarities,
+        IReadOnlyList<string> egoTypes)
     {
         ArgumentNullException.ThrowIfNull(sinners);
         ArgumentNullException.ThrowIfNull(rarities);
+        ArgumentNullException.ThrowIfNull(egoTypes);
 
+        // «Type» у E.G.O. занят под Awakening/Corrosion, поэтому тип урона — Attack Type.
         TypeList = new FilterListViewModel
         {
-            Title = "Type",
+            Title = "Attack Type",
             Items = [.. ElementOptions.DamageTypes.Select(Wrap)],
         };
 
@@ -94,6 +99,12 @@ public sealed class TableFilterViewModel : ObservableObject
             Items = [.. rarities.Select(name => new FilterOptionViewModel { Name = name })],
         };
 
+        EgoTypeList = new FilterListViewModel
+        {
+            Title = "Type",
+            Items = [.. egoTypes.Select(name => new FilterOptionViewModel { Name = name })],
+        };
+
         foreach (FilterListViewModel list in Lists)
         {
             foreach (FilterOptionViewModel item in list.Items)
@@ -110,6 +121,9 @@ public sealed class TableFilterViewModel : ObservableObject
     public FilterListViewModel SinnerList { get; }
 
     public FilterListViewModel RarityList { get; }
+
+    /// <summary>Вид E.G.O.: Awakening или Corrosion. Отбирает строку целиком.</summary>
+    public FilterListViewModel EgoTypeList { get; }
 
     /// <summary>Фильтр изменился — таблицу нужно пересобрать.</summary>
     public event EventHandler? Changed;
@@ -135,7 +149,7 @@ public sealed class TableFilterViewModel : ObservableObject
     public bool FiltersMarks => TypeList.Any || SinList.Any;
 
     public bool IsActive =>
-        FiltersMarks || SinnerList.Any || RarityList.Any || _search.Length > 0;
+        FiltersMarks || SinnerList.Any || RarityList.Any || EgoTypeList.Any || _search.Length > 0;
 
     /// <summary>Подходит ли название строки под поиск.</summary>
     public bool AllowsName(string? name) =>
@@ -145,6 +159,8 @@ public sealed class TableFilterViewModel : ObservableObject
     public bool AllowsSinner(string? name) => Allows(SinnerList, name);
 
     public bool AllowsRarity(string? rarity) => Allows(RarityList, rarity);
+
+    public bool AllowsEgoType(string? type) => Allows(EgoTypeList, type);
 
     private static bool Allows(FilterListViewModel list, string? name) =>
         !list.Any || list.Items.Any(item => item.IsSelected && item.Name == name);
@@ -166,7 +182,8 @@ public sealed class TableFilterViewModel : ObservableObject
         Search = string.Empty;
     }
 
-    private IEnumerable<FilterListViewModel> Lists => [TypeList, SinList, SinnerList, RarityList];
+    private IEnumerable<FilterListViewModel> Lists =>
+        [TypeList, SinList, SinnerList, RarityList, EgoTypeList];
 
     private static bool Matches(FilterListViewModel list, ElementOption? actual) =>
         !list.Any

@@ -88,6 +88,7 @@
              и прокрутка упиралась именно в них. -->
         <DataTemplate x:Key="TextEditorTemplate">
             <TextBox Style="{StaticResource TableCellTextBox}"
+                     FontSize="{Binding Column.FontSize}"
                      LostFocus="CellEditor_LostFocus"
                      Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"/>
         </DataTemplate>
@@ -98,6 +99,14 @@
                      Padding="{DynamicResource CellDamagePadding}"
                      behaviors:IntegerText.Enabled="True"
                      IsReadOnly="{Binding HasSetup}"
+                     LostFocus="CellEditor_LostFocus"
+                     Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"/>
+        </DataTemplate>
+
+        <DataTemplate x:Key="PlainNumberEditorTemplate">
+            <TextBox Style="{StaticResource TableCellTextBox}"
+                     TextAlignment="Center" Padding="6,4"
+                     behaviors:IntegerText.Enabled="True"
                      LostFocus="CellEditor_LostFocus"
                      Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"/>
         </DataTemplate>
@@ -138,7 +147,8 @@
                     MouseLeftButtonDown="Cell_BeginEdit"
                     ContextMenuOpening="Row_ContextMenuOpening">
                 <TextBlock Text="{Binding Value}" Margin="8,4" VerticalAlignment="Center"
-                           TextTrimming="CharacterEllipsis"/>
+                           TextTrimming="CharacterEllipsis"
+                           FontSize="{Binding Column.FontSize}"/>
             </Border>
         </DataTemplate>
 
@@ -192,6 +202,22 @@
             </Border>
         </DataTemplate>
 
+        <!-- Число, которое не урон (Sin Cost): ни меток, ни набора из калькулятора,
+             поэтому и обводке «откуда взялось» здесь делать нечего. Стоит по центру. -->
+        <DataTemplate x:Key="PlainNumberCellTemplate">
+            <Border Width="{Binding Column.ActualWidth}" MinHeight="28"
+                    Background="Transparent"
+                    BorderBrush="{DynamicResource OutlineBrush}"
+                    BorderThickness="0,0,1,1"
+                    SnapsToDevicePixels="True"
+                    MouseLeftButtonDown="Cell_BeginEdit"
+                    ContextMenuOpening="Row_ContextMenuOpening">
+                <TextBlock Text="{Binding Value}" VerticalAlignment="Center"
+                           Margin="6,4" TextAlignment="Center"
+                           Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibility}}"/>
+            </Border>
+        </DataTemplate>
+
         <!-- Счётная клетка: значение берётся у соседей, править его нечем, поэтому
              ни поля ввода, ни меню, ни обводки «откуда взялось» у неё нет. -->
         <DataTemplate x:Key="ComputedCellTemplate">
@@ -203,7 +229,6 @@
                      по центру всегда — независимо от настройки иконок. -->
                 <TextBlock Text="{Binding Value}" VerticalAlignment="Center"
                            Margin="6,4" TextAlignment="Center"
-                           Foreground="{DynamicResource SubtleTextBrush}"
                            Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibility}}"/>
             </Border>
         </DataTemplate>
@@ -212,7 +237,8 @@
                                     Text="{StaticResource TextCellTemplate}"
                                     Integer="{StaticResource IntegerCellTemplate}"
                                     Options="{StaticResource OptionsCellTemplate}"
-                                    Computed="{StaticResource ComputedCellTemplate}"/>
+                                    Computed="{StaticResource ComputedCellTemplate}"
+                                    PlainNumber="{StaticResource PlainNumberCellTemplate}"/>
 
         <!-- Справочная таблица: столбцы задаёт модель, поэтому разметка одна
              и для ID, и для E.G.O. Обработчики кнопок живут в этом окне,
@@ -279,6 +305,15 @@
                                 Tag="{Binding SinnerList}"
                                 Content="{Binding SinnerList.Label}"
                                 Visibility="{Binding DataContext.HasSinners,
+                                             RelativeSource={RelativeSource AncestorType=ContentPresenter},
+                                             Converter={StaticResource BoolToVisibility}}"
+                                Click="FilterList_Click"/>
+                        <!-- Вид E.G.O. — Awakening или Corrosion; у ID такого столбца нет. -->
+                        <Button Margin="8,0,0,0" Style="{StaticResource SmallButton}"
+                                AutomationProperties.AutomationId="FilterEgoTypeButton"
+                                Tag="{Binding EgoTypeList}"
+                                Content="{Binding EgoTypeList.Label}"
+                                Visibility="{Binding DataContext.HasEgoType,
                                              RelativeSource={RelativeSource AncestorType=ContentPresenter},
                                              Converter={StaticResource BoolToVisibility}}"
                                 Click="FilterList_Click"/>
@@ -403,7 +438,16 @@
                                                                 <DataTrigger Binding="{Binding Column.Kind}" Value="Computed">
                                                                     <Setter Property="HorizontalAlignment" Value="Stretch"/>
                                                                     <Setter Property="TextAlignment" Value="Center"/>
+                                                                    <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
                                                                 </DataTrigger>
+                                                                <!-- Число, которое не урон (Sin Cost), стоит по центру. -->
+                                                                <MultiDataTrigger>
+                                                                    <MultiDataTrigger.Conditions>
+                                                                        <Condition Binding="{Binding Column.Kind}" Value="Integer"/>
+                                                                        <Condition Binding="{Binding Column.AcceptsSetup}" Value="False"/>
+                                                                    </MultiDataTrigger.Conditions>
+                                                                    <Setter Property="TextAlignment" Value="Center"/>
+                                                                </MultiDataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
                                                     </TextBlock.Style>
@@ -511,7 +555,7 @@
                               ContentTemplate="{StaticResource ReferenceTableTemplate}"/>
         </TabItem>
 
-        <TabItem Header="E.G.O." IsEnabled="False" ToolTip="Not ready yet">
+        <TabItem Header="E.G.O.">
             <ContentPresenter Content="{Binding EgoTable}"
                               ContentTemplate="{StaticResource ReferenceTableTemplate}"/>
         </TabItem>
@@ -900,8 +944,8 @@
                 <Button Content="Export to E.G.O." Margin="8,0,0,0"
                         Style="{StaticResource SmallButton}"
                         AutomationProperties.AutomationId="ExportToEgoButton"
-                        IsEnabled="False"
-                        ToolTip="Not ready yet"/>
+                        ToolTip="Put this setup into a cell of the E.G.O. table"
+                        Click="ExportToEgo_Click"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">

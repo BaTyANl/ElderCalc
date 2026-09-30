@@ -19,11 +19,15 @@ public sealed class CellTemplateSelector : DataTemplateSelector
 
     public DataTemplate? Computed { get; set; }
 
+    /// <summary>Целое число, которое не урон: без меток и обводки, по центру.</summary>
+    public DataTemplate? PlainNumber { get; set; }
+
     public override DataTemplate? SelectTemplate(object item, DependencyObject container) =>
         item is not TableCell cell
             ? base.SelectTemplate(item, container)
             : cell.Column.Kind switch
             {
+                TableCellKind.Integer when !cell.Column.AcceptsSetup => PlainNumber ?? Integer,
                 TableCellKind.Integer => Integer,
                 TableCellKind.Options => Options,
                 TableCellKind.Computed => Computed,

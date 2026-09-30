@@ -461,6 +461,7 @@ namespace LimbusCalc
 
             string template = cell.Column.Kind switch
             {
+                TableCellKind.Integer when !cell.Column.AcceptsSetup => "PlainNumberEditorTemplate",
                 TableCellKind.Integer => "IntegerEditorTemplate",
                 TableCellKind.Options => "OptionsEditorTemplate",
                 _ => "TextEditorTemplate",
