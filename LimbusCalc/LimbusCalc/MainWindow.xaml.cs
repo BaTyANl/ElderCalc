@@ -11,6 +11,7 @@ using LimbusCalc.Storage;
 using Microsoft.Win32;
 using LimbusCalc.Theming;
 using LimbusCalc.ViewModels;
+using LimbusCalc.Views;
 
 namespace LimbusCalc
 {
@@ -39,6 +40,12 @@ namespace LimbusCalc
             Interval = TimeSpan.FromSeconds(1.5),
         };
 
+        /// <summary>Очередь записи таблиц в фоне; каждая следующая ждёт предыдущую.</summary>
+        private Task _saving = Task.CompletedTask;
+
+        /// <summary>Об ошибке записи уже сказали — повторять до первой удачи незачем.</summary>
+        private bool _saveErrorShown;
+
         private SubtargetsWindow? _subtargetsWindow;
 
         private DamageByTargetWindow? _damageByTargetWindow;
@@ -61,18 +68,97 @@ namespace LimbusCalc
                 [_viewModel.EgoTable] = TableStorage.EgoFileName,
             };
 
-            foreach ((TableViewModel table, string file) in _tableFiles)
-            {
-                TableStorage.Load(file, table);
-            }
-
-            // Подписываемся после загрузки: сохранять только что прочитанное незачем.
+            // Таблицы читаются, когда окно уже показалось: файл в пару мегабайт иначе
+            // держал бы запуск на пустом экране. До тех пор их закрывает заглушка.
             foreach (TableViewModel table in _tableFiles.Keys)
             {
-                table.Changed += OnTableChanged;
+                table.IsLoading = true;
             }
 
+            ContentRendered += LoadTablesOnce;
             _tableSaveTimer.Tick += (_, _) => SaveTables();
+        }
+
+        /// <summary>
+        /// Читает таблицы в фоне и ставит их на место. Сохранение подключается только
+        /// после этого: прочитанное писать обратно незачем, а до конца чтения — опасно.
+        /// </summary>
+        private async void LoadTablesOnce(object? sender, EventArgs e)
+        {
+            ContentRendered -= LoadTablesOnce;
+
+            Dictionary<TableViewModel, Task<TableLoadResult>> reading = _tableFiles.ToDictionary(
+                pair => pair.Key,
+                pair => Task.Run(() => TableStorage.Read(pair.Value)));
+
+            List<string> problems = [];
+
+            foreach ((TableViewModel table, Task<TableLoadResult> task) in reading)
+            {
+                TableLoadResult result;
+
+                try
+                {
+                    result = await task;
+                }
+                catch (Exception error)
+                {
+                    // Сюда попадает только непредвиденное: ошибки чтения Read ловит сам.
+                    // Что стало с файлом, неизвестно, поэтому и писать в него не будем.
+                    result = new TableLoadResult(
+                        TableLoadOutcome.Failed, TableData.Empty, error.Message, null, CanSave: false);
+                }
+
+                TableStorage.Apply(table, result.Data);
+
+                if (result.CanSave)
+                {
+                    table.Changed += OnTableChanged;
+                }
+
+                if (Describe(table, result) is string problem)
+                {
+                    problems.Add(problem);
+                }
+
+                table.IsLoading = false;
+            }
+
+            if (problems.Count > 0)
+            {
+                MessageBox.Show(
+                    this,
+                    string.Join(Environment.NewLine + Environment.NewLine, problems),
+                    "Table file problem",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+        }
+
+        /// <summary>Что сказать пользователю о чтении таблицы; всё в порядке — ничего.</summary>
+        private string? Describe(TableViewModel table, TableLoadResult result)
+        {
+            string path = TableStorage.PathOf(_tableFiles[table]);
+
+            return result.Outcome switch
+            {
+                TableLoadOutcome.RestoredFromBackup =>
+                    $"The {table.Title} table file could not be read ({result.Problem}). "
+                    + "The previous version was restored from the backup copy. "
+                    + $"The damaged file was kept as {result.BrokenCopy}.",
+
+                TableLoadOutcome.Failed when result.CanSave =>
+                    $"The {table.Title} table file could not be read ({result.Problem}), "
+                    + "and there was no readable backup copy. The table starts empty. "
+                    + $"The damaged file was kept as {result.BrokenCopy}.",
+
+                TableLoadOutcome.Failed =>
+                    $"The {table.Title} table file could not be read ({result.Problem}), "
+                    + "and it could not be set aside either. So that nothing is lost, changes "
+                    + $"to this table will not be saved until the app is restarted. File: {path}",
+
+                _ => null,
+            };
         }
 
         private void OnTableChanged(object? sender, EventArgs e)
@@ -86,24 +172,81 @@ namespace LimbusCalc
             _tableSaveTimer.Start();
         }
 
+        /// <summary>
+        /// Снимок таблицы — в потоке окна, за доли миллисекунды; сама запись — в фоне,
+        /// и пока пишется файл в пару мегабайт, в таблице можно работать дальше.
+        /// </summary>
         private void SaveTables()
         {
             _tableSaveTimer.Stop();
 
             foreach (TableViewModel table in _changedTables)
             {
-                TableStorage.Save(_tableFiles[table], table);
+                QueueSave(table, TableStorage.Snapshot(table));
             }
 
             _changedTables.Clear();
+        }
+
+        /// <summary>
+        /// Записи идут строго друг за другом: иначе старый снимок мог бы лечь
+        /// поверх нового, записанного чуть раньше.
+        /// </summary>
+        private void QueueSave(TableViewModel table, TableSnapshot snapshot)
+        {
+            string file = _tableFiles[table];
+
+            _saving = _saving.ContinueWith(
+                _ =>
+                {
+                    try
+                    {
+                        TableStorage.Save(file, snapshot);
+                        Dispatcher.BeginInvoke(() => _saveErrorShown = false);
+                    }
+                    catch (Exception error)
+                    {
+                        Dispatcher.BeginInvoke(() => ReportSaveError(table, error));
+                    }
+                },
+                TaskScheduler.Default);
+        }
+
+        /// <summary>
+        /// Запись не удалась. Прежний файл цел — подмена случается только после
+        /// полной записи. Таблицу помечаем изменённой, чтобы попытаться ещё раз.
+        /// </summary>
+        private void ReportSaveError(TableViewModel table, Exception error)
+        {
+            _changedTables.Add(table);
+
+            // Одно окно на полосу сбоев: сохранение срабатывает часто.
+            if (_saveErrorShown)
+            {
+                return;
+            }
+
+            _saveErrorShown = true;
+
+            MessageBox.Show(
+                this,
+                $"The {table.Title} table could not be saved: {error.Message}"
+                    + Environment.NewLine + Environment.NewLine
+                    + "The previous version of the file is intact. Saving will be retried "
+                    + "after the next change and when the app closes.",
+                "Save failed",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
         }
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
             base.OnClosing(e);
 
-            // Правку могли не успеть записать по таймеру — дописываем на выходе.
+            // Правку могли не успеть записать по таймеру — дописываем на выходе
+            // и ждём, пока запись закончится: иначе процесс оборвёт её на середине.
             SaveTables();
+            _saving.Wait(TimeSpan.FromSeconds(15));
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -151,13 +294,39 @@ namespace LimbusCalc
         }
 
         /// <summary>
-        /// Меню строки открывается по правой кнопке над клетками, которые её описывают.
-        /// Строку и таблицу берём из дерева: у клетки в привязке только она сама.
+        /// Правая кнопка над строкой. Клетку находим по месту щелчка: у клеток урона своё
+        /// меню, у счётных и скрытых фильтром — никакого, у остальных — меню строки.
         /// </summary>
-        private void Row_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        private void RowView_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
-            if (sender is not FrameworkElement element
-                || DataOf<TableRowViewModel>(element) is not TableRowViewModel row
+            if (sender is not TableRowView view
+                || view.CellAt(Mouse.GetPosition(view), out _) is not TableCell cell)
+            {
+                return;
+            }
+
+            e.Handled = true;
+
+            if (cell.Column.Kind == TableCellKind.Computed || !cell.IsVisible)
+            {
+                return;
+            }
+
+            // Клетке вроде Sin Cost предложить нечего: ни набора, ни меток — ей меню строки.
+            if (cell.HasSetup || cell.CanEditMarks)
+            {
+                OpenCellMenu(cell, view);
+            }
+            else
+            {
+                OpenRowMenu(view);
+            }
+        }
+
+        /// <summary>Меню строки. Строку и таблицу берём из дерева над элементом.</summary>
+        private void OpenRowMenu(FrameworkElement element)
+        {
+            if (DataOf<TableRowViewModel>(element) is not TableRowViewModel row
                 || DataOf<TableViewModel>(element) is not TableViewModel table)
             {
                 return;
@@ -169,8 +338,6 @@ namespace LimbusCalc
             menu.Tag = table;
             menu.PlacementTarget = element;
             menu.IsOpen = true;
-
-            e.Handled = true;
         }
 
         /// <summary>Ближайшая вверх по дереву привязка нужного вида.</summary>
@@ -371,6 +538,17 @@ namespace LimbusCalc
         /// </summary>
         private void ExportToTable(TableViewModel table)
         {
+            if (table.IsLoading)
+            {
+                MessageBox.Show(
+                    this,
+                    $"The {table.Title} table is still loading. Try again in a moment.",
+                    $"Export to {table.Title}",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+                return;
+            }
+
             ExportToTableViewModel selection = ExportToTableViewModel.Create(table);
 
             if (selection.AllTargets.Count == 0)
@@ -401,32 +579,16 @@ namespace LimbusCalc
         }
 
         /// <summary>
-        /// Меню клетки открываем сами и одно на всех: в шаблоне клетки оно заводилось
-        /// для каждой клетки отдельно вместе с подменю и картинками, и на прокрутке
-        /// это было самой дорогой частью строки.
+        /// Меню клетки урона. Оно одно на всё окно: заводить своё на каждую клетку
+        /// вместе с подменю и картинками было самой дорогой частью прокрутки.
         /// </summary>
-        private void Cell_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        private void OpenCellMenu(TableCell cell, FrameworkElement placement)
         {
-            if (sender is not FrameworkElement { DataContext: TableCell cell } element)
-            {
-                return;
-            }
-
-            // Клетке вроде Sin Cost предложить нечего: ни набора, ни меток. Показываем
-            // меню строки — пустое меню под правой кнопкой выглядело бы поломкой.
-            if (!cell.HasSetup && !cell.CanEditMarks)
-            {
-                Row_ContextMenuOpening(sender, e);
-                return;
-            }
-
             ContextMenu menu = (ContextMenu)FindResource("CellMenu");
 
             menu.DataContext = cell;
-            menu.PlacementTarget = element;
+            menu.PlacementTarget = placement;
             menu.IsOpen = true;
-
-            e.Handled = true;
         }
 
         /// <summary>Клетка, которую сейчас правят, и слой с её полем ввода.</summary>
@@ -435,15 +597,26 @@ namespace LimbusCalc
         private Border? _editorHost;
 
         /// <summary>
-        /// По клику над клеткой встаёт поле ввода. Раньше поле лежало в каждой клетке,
-        /// и прокрутка упиралась именно в них: на экране их под три сотни, а нужно одно.
+        /// Щелчок по строке: клетку находим по месту щелчка. Счётную клетку не правят,
+        /// а скрытая фильтром на экране пуста — править в ней нечего.
         /// </summary>
-        private void Cell_BeginEdit(object sender, MouseButtonEventArgs e)
+        private void RowView_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (sender is not FrameworkElement { DataContext: TableCell cell } element)
+            if (sender is TableRowView view
+                && view.CellAt(e.GetPosition(view), out Rect bounds) is TableCell cell
+                && cell.Column.Kind != TableCellKind.Computed
+                && cell.IsVisible)
             {
-                return;
+                BeginEdit(cell, view, bounds);
             }
+        }
+
+        /// <summary>
+        /// Над клеткой встаёт поле ввода — одно на таблицу: держать его в каждой клетке
+        /// дорого, на экране их сотни. Границы клетки даны в координатах <paramref name="element"/>.
+        /// </summary>
+        private void BeginEdit(TableCell cell, FrameworkElement element, Rect bounds)
+        {
 
             if (ReferenceEquals(_editingCell, cell))
             {
@@ -467,13 +640,22 @@ namespace LimbusCalc
                 _ => "TextEditorTemplate",
             };
 
-            Rect box = element.TransformToVisual(layer)
-                .TransformBounds(new Rect(element.RenderSize));
+            Rect box = element.TransformToVisual(layer).TransformBounds(bounds);
 
             Canvas.SetLeft(host, box.X);
             Canvas.SetTop(host, box.Y);
             host.Width = box.Width;
             host.Height = box.Height;
+
+            // Шрифт — как у клетки под полем: свой у столбца или общий у таблицы.
+            if (cell.Column.FontSize is double size)
+            {
+                slot.FontSize = size;
+            }
+            else
+            {
+                slot.ClearValue(FontSizeProperty);
+            }
 
             slot.ContentTemplate = (DataTemplate)FindResource(template);
             slot.Content = cell;

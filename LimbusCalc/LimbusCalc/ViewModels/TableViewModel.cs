@@ -101,14 +101,11 @@ public sealed class TableColumn : ObservableObject
     /// <summary>Столбец попадает в выпадающие списки, и там его подписывают этим.</summary>
     public override string ToString() => Title;
 
-    /// <summary>Размер шрифта строк таблицы — тот же, что у всего окна.</summary>
-    public const double DefaultFontSize = 13;
-
     /// <summary>
-    /// Шрифт клеток столбца. Мельче обычного там, где длинным названиям тесно:
-    /// у E.G.O. они бывают с оригинальным написанием в скобках.
+    /// Шрифт клеток столбца. Не задан — как у всей таблицы. Мельче обычного там,
+    /// где длинным названиям тесно: у E.G.O. они бывают с оригиналом в скобках.
     /// </summary>
-    public double FontSize { get; init; } = DefaultFontSize;
+    public double? FontSize { get; init; }
 
     /// <summary>Столбец забирает всю ширину, не занятую остальными.</summary>
     public bool Stretch { get; init; }
@@ -333,6 +330,7 @@ public sealed class TableViewModel : ObservableObject
     private IReadOnlyList<TableAverage>? _averages;
     private int _bulkDepth;
     private bool _bulkChanged;
+    private bool _isLoading;
 
     /// <summary>Подпись над таблицей.</summary>
     public required string Title { get; init; }
@@ -387,6 +385,16 @@ public sealed class TableViewModel : ObservableObject
 
     /// <summary>Таблица пуста — вместо строк показываем подсказку.</summary>
     public bool IsEmpty => Rows.Count == 0;
+
+    /// <summary>
+    /// Таблица ещё читается из файла. Пока это так, её закрывает заглушка: правка
+    /// до конца чтения была бы тут же затёрта прочитанным.
+    /// </summary>
+    public bool IsLoading
+    {
+        get => _isLoading;
+        set => SetProperty(ref _isLoading, value);
+    }
 
     /// <summary>
     /// Содержимое изменилось: добавили или убрали строку, поправили клетку, пересортировали.

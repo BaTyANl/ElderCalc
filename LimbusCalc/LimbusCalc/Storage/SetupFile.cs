@@ -123,7 +123,7 @@ public static class SetupFile
             });
         }
 
-        return new JsonObject
+        JsonObject setup = new()
         {
             ["baseRoll"] = model.BaseRoll,
             ["passiveModDynPercent"] = model.PassiveModDynPercent,
@@ -137,7 +137,10 @@ public static class SetupFile
             ["coins"] = coins,
             ["targets"] = targets,
         };
+
+        return SetupDefaults.Compact(setup);
     }
+
 
     public static void FromJson(MainViewModel model, JsonObject setup)
     {
@@ -148,7 +151,7 @@ public static class SetupFile
         model.PassiveModDynPercent = Number(setup["passiveModDynPercent"]);
         model.ClashCount = (int)Number(setup["clashCount"]);
         model.TimeMoratorium = Flag(setup["timeMoratorium"]);
-        model.TimeMoratoriumStacks = (int)Number(setup["timeMoratoriumStacks"], 1);
+        model.TimeMoratoriumStacks = (int)Number(setup["timeMoratoriumStacks"], SetupDefaults.MoratoriumStacks);
 
         if (Option(setup["skillType"], ElementOptions.DamageTypes) is ElementOption type)
         {
@@ -160,10 +163,9 @@ public static class SetupFile
             model.SkillSin = sin;
         }
 
-        if (setup["resistances"] is JsonObject resistances)
-        {
-            ApplyResistances(AllResistances(model), resistances);
-        }
+        // Сопротивления ставим всегда: отсутствующее в файле значит 1.0, а не
+        // «оставить как было в калькуляторе».
+        ApplyResistances(AllResistances(model), setup["resistances"] as JsonObject);
 
         // Монеты заводим до бонусов: строка бонуса раздаёт значение каждой монете.
         JsonArray coins = setup["coins"] as JsonArray ?? [];
@@ -240,10 +242,10 @@ public static class SetupFile
         coin.ModDynPercent = Number(stored["modDynPercent"]);
         coin.OffenseDefenseDiff = Number(stored["offenseDefenseDiff"]);
         coin.HasCrit = Flag(stored["hasCrit"]);
-        coin.CritPercent = Number(stored["critPercent"], 20.0);
+        coin.CritPercent = Number(stored["critPercent"], SetupDefaults.CritPercent);
 
         // Вес меняем последним из простых полей: он заводит подцели.
-        coin.Weight = Math.Max(1, (int)Number(stored["weight"], 1));
+        coin.Weight = Math.Max(1, (int)Number(stored["weight"], SetupDefaults.Weight));
 
         JsonArray subtargets = stored["subtargets"] as JsonArray ?? [];
 
@@ -265,12 +267,21 @@ public static class SetupFile
             subtarget.ModDynPercent = Number(storedSubtarget["modDynPercent"]);
             subtarget.OffenseDefenseDiff = Number(storedSubtarget["offenseDefenseDiff"]);
             subtarget.HasCrit = Flag(storedSubtarget["hasCrit"]);
-            subtarget.CritPercent = Number(storedSubtarget["critPercent"], 20.0);
+            subtarget.CritPercent = Number(storedSubtarget["critPercent"], SetupDefaults.CritPercent);
         }
     }
 
     private static void LoadTargets(MainViewModel model, JsonArray targets)
     {
+        // Сначала всё к значениям по умолчанию: цель, у которой ничего не менялось,
+        // в файл не пишется, и прежнее состояние калькулятора не должно в ней остаться.
+        foreach (SubtargetViewModel subtarget in AllSubtargets(model))
+        {
+            ApplyResistances(subtarget.Resistances, null);
+            subtarget.Shared.TimeMoratorium = false;
+            subtarget.Shared.TimeMoratoriumStacks = (int)SetupDefaults.MoratoriumStacks;
+        }
+
         foreach (JsonNode? node in targets)
         {
             if (node is not JsonObject stored || (string?)stored["name"] is not string name)
@@ -285,28 +296,23 @@ public static class SetupFile
                     continue;
                 }
 
-                if (stored["resistances"] is JsonObject resistances)
-                {
-                    ApplyResistances(subtarget.Resistances, resistances);
-                }
+                ApplyResistances(subtarget.Resistances, stored["resistances"] as JsonObject);
 
                 subtarget.Shared.TimeMoratorium = Flag(stored["timeMoratorium"]);
-                subtarget.Shared.TimeMoratoriumStacks = (int)Number(stored["timeMoratoriumStacks"], 1);
+                subtarget.Shared.TimeMoratoriumStacks = (int)Number(stored["timeMoratoriumStacks"], SetupDefaults.MoratoriumStacks);
                 break;
             }
         }
     }
 
+    /// <summary>Сопротивления из файла; которых там нет — нейтральные, 1.0.</summary>
     private static void ApplyResistances(
         IEnumerable<ResistanceViewModel> resistances,
-        JsonObject stored)
+        JsonObject? stored)
     {
         foreach (ResistanceViewModel resistance in resistances)
         {
-            if (stored[resistance.Option.Element.ToString()] is JsonNode value)
-            {
-                resistance.Value = Number(value, 1.0);
-            }
+            resistance.Value = Number(stored?[resistance.Option.Element.ToString()], SetupDefaults.NeutralResistance);
         }
     }
 

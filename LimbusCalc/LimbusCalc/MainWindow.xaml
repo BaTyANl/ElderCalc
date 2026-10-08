@@ -88,7 +88,6 @@
              и прокрутка упиралась именно в них. -->
         <DataTemplate x:Key="TextEditorTemplate">
             <TextBox Style="{StaticResource TableCellTextBox}"
-                     FontSize="{Binding Column.FontSize}"
                      LostFocus="CellEditor_LostFocus"
                      Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"/>
         </DataTemplate>
@@ -118,133 +117,12 @@
                       SelectedItem="{Binding Value}"/>
         </DataTemplate>
 
-        <!-- Обводка показывает, откуда взялся урон: акцентом — выгруженный
-             из калькулятора, приглушённым — вписанный руками, пусто — без рамки. -->
-        <Style x:Key="CellOutline" TargetType="Border">
-            <Setter Property="Margin" Value="2"/>
-            <Setter Property="CornerRadius" Value="4"/>
-            <Setter Property="BorderThickness" Value="1.5"/>
-            <Setter Property="BorderBrush" Value="Transparent"/>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding Source}" Value="Manual">
-                    <Setter Property="BorderBrush" Value="{DynamicResource ManualOutlineBrush}"/>
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Source}" Value="Calculator">
-                    <Setter Property="BorderBrush" Value="{DynamicResource CalculatorOutlineBrush}"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-
-        <!-- Клетки трёх видов: свободный текст, целое число и выбор из списка.
-             Каждая сама себе рамка сетки: лишняя обёртка на клетку — это лишние
-             две с половиной тысячи элементов на таблицу. -->
-        <DataTemplate x:Key="TextCellTemplate">
-            <Border Width="{Binding Column.ActualWidth}" MinHeight="28"
-                    Background="Transparent"
-                    BorderBrush="{DynamicResource OutlineBrush}"
-                    BorderThickness="0,0,1,1"
-                    SnapsToDevicePixels="True"
-                    MouseLeftButtonDown="Cell_BeginEdit"
-                    ContextMenuOpening="Row_ContextMenuOpening">
-                <TextBlock Text="{Binding Value}" Margin="8,4" VerticalAlignment="Center"
-                           TextTrimming="CharacterEllipsis"
-                           FontSize="{Binding Column.FontSize}"/>
-            </Border>
-        </DataTemplate>
-
-        <DataTemplate x:Key="IntegerCellTemplate">
-            <Border Width="{Binding Column.ActualWidth}" MinHeight="28"
-                    BorderBrush="{DynamicResource OutlineBrush}"
-                    BorderThickness="0,0,1,1"
-                    SnapsToDevicePixels="True">
-                <!-- Не прошедшая фильтр клетка остаётся пустой: сетка на месте, значения нет. -->
-                <Grid Background="Transparent"
-                      Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibility}}"
-                      MouseLeftButtonDown="Cell_BeginEdit"
-                      ContextMenuOpening="Cell_ContextMenuOpening">
-                    <Border Style="{StaticResource CellOutline}"/>
-
-                    <!-- Урон слева, иконки справа: правый отступ оставляет им место.
-                         Иконки можно выключить в настройках — тогда урон встаёт
-                         по центру клетки, а отступы становятся ровными. -->
-                    <TextBlock Text="{Binding Value}" VerticalAlignment="Center"
-                               Margin="{DynamicResource CellDamagePadding}"
-                               TextAlignment="{DynamicResource CellDamageAlignment}"/>
-
-                    <Image Source="{Binding SkillType.IconPath}" Width="15" Height="15"
-                           HorizontalAlignment="Right" VerticalAlignment="Center"
-                           Margin="0,0,21,0" IsHitTestVisible="False"
-                           Visibility="{DynamicResource SkillIconVisibility}"
-                           RenderOptions.BitmapScalingMode="HighQuality"/>
-                    <Image Source="{Binding SkillSin.IconPath}" Width="15" Height="15"
-                           HorizontalAlignment="Right" VerticalAlignment="Center"
-                           Margin="0,0,4,0" IsHitTestVisible="False"
-                           Visibility="{DynamicResource SkillIconVisibility}"
-                           RenderOptions.BitmapScalingMode="HighQuality"/>
-                </Grid>
-            </Border>
-        </DataTemplate>
-
-        <DataTemplate x:Key="OptionsCellTemplate">
-            <Border Width="{Binding Column.ActualWidth}" MinHeight="28"
-                    Background="Transparent" Cursor="Hand"
-                    BorderBrush="{DynamicResource OutlineBrush}"
-                    BorderThickness="0,0,1,1"
-                    SnapsToDevicePixels="True"
-                    MouseLeftButtonDown="Cell_BeginEdit"
-                    ContextMenuOpening="Row_ContextMenuOpening">
-                <Grid>
-                    <TextBlock Text="{Binding Value}" Margin="8,0,22,0" VerticalAlignment="Center"/>
-                    <Path Data="M0,0 L4,4 L8,0" Stroke="{DynamicResource SubtleTextBrush}"
-                          StrokeThickness="1.4" Margin="0,0,8,0"
-                          HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                </Grid>
-            </Border>
-        </DataTemplate>
-
-        <!-- Число, которое не урон (Sin Cost): ни меток, ни набора из калькулятора,
-             поэтому и обводке «откуда взялось» здесь делать нечего. Стоит по центру. -->
-        <DataTemplate x:Key="PlainNumberCellTemplate">
-            <Border Width="{Binding Column.ActualWidth}" MinHeight="28"
-                    Background="Transparent"
-                    BorderBrush="{DynamicResource OutlineBrush}"
-                    BorderThickness="0,0,1,1"
-                    SnapsToDevicePixels="True"
-                    MouseLeftButtonDown="Cell_BeginEdit"
-                    ContextMenuOpening="Row_ContextMenuOpening">
-                <TextBlock Text="{Binding Value}" VerticalAlignment="Center"
-                           Margin="6,4" TextAlignment="Center"
-                           Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibility}}"/>
-            </Border>
-        </DataTemplate>
-
-        <!-- Счётная клетка: значение берётся у соседей, править его нечем, поэтому
-             ни поля ввода, ни меню, ни обводки «откуда взялось» у неё нет. -->
-        <DataTemplate x:Key="ComputedCellTemplate">
-            <Border Width="{Binding Column.ActualWidth}" MinHeight="28"
-                    BorderBrush="{DynamicResource OutlineBrush}"
-                    BorderThickness="0,0,1,1"
-                    SnapsToDevicePixels="True">
-                <!-- Иконок у счётной клетки не бывает, поэтому её число стоит
-                     по центру всегда — независимо от настройки иконок. -->
-                <TextBlock Text="{Binding Value}" VerticalAlignment="Center"
-                           Margin="6,4" TextAlignment="Center"
-                           Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibility}}"/>
-            </Border>
-        </DataTemplate>
-
-        <views:CellTemplateSelector x:Key="CellTemplates"
-                                    Text="{StaticResource TextCellTemplate}"
-                                    Integer="{StaticResource IntegerCellTemplate}"
-                                    Options="{StaticResource OptionsCellTemplate}"
-                                    Computed="{StaticResource ComputedCellTemplate}"
-                                    PlainNumber="{StaticResource PlainNumberCellTemplate}"/>
-
         <!-- Справочная таблица: столбцы задаёт модель, поэтому разметка одна
              и для ID, и для E.G.O. Обработчики кнопок живут в этом окне,
              из-за чего шаблон и лежит здесь, а не в общем словаре стилей. -->
         <DataTemplate x:Key="ReferenceTableTemplate">
             <Border Style="{StaticResource Card}">
+                <Grid>
                 <DockPanel>
                     <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
                         <!-- Работа с файлом — у правого края, отдельно от правки строк. -->
@@ -501,13 +379,10 @@
                                     </ItemsControl.ItemContainerStyle>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <!-- Чем заполняется клетка, задаёт её столбец. -->
-                                            <ItemsControl ItemsSource="{Binding Cells}"
-                                                          ItemTemplateSelector="{StaticResource CellTemplates}">
-                                                <ItemsControl.ItemsPanel>
-                                                    <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
-                                                </ItemsControl.ItemsPanel>
-                                            </ItemsControl>
+                                            <!-- Строка рисует свои клетки сама: один элемент
+                                                 на строку вместо шаблона на каждую клетку. -->
+                                            <views:TableRowView MouseLeftButtonDown="RowView_MouseLeftButtonDown"
+                                                                ContextMenuOpening="RowView_ContextMenuOpening"/>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
@@ -524,6 +399,17 @@
                         </Grid>
                     </Border>
                 </DockPanel>
+
+                <!-- Пока таблица читается из файла, её закрывает заглушка: правка до конца
+                     чтения была бы тут же затёрта прочитанным. -->
+                <Border Background="{DynamicResource SurfaceBrush}"
+                        AutomationProperties.AutomationId="TableLoading"
+                        Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock Text="Loading table…" HorizontalAlignment="Center"
+                               VerticalAlignment="Center" FontSize="15"
+                               Foreground="{DynamicResource SubtleTextBrush}"/>
+                </Border>
+                </Grid>
             </Border>
         </DataTemplate>
     </Window.Resources>

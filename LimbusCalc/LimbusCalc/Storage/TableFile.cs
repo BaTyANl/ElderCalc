@@ -30,7 +30,8 @@ public static class TableFile
 
         // Выгрузку открывают и правят руками, поэтому с отступами — в отличие
         // от файла в профиле, который переписывается на каждой правке.
-        File.WriteAllText(path, TableStorage.ToJson(table).ToJsonString(JsonFormat.Readable));
+        using FileStream stream = File.Create(path);
+        TableStorage.Write(stream, TableStorage.Snapshot(table), indented: true);
     }
 
     public static void Import(TableViewModel table, string path)
