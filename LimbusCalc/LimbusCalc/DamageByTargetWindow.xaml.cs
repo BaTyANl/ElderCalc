@@ -4,7 +4,7 @@ using LimbusCalc.ViewModels;
 
 namespace LimbusCalc
 {
-    /// <summary>Таблица распределения урона: строки — цели, столбцы — монеты.</summary>
+    /// <summary>Damage split by target: rows are targets, columns are coins.</summary>
     public partial class DamageByTargetWindow : Window
     {
         public DamageByTargetWindow(MainViewModel viewModel)
@@ -14,7 +14,7 @@ namespace LimbusCalc
             DataContext = viewModel;
         }
 
-        /// <summary>Нажатие на подпись столбца сортирует таблицу по нему.</summary>
+        /// <summary>Clicking a column header sorts the table by that column.</summary>
         private void Sort_Click(object sender, RoutedEventArgs e)
         {
             if (sender is FrameworkElement { DataContext: TargetColumnViewModel column }

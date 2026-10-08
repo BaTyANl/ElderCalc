@@ -6,8 +6,8 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!-- Первым идёт словарь темы: ThemeManager подменяет именно его.
-                     Здесь стоит тема по умолчанию, сохранённый выбор применяется при запуске. -->
+                <!-- The theme dictionary must come first: ThemeManager swaps exactly this one.
+                     Dark is the default; the saved choice is applied at startup. -->
                 <ResourceDictionary Source="Themes/Dark.xaml"/>
                 <ResourceDictionary Source="Themes/Controls.xaml"/>
             </ResourceDictionary.MergedDictionaries>

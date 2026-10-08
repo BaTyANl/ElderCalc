@@ -2,19 +2,19 @@ using System.Collections.ObjectModel;
 
 namespace LimbusCalc.ViewModels;
 
-/// <summary>Строка справочника как пункт выпадающего списка.</summary>
+/// <summary>A table row as a suggestion list item.</summary>
 public sealed class ExportTargetViewModel
 {
     public required TableRowViewModel Row { get; init; }
 
-    /// <summary>Подпись пункта: грешник и название айди.</summary>
+    /// <summary>The item label: sinner and ID name.</summary>
     public required string Display { get; init; }
 
     public override string ToString() => Display;
 }
 
 /// <summary>
-/// Куда выгружать набор калькулятора: строка справочника и столбец скилла.
+/// Where the calculator setup goes: a table row and a skill column.
 /// </summary>
 public sealed class ExportToTableViewModel : ObservableObject
 {
@@ -22,20 +22,20 @@ public sealed class ExportToTableViewModel : ObservableObject
     private TableColumn? _selectedSkill;
     private string _search = string.Empty;
 
-    /// <summary>Заголовок окна: в какую именно таблицу выгружаем.</summary>
+    /// <summary>Window title: which table we export to.</summary>
     public required string Caption { get; init; }
 
-    /// <summary>Все именованные строки справочника; список сужается поиском.</summary>
+    /// <summary>All named rows of the table; the search narrows the list.</summary>
     public required IReadOnlyList<ExportTargetViewModel> AllTargets { get; init; }
 
-    /// <summary>Что показывать в списке сейчас.</summary>
+    /// <summary>What the list shows right now.</summary>
     public ObservableCollection<ExportTargetViewModel> Targets { get; } = [];
 
     public required IReadOnlyList<TableColumn> Skills { get; init; }
 
     /// <summary>
-    /// Поиск по подписи пункта. В ней и название айди, и грешник, поэтому набрать
-    /// можно любое из двух — в справочнике на сотню строк иначе не найтись.
+    /// Search over the item label. It contains both the ID name and the sinner, so either
+    /// can be typed — otherwise there's no finding anything among a hundred rows.
     /// </summary>
     public string Search
     {
@@ -73,19 +73,19 @@ public sealed class ExportToTableViewModel : ObservableObject
         }
     }
 
-    /// <summary>Пока не выбраны и айди, и скилл, сохранять некуда.</summary>
+    /// <summary>Nothing to save until both the row and the skill are chosen.</summary>
     public bool CanSave => SelectedTarget is not null && SelectedSkill is not null;
 
-    /// <summary>Ничего не нашлось: список пуст не потому, что справочник пуст.</summary>
+    /// <summary>The search found nothing (as opposed to the table being empty).</summary>
     public bool NothingFound => Targets.Count == 0 && AllTargets.Count > 0;
 
-    /// <summary>Клетка, в которую пойдёт выгрузка.</summary>
+    /// <summary>The cell that receives the export.</summary>
     public TableCell? TargetCell =>
         SelectedTarget is null || SelectedSkill is null
             ? null
             : SelectedTarget.Row.CellOf(SelectedSkill);
 
-    /// <summary>Собирает список из строк справочника; безымянные строки пропускаем.</summary>
+    /// <summary>Builds the list from the table's rows; unnamed rows are skipped.</summary>
     public static ExportToTableViewModel Create(TableViewModel table)
     {
         ArgumentNullException.ThrowIfNull(table);
@@ -106,8 +106,8 @@ public sealed class ExportToTableViewModel : ObservableObject
             targets.Add(new ExportTargetViewModel
             {
                 Row = row,
-                // Одно и то же название встречается у разных грешников, поэтому
-                // в подписи оба: иначе LCB Sinner выглядел бы двенадцать раз подряд.
+                // The same name appears under different sinners, so the label has both:
+                // otherwise "LCB Sinner" would show up twelve times in a row.
                 Display = sinner.Length == 0 ? name : $"{sinner} — {name}",
             });
         }
@@ -124,8 +124,8 @@ public sealed class ExportToTableViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Пересобирает показанный список. Выбранный айди сохраняем, если он прошёл поиск:
-    /// иначе набранная буква сбрасывала бы уже сделанный выбор.
+    /// Rebuilds the shown list. The chosen row is kept if it still matches the search;
+    /// otherwise every typed letter would drop a choice already made.
     /// </summary>
     private void ApplySearch()
     {
@@ -142,8 +142,8 @@ public sealed class ExportToTableViewModel : ObservableObject
             }
         }
 
-        // Осталась одна подсказка — выбирать между чем-то уже не из чего, и заставлять
-        // ткнуть в единственную строку незачем. Прежний выбор держим, пока он подходит.
+        // With a single match left there's nothing to choose between, so it's selected
+        // automatically. The previous choice is kept while it still matches.
         SelectedTarget =
             chosen is not null && Targets.Contains(chosen) ? chosen
             : _search.Length > 0 && Targets.Count == 1 ? Targets[0]

@@ -1,6 +1,6 @@
 namespace LimbusCalc.ViewModels;
 
-/// <summary>Сопротивление цели к одному типу урона или греху. Единица — без эффекта.</summary>
+/// <summary>A target's resistance to one damage type or sin. 1.0 means no effect.</summary>
 public sealed class ResistanceViewModel : ObservableObject
 {
     private double _value = 1.0;

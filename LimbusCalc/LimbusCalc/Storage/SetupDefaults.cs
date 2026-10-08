@@ -3,10 +3,10 @@ using System.Text.Json.Nodes;
 namespace LimbusCalc.Storage;
 
 /// <summary>
-/// Значения полей набора калькулятора, которые подставляются, если в файле поля нет.
-/// Писатель опускает равные им поля, читатель их подставляет — поэтому и то и другое
-/// берёт их отсюда. Без WPF: так ужатие проверяется консольными проверками и
-/// работает при загрузке таблицы в фоновом потоке.
+/// Default values of calculator setup fields, used when a field is missing from the file.
+/// The writer omits fields equal to these and the reader fills them back in, so both take
+/// them from here. No WPF dependencies: the console checks can test compaction, and it runs
+/// while tables load on a background thread.
 /// </summary>
 public static class SetupDefaults
 {
@@ -19,10 +19,10 @@ public static class SetupDefaults
     public const double MoratoriumStacks = 1.0;
 
     /// <summary>
-    /// Убирает из набора поля, которые читатель и так получит значением по умолчанию:
-    /// нулевые моды, нейтральные сопротивления, пустые списки, цели без изменений.
-    /// Набор становится в разы короче, а прочитается ровно так же. Годится и для
-    /// наборов, записанных раньше целиком, — их так ужимают при загрузке таблицы.
+    /// Removes fields the reader would get as defaults anyway: zero modifiers, neutral
+    /// resistances, empty lists, untouched targets. The setup becomes several times shorter
+    /// and reads back exactly the same. Also works on older setups written in full, which
+    /// are compacted this way when a table loads.
     /// </summary>
     public static JsonObject Compact(JsonObject setup)
     {
@@ -47,9 +47,9 @@ public static class SetupDefaults
                 RemoveIf(coin, "critPercent", CritPercent);
                 RemoveIf(coin, "weight", Weight);
 
-                // Подцели монеты идут по порядку, поэтому сами остаются в списке —
-                // выбрасываем только их поля по умолчанию. Название держим всегда:
-                // по нему подцель находит свою общую часть.
+                // A coin's subtargets are positional, so they stay in the list and only lose
+                // their default fields. The name is always kept: it links the subtarget to
+                // its shared part.
                 if (coin["subtargets"] is JsonArray subtargets)
                 {
                     foreach (JsonObject subtarget in subtargets.OfType<JsonObject>())
@@ -65,8 +65,8 @@ public static class SetupDefaults
             }
         }
 
-        // Цель, у которой всё по умолчанию, не пишется вовсе: читатель сбрасывает
-        // все цели перед тем, как расставить записанные.
+        // A target with everything at default isn't written at all: the reader resets
+        // every target before applying the stored ones.
         if (setup["targets"] is JsonArray targets)
         {
             foreach (JsonObject target in targets.OfType<JsonObject>())

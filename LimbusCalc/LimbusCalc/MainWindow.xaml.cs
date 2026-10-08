@@ -2,6 +2,7 @@ using System.Globalization;
 using System.IO;
 using System.Text.Json.Nodes;
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -16,35 +17,55 @@ using LimbusCalc.Views;
 namespace LimbusCalc
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// The main window: the ID and E.G.O. reference tables and the calculator. The calculation
+    /// itself lives in <see cref="MainViewModel"/>; this class handles table editing, saving,
+    /// file dialogs and the view state between launches.
     /// </summary>
     public partial class MainWindow : Window
     {
         private readonly MainViewModel _viewModel = new();
 
-        /// <summary>Настройки приложения: тема и обводка клеток.</summary>
+        /// <summary>App settings: theme, cell look and outlines.</summary>
         private readonly SettingsViewModel _settings;
 
-        /// <summary>Справочные таблицы и файлы, в которых они хранятся.</summary>
+        /// <summary>The reference tables and the files they are stored in.</summary>
         private readonly Dictionary<TableViewModel, string> _tableFiles;
 
-        /// <summary>Таблицы, изменённые с прошлой записи: остальные файлы не трогаем.</summary>
+        /// <summary>Tables changed since the last save; other files are left alone.</summary>
         private readonly HashSet<TableViewModel> _changedTables = [];
 
         /// <summary>
-        /// Откладывает запись таблиц: во время набора правки идут на каждый символ,
-        /// и писать файл после каждого незачем.
+        /// Delays saving tables: while typing every key is an edit, and writing the file after
+        /// each one is pointless.
         /// </summary>
         private readonly DispatcherTimer _tableSaveTimer = new()
         {
             Interval = TimeSpan.FromSeconds(1.5),
         };
 
-        /// <summary>Очередь записи таблиц в фоне; каждая следующая ждёт предыдущую.</summary>
+        /// <summary>Background save queue; each save waits for the previous one.</summary>
         private Task _saving = Task.CompletedTask;
 
-        /// <summary>Об ошибке записи уже сказали — повторять до первой удачи незачем.</summary>
-        private bool _saveErrorShown;
+        /// <summary>
+        /// Number of the latest edit of each table. If the number grew after a save finished,
+        /// the disk doesn't hold the latest content yet and it's too early to say "Saved".
+        /// </summary>
+        private readonly Dictionary<TableViewModel, int> _versions = [];
+
+        /// <summary>
+        /// Tables whose last save failed, and why. Written from the background, read on exit
+        /// while the UI thread waits for the save queue and isn't processing messages.
+        /// </summary>
+        private readonly Dictionary<TableViewModel, string> _saveFailures = [];
+
+        /// <summary>
+        /// The calculator setup that is already stored somewhere: in a file, in a table cell,
+        /// or just loaded from one. If the current setup differs, there's something to lose.
+        /// </summary>
+        private string _calculatorKept;
+
+        /// <summary>The view from the last launch: window, tab, table sorting and filters.</summary>
+        private readonly ViewState _view = ViewState.Load();
 
         private SubtargetsWindow? _subtargetsWindow;
 
@@ -56,11 +77,13 @@ namespace LimbusCalc
 
             DataContext = _viewModel;
 
-            // Восстанавливаем выбор пользователя до показа окна, чтобы тема не мигала,
-            // и сразу ставим кисти обводки — иначе клетки нарисуются без них.
+            // Restore the user's choice before the window shows so the theme doesn't flash,
+            // and set the outline brushes now, otherwise cells would be drawn without them.
             ThemeManager.Apply(AppSettings.LoadTheme());
             _settings = new SettingsViewModel();
             _settings.Apply();
+
+            RestoreWindow();
 
             _tableFiles = new Dictionary<TableViewModel, string>
             {
@@ -68,8 +91,8 @@ namespace LimbusCalc
                 [_viewModel.EgoTable] = TableStorage.EgoFileName,
             };
 
-            // Таблицы читаются, когда окно уже показалось: файл в пару мегабайт иначе
-            // держал бы запуск на пустом экране. До тех пор их закрывает заглушка.
+            // Tables are read once the window is shown: a file of a couple of megabytes would
+            // otherwise keep the startup on a blank screen. Until then a cover hides them.
             foreach (TableViewModel table in _tableFiles.Keys)
             {
                 table.IsLoading = true;
@@ -77,11 +100,14 @@ namespace LimbusCalc
 
             ContentRendered += LoadTablesOnce;
             _tableSaveTimer.Tick += (_, _) => SaveTables();
+
+            // The calculator starts empty: there's nothing to lose in a blank setup.
+            _calculatorKept = CalculatorState();
         }
 
         /// <summary>
-        /// Читает таблицы в фоне и ставит их на место. Сохранение подключается только
-        /// после этого: прочитанное писать обратно незачем, а до конца чтения — опасно.
+        /// Reads the tables in the background and puts them in place. Saving is hooked up only
+        /// after that: writing back what was just read is pointless, and doing it earlier is risky.
         /// </summary>
         private async void LoadTablesOnce(object? sender, EventArgs e)
         {
@@ -103,20 +129,34 @@ namespace LimbusCalc
                 }
                 catch (Exception error)
                 {
-                    // Сюда попадает только непредвиденное: ошибки чтения Read ловит сам.
-                    // Что стало с файлом, неизвестно, поэтому и писать в него не будем.
+                    // Only the unexpected ends up here: Read handles reading errors itself.
+                    // There's no telling what happened to the file, so it won't be written to.
                     result = new TableLoadResult(
                         TableLoadOutcome.Failed, TableData.Empty, error.Message, null, CanSave: false);
                 }
 
                 TableStorage.Apply(table, result.Data);
 
+                // The view comes after the rows are read: there's nothing to sort before that.
+                // And before subscribing to edits: re-sorting is no reason to rewrite the file.
+                if (_view.Tables.TryGetValue(table.Title, out TableViewState? state))
+                {
+                    state.ApplyTo(table);
+                }
+
+                string? problem = Describe(table, result);
+
                 if (result.CanSave)
                 {
                     table.Changed += OnTableChanged;
                 }
+                else
+                {
+                    table.SaveState = TableSaveState.Off;
+                    table.SaveProblem = problem ?? string.Empty;
+                }
 
-                if (Describe(table, result) is string problem)
+                if (problem is not null)
                 {
                     problems.Add(problem);
                 }
@@ -135,7 +175,7 @@ namespace LimbusCalc
             }
         }
 
-        /// <summary>Что сказать пользователю о чтении таблицы; всё в порядке — ничего.</summary>
+        /// <summary>What to tell the user about reading a table; null when everything is fine.</summary>
         private string? Describe(TableViewModel table, TableLoadResult result)
         {
             string path = TableStorage.PathOf(_tableFiles[table]);
@@ -166,6 +206,8 @@ namespace LimbusCalc
             if (sender is TableViewModel table)
             {
                 _changedTables.Add(table);
+                _versions[table] = _versions.GetValueOrDefault(table) + 1;
+                table.SaveState = TableSaveState.Saving;
             }
 
             _tableSaveTimer.Stop();
@@ -173,8 +215,8 @@ namespace LimbusCalc
         }
 
         /// <summary>
-        /// Снимок таблицы — в потоке окна, за доли миллисекунды; сама запись — в фоне,
-        /// и пока пишется файл в пару мегабайт, в таблице можно работать дальше.
+        /// The table snapshot is taken on the UI thread in a fraction of a millisecond; the write
+        /// itself happens in the background, so the table stays usable while megabytes are written.
         /// </summary>
         private void SaveTables()
         {
@@ -182,17 +224,17 @@ namespace LimbusCalc
 
             foreach (TableViewModel table in _changedTables)
             {
-                QueueSave(table, TableStorage.Snapshot(table));
+                QueueSave(table, TableStorage.Snapshot(table), _versions.GetValueOrDefault(table));
             }
 
             _changedTables.Clear();
         }
 
         /// <summary>
-        /// Записи идут строго друг за другом: иначе старый снимок мог бы лечь
-        /// поверх нового, записанного чуть раньше.
+        /// Saves run strictly one after another: otherwise an older snapshot could land on top
+        /// of a newer one written a moment earlier.
         /// </summary>
-        private void QueueSave(TableViewModel table, TableSnapshot snapshot)
+        private void QueueSave(TableViewModel table, TableSnapshot snapshot, int version)
         {
             string file = _tableFiles[table];
 
@@ -202,76 +244,192 @@ namespace LimbusCalc
                     try
                     {
                         TableStorage.Save(file, snapshot);
-                        Dispatcher.BeginInvoke(() => _saveErrorShown = false);
+
+                        lock (_saveFailures)
+                        {
+                            _saveFailures.Remove(table);
+                        }
+
+                        Dispatcher.BeginInvoke(() => ReportSaved(table, version));
                     }
                     catch (Exception error)
                     {
+                        lock (_saveFailures)
+                        {
+                            _saveFailures[table] = error.Message;
+                        }
+
                         Dispatcher.BeginInvoke(() => ReportSaveError(table, error));
                     }
                 },
                 TaskScheduler.Default);
         }
 
+        /// <summary>Saved. Shows "Saved" only if the table wasn't edited after this snapshot.</summary>
+        private void ReportSaved(TableViewModel table, int version)
+        {
+            if (_versions.GetValueOrDefault(table) == version && !_changedTables.Contains(table))
+            {
+                table.SaveState = TableSaveState.Saved;
+                table.SaveProblem = string.Empty;
+            }
+        }
+
         /// <summary>
-        /// Запись не удалась. Прежний файл цел — подмена случается только после
-        /// полной записи. Таблицу помечаем изменённой, чтобы попытаться ещё раз.
+        /// The save failed. The previous file is intact — the swap happens only after a complete
+        /// write. The table is marked changed so the save is retried. Work isn't interrupted with
+        /// a dialog: the indicator above the table turns red, and the user is asked on exit.
         /// </summary>
         private void ReportSaveError(TableViewModel table, Exception error)
         {
             _changedTables.Add(table);
+            table.SaveState = TableSaveState.Failed;
+            table.SaveProblem = error.Message;
+        }
 
-            // Одно окно на полосу сбоев: сохранение срабатывает часто.
-            if (_saveErrorShown)
+        /// <summary>Click on the save indicator: explains what's wrong and offers to retry.</summary>
+        private void SaveStatus_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not FrameworkElement { DataContext: TableViewModel table })
             {
                 return;
             }
 
-            _saveErrorShown = true;
+            switch (table.SaveState)
+            {
+                case TableSaveState.Failed:
+                    bool retry = ConfirmWindow.Ask(
+                        this,
+                        "Not saved",
+                        $"The {table.Title} table could not be saved: {table.SaveProblem}"
+                            + Environment.NewLine + Environment.NewLine
+                            + "The previous version of the file is intact. Saving is retried "
+                            + "after the next change and when the app closes.",
+                        "Try again");
 
-            MessageBox.Show(
-                this,
-                $"The {table.Title} table could not be saved: {error.Message}"
-                    + Environment.NewLine + Environment.NewLine
-                    + "The previous version of the file is intact. Saving will be retried "
-                    + "after the next change and when the app closes.",
-                "Save failed",
-                MessageBoxButton.OK,
-                MessageBoxImage.Warning);
+                    if (retry)
+                    {
+                        _changedTables.Add(table);
+                        table.SaveState = TableSaveState.Saving;
+                        SaveTables();
+                    }
+
+                    break;
+
+                case TableSaveState.Off:
+                    MessageBox.Show(
+                        this,
+                        table.SaveProblem,
+                        "Saving off",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                    break;
+            }
         }
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
             base.OnClosing(e);
 
-            // Правку могли не успеть записать по таймеру — дописываем на выходе
-            // и ждём, пока запись закончится: иначе процесс оборвёт её на середине.
+            SaveView();
+
+            // An edit may not have been saved by the timer yet — save it on exit and wait for
+            // the write to finish, otherwise the process would cut it off midway.
             SaveTables();
             _saving.Wait(TimeSpan.FromSeconds(15));
+
+            List<string> failures;
+
+            lock (_saveFailures)
+            {
+                failures = [.. _saveFailures.Select(pair => $"{pair.Key.Title}: {pair.Value}")];
+            }
+
+            if (failures.Count == 0)
+            {
+                return;
+            }
+
+            // The latest edits didn't reach the disk. Closing silently would lose them.
+            bool close = ConfirmWindow.Ask(
+                this,
+                "Changes not saved",
+                "The latest changes could not be saved:"
+                    + Environment.NewLine + string.Join(Environment.NewLine, failures)
+                    + Environment.NewLine + Environment.NewLine
+                    + "If you close now, they will be lost. The previous version of the file is intact.",
+                "Close anyway");
+
+            e.Cancel = !close;
         }
 
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
 
-            // Описатель окна появляется только сейчас, раньше заголовок не перекрасить.
+            // The window handle exists only now; the title bar can't be themed earlier.
             ThemeManager.ApplyTitleBar(this, ThemeManager.Current);
         }
 
         /// <summary>
-        /// Кнопки справочных таблиц. Какую таблицу правим, берём из привязки самой кнопки:
-        /// разметка у ID и E.G.O. общая, а модели разные.
+        /// Reference table buttons. The table comes from the button's own binding: ID and
+        /// E.G.O. share the markup but have different models.
         /// </summary>
         private void AddRow_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is FrameworkElement { DataContext: TableViewModel table })
+            if (sender is not FrameworkElement { DataContext: TableViewModel table } element)
             {
-                table.AddRow();
+                return;
             }
+
+            EndEdit();
+
+            TableRowViewModel row = table.AddRow();
+
+            // Filters almost always hide an empty row — but it was just added to be filled in.
+            if (!row.IsVisible)
+            {
+                table.Filter.Reset();
+            }
+
+            EditName(element, table, row);
         }
 
         /// <summary>
-        /// Очистка таблицы целиком. Отменить это нечем, поэтому сначала спрашиваем
-        /// и называем, сколько строк уйдёт.
+        /// Opens the name editor of a freshly added row so it can be named right away.
+        /// The row may be far down; it scrolls into view.
+        /// </summary>
+        private void EditName(DependencyObject element, TableViewModel table, TableRowViewModel row)
+        {
+            if (RowsOf(element, table) is ItemsControl rows && row.CellOf("Name") is TableCell name)
+            {
+                ShowCell(rows, row, name, openList: false);
+            }
+        }
+
+        /// <summary>The copy goes below the row with its name editor open, ready for renaming.</summary>
+        private void DuplicateRow_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not MenuItem
+                {
+                    Parent: ContextMenu
+                    {
+                        DataContext: TableRowViewModel row,
+                        Tag: TableViewModel table,
+                        PlacementTarget: UIElement placement,
+                    },
+                })
+            {
+                return;
+            }
+
+            EndEdit();
+            EditName(placement, table, table.Duplicate(row));
+        }
+
+        /// <summary>
+        /// Clears the whole table. It can be undone, but a slip is costly, so the user is asked
+        /// first and told how many rows will go.
         /// </summary>
         private void ClearTable_Click(object sender, RoutedEventArgs e)
         {
@@ -284,7 +442,7 @@ namespace LimbusCalc
             bool confirmed = ConfirmWindow.Ask(
                 this,
                 $"Clear {table.Title}",
-                $"All {table.Rows.Count} rows will be removed, together with the setups stored in their cells. This cannot be undone.",
+                $"All {table.Rows.Count} rows will be removed, together with the setups stored in their cells. You can bring them back with Undo (Ctrl+Z).",
                 "Clear table");
 
             if (confirmed)
@@ -294,8 +452,8 @@ namespace LimbusCalc
         }
 
         /// <summary>
-        /// Правая кнопка над строкой. Клетку находим по месту щелчка: у клеток урона своё
-        /// меню, у счётных и скрытых фильтром — никакого, у остальных — меню строки.
+        /// Right click on a row. The cell is found by the click position: damage cells have their
+        /// own menu, computed and filtered-out cells have none, other cells get the row menu.
         /// </summary>
         private void RowView_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
@@ -312,7 +470,7 @@ namespace LimbusCalc
                 return;
             }
 
-            // Клетке вроде Sin Cost предложить нечего: ни набора, ни меток — ей меню строки.
+            // A cell like Sin Cost has nothing to offer — no setup, no marks — so it gets the row menu.
             if (cell.HasSetup || cell.CanEditMarks)
             {
                 OpenCellMenu(cell, view);
@@ -323,7 +481,7 @@ namespace LimbusCalc
             }
         }
 
-        /// <summary>Меню строки. Строку и таблицу берём из дерева над элементом.</summary>
+        /// <summary>The row menu. The row and the table are taken from the tree above the element.</summary>
         private void OpenRowMenu(FrameworkElement element)
         {
             if (DataOf<TableRowViewModel>(element) is not TableRowViewModel row
@@ -340,7 +498,7 @@ namespace LimbusCalc
             menu.IsOpen = true;
         }
 
-        /// <summary>Ближайшая вверх по дереву привязка нужного вида.</summary>
+        /// <summary>The nearest data context of the given type up the visual tree.</summary>
         private static T? DataOf<T>(DependencyObject start)
             where T : class
         {
@@ -356,8 +514,8 @@ namespace LimbusCalc
         }
 
         /// <summary>
-        /// Удаление строки. Вместе с ней уходят наборы, лежавшие в её клетках,
-        /// и вернуть их нечем — поэтому сначала спрашиваем и называем, что удаляем.
+        /// Deletes a row together with the setups stored in its cells. A slip is easy, so the user
+        /// is asked first and told what is being deleted. Undo brings everything back.
         /// </summary>
         private void DeleteRow_Click(object sender, RoutedEventArgs e)
         {
@@ -380,7 +538,7 @@ namespace LimbusCalc
             bool confirmed = ConfirmWindow.Ask(
                 this,
                 "Delete row",
-                $"{label} will be removed, together with the setups stored in its cells. This cannot be undone.",
+                $"{label} will be removed, together with the setups stored in its cells. You can bring it back with Undo (Ctrl+Z).",
                 "Delete row");
 
             if (confirmed)
@@ -390,13 +548,8 @@ namespace LimbusCalc
         }
 
         /// <summary>
-        /// Шапка таблицы стоит вне прокрутки строк, поэтому вбок её нужно двигать вручную —
-        /// иначе при горизонтальной прокрутке подписи разъедутся со своими столбцами.
-        /// </summary>
-        /// <summary>
-        /// Ширина видимой области поменялась — пересчитываем растяжимый столбец.
-        /// Одного ScrollChanged мало: при первой раскладке он приходит раньше,
-        /// чем становится известна настоящая ширина.
+        /// The viewport size changed: recalculate the stretching column. ScrollChanged alone
+        /// isn't enough: on the first layout it arrives before the real width is known.
         /// </summary>
         private void TableScroll_SizeChanged(object sender, SizeChangedEventArgs e)
         {
@@ -409,9 +562,9 @@ namespace LimbusCalc
         }
 
         /// <summary>
-        /// Сколько ширины достаётся столбцам. ViewportWidth у прокрутки с виртуализацией
-        /// показывает не всю доступную ширину, поэтому берём размер самой области
-        /// и вычитаем полосу прокрутки, когда она есть.
+        /// How much width the columns get. ViewportWidth of a virtualizing scroll viewer doesn't
+        /// report the full available width, so take the viewer's own size and subtract the
+        /// scrollbar when it's shown.
         /// </summary>
         private static double VisibleWidth(ScrollViewer viewer)
         {
@@ -422,6 +575,11 @@ namespace LimbusCalc
             return viewer.ActualWidth - scrollbar;
         }
 
+        /// <summary>
+        /// The header and the averages row sit outside the rows' scroll viewer, so they are moved
+        /// horizontally by hand — otherwise the titles would drift away from their columns.
+        /// Any scroll also closes the cell editor and the cell tooltip.
+        /// </summary>
         private void TableScroll_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             if (sender is not DependencyObject body)
@@ -429,20 +587,20 @@ namespace LimbusCalc
                 return;
             }
 
-            // Ширину растяжимого столбца считаем от видимой области строк: у шапки
-            // и строки средних она своя, и по ней столбцы разъехались бы на ширину
-            // вертикальной полосы прокрутки.
+            // The stretching column is sized from the rows' viewport: the header and averages
+            // have their own, and using it would misalign the columns by the scrollbar width.
             if (e.ViewportWidthChange != 0.0
                 && sender is ScrollViewer { DataContext: TableViewModel table } viewer)
             {
                 table.UpdateColumnWidths(VisibleWidth(viewer));
             }
 
-            // Поле ввода стоит поверх клетки и вместе с ней не едет: при прокрутке
-            // оно оказалось бы над чужой. Закрываем — значение уже записано.
+            // The editor sits over the cell and doesn't move with it: after a scroll it would be
+            // over someone else's cell. Close it — the value is already written.
             if (e.VerticalChange != 0.0 || e.HorizontalChange != 0.0)
             {
                 EndEdit();
+                TableRowView.HideTip();
             }
 
             if (e.HorizontalChange == 0.0)
@@ -450,8 +608,8 @@ namespace LimbusCalc
                 return;
             }
 
-            // Шаблон таблицы разложен дважды, у ID и E.G.O., поэтому ищем не по имени,
-            // а рядом с собой: шапка и строка средних лежат в одной панели со строками.
+            // The table template exists twice, for ID and E.G.O., so instead of a name lookup
+            // search next to ourselves: the header and averages share a panel with the rows.
             foreach (ScrollViewer paired in Siblings<ScrollViewer>(body))
             {
                 if (paired.Tag as string == "TableSyncScroll")
@@ -464,8 +622,8 @@ namespace LimbusCalc
         private static IEnumerable<T> Siblings<T>(DependencyObject element)
             where T : DependencyObject
         {
-            // Ищем именно панель самой таблицы: над строками есть и свои обёртки,
-            // а шапка со строкой средних лежат уровнем выше, в общем доке.
+            // Look for the table's own panel: the rows have wrappers of their own, while the
+            // header and averages sit one level up, in the shared dock panel.
             DependencyObject? parent = VisualTreeHelper.GetParent(element);
 
             while (parent is not null and not DockPanel)
@@ -498,8 +656,8 @@ namespace LimbusCalc
         }
 
         /// <summary>
-        /// Открывает список фильтра. Какой именно — говорит сама кнопка: список лежит
-        /// у неё в Tag, поэтому окошко на все три одно.
+        /// Opens a filter list. The button itself tells which one: the list is in its Tag,
+        /// so one popup serves all of them.
         /// </summary>
         private void FilterList_Click(object sender, RoutedEventArgs e)
         {
@@ -514,6 +672,109 @@ namespace LimbusCalc
             FilterPopup.IsOpen = true;
         }
 
+        /// <summary>Opens the columns list next to the button that was clicked.</summary>
+        private void Columns_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not FrameworkElement { DataContext: TableViewModel table } element)
+            {
+                return;
+            }
+
+            EndEdit();
+
+            ColumnsPopup.IsOpen = false;
+            ColumnsPopup.DataContext = table;
+            ColumnsPopup.PlacementTarget = element;
+            ColumnsPopup.IsOpen = true;
+        }
+
+        private void ShowAllColumns_Click(object sender, RoutedEventArgs e)
+        {
+            if (ColumnsPopup.DataContext is TableViewModel table)
+            {
+                table.ShowAllColumns();
+            }
+        }
+
+        private void HideAllColumns_Click(object sender, RoutedEventArgs e)
+        {
+            if (ColumnsPopup.DataContext is TableViewModel table)
+            {
+                EndEdit();
+                table.HideAllColumns();
+            }
+        }
+
+        /// <summary>
+        /// Puts the window where it was. If that screen is gone — say, a second monitor was
+        /// unplugged — the window stays centered, as on first launch.
+        /// </summary>
+        private void RestoreWindow()
+        {
+            if (_view.Tab is int tab && tab >= 0 && tab < Tabs.Items.Count)
+            {
+                Tabs.SelectedIndex = tab;
+            }
+
+            if (_view.Window is not WindowViewState saved
+                || saved.Width < MinWidth
+                || saved.Height < MinHeight)
+            {
+                return;
+            }
+
+            Rect screen = new(
+                SystemParameters.VirtualScreenLeft,
+                SystemParameters.VirtualScreenTop,
+                SystemParameters.VirtualScreenWidth,
+                SystemParameters.VirtualScreenHeight);
+
+            Rect visible = Rect.Intersect(screen, new Rect(saved.Left, saved.Top, saved.Width, saved.Height));
+
+            // Enough of it must be visible to grab the title bar.
+            if (visible.IsEmpty || visible.Width < 120 || visible.Height < 60)
+            {
+                return;
+            }
+
+            WindowStartupLocation = WindowStartupLocation.Manual;
+            Left = saved.Left;
+            Top = saved.Top;
+            Width = saved.Width;
+            Height = saved.Height;
+            WindowState = saved.Maximized ? WindowState.Maximized : WindowState.Normal;
+        }
+
+        /// <summary>Remembers the view on exit. The size is the normal window size, even when maximized.</summary>
+        private void SaveView()
+        {
+            Rect bounds = WindowState == WindowState.Normal
+                ? new Rect(Left, Top, Width, Height)
+                : RestoreBounds;
+
+            if (!bounds.IsEmpty)
+            {
+                _view.Window = new WindowViewState
+                {
+                    Left = bounds.Left,
+                    Top = bounds.Top,
+                    Width = bounds.Width,
+                    Height = bounds.Height,
+                    Maximized = WindowState == WindowState.Maximized,
+                };
+            }
+
+            _view.Tab = Tabs.SelectedIndex;
+
+            // A table that never finished loading is skipped: its view stays as it was.
+            foreach (TableViewModel table in _tableFiles.Keys.Where(table => !table.IsLoading))
+            {
+                _view.Tables[table.Title] = TableViewState.Capture(table);
+            }
+
+            _view.Save();
+        }
+
         private void FilterReset_Click(object sender, RoutedEventArgs e)
         {
             if (sender is FrameworkElement { DataContext: TableFilterViewModel filter })
@@ -523,8 +784,8 @@ namespace LimbusCalc
         }
 
         /// <summary>
-        /// Кладёт текущий набор калькулятора в клетку справочника: пользователь выбирает
-        /// айди и скилл, в клетку идёт итоговый урон, а набор остаётся при ней.
+        /// Export buttons on the calculator tab: the user picks a row and a skill, the cell
+        /// gets the total damage and keeps the setup.
         /// </summary>
         private void ExportToId_Click(object sender, RoutedEventArgs e) =>
             ExportToTable(_viewModel.IdTable);
@@ -533,8 +794,8 @@ namespace LimbusCalc
             ExportToTable(_viewModel.EgoTable);
 
         /// <summary>
-        /// Кладёт текущий набор в клетку справочника: пользователь выбирает строку
-        /// по названию и столбец, куда это уходит.
+        /// Puts the current setup into a table cell: the user picks the row by name and the
+        /// column it goes to.
         /// </summary>
         private void ExportToTable(TableViewModel table)
         {
@@ -569,18 +830,50 @@ namespace LimbusCalc
                 return;
             }
 
-            cell.Value = _viewModel.Total.ToString("0.##", CultureInfo.InvariantCulture);
+            EndEdit();
 
-            // Тип и грех берём из самого набора: в таблице они видны иконками,
-            // и назначать их отдельно после выгрузки уже не нужно.
-            cell.SkillType = _viewModel.SkillType;
-            cell.SkillSin = _viewModel.SkillSin;
-            cell.Setup = SetupFile.ToJson(_viewModel).ToJsonString();
+            string setup = CalculatorState();
+
+            // Number, marks and setup are one edit and are undone together.
+            using (table.BeginCellEdit(cell, $"Export to {cell.Column.Title}"))
+            {
+                cell.Value = _viewModel.Total.ToString("0.##", CultureInfo.InvariantCulture);
+
+                // Type and sin come from the setup itself: the table shows them as icons, so
+                // there's no need to set them separately after an export.
+                cell.SkillType = _viewModel.SkillType;
+                cell.SkillSin = _viewModel.SkillSin;
+                cell.Setup = setup;
+            }
+
+            _calculatorKept = setup;
+        }
+
+        /// <summary>The calculator setup as a string, for telling whether anything would be lost.</summary>
+        private string CalculatorState() => SetupFile.ToJson(_viewModel).ToJsonString();
+
+        /// <summary>
+        /// The calculator setup is about to be replaced. If the current one isn't stored anywhere,
+        /// ask first: there would be nowhere to get it back from.
+        /// </summary>
+        private bool MayReplaceCalculator(string source)
+        {
+            if (CalculatorState() == _calculatorKept)
+            {
+                return true;
+            }
+
+            return ConfirmWindow.Ask(
+                this,
+                "Replace calculator setup",
+                "The calculator has changes that are not saved to a file or to a table cell. "
+                    + $"They will be replaced by the setup from {source}.",
+                "Replace");
         }
 
         /// <summary>
-        /// Меню клетки урона. Оно одно на всё окно: заводить своё на каждую клетку
-        /// вместе с подменю и картинками было самой дорогой частью прокрутки.
+        /// The damage cell menu. There's one for the whole window: creating one per cell with
+        /// submenus and images was the most expensive part of scrolling.
         /// </summary>
         private void OpenCellMenu(TableCell cell, FrameworkElement placement)
         {
@@ -591,14 +884,17 @@ namespace LimbusCalc
             menu.IsOpen = true;
         }
 
-        /// <summary>Клетка, которую сейчас правят, и слой с её полем ввода.</summary>
+        /// <summary>The cell being edited and the layer with its editor.</summary>
         private TableCell? _editingCell;
 
         private Border? _editorHost;
 
+        /// <summary>The cell edit for the history: everything typed in the editor is one undo step.</summary>
+        private CellEdit? _cellEdit;
+
         /// <summary>
-        /// Щелчок по строке: клетку находим по месту щелчка. Счётную клетку не правят,
-        /// а скрытая фильтром на экране пуста — править в ней нечего.
+        /// Left click on a row: the cell is found by the click position. Computed cells aren't
+        /// edited, and a cell hidden by the filter is blank on screen — nothing to edit there.
         /// </summary>
         private void RowView_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -612,12 +908,11 @@ namespace LimbusCalc
         }
 
         /// <summary>
-        /// Над клеткой встаёт поле ввода — одно на таблицу: держать его в каждой клетке
-        /// дорого, на экране их сотни. Границы клетки даны в координатах <paramref name="element"/>.
+        /// An editor appears over the cell — one per table: an editor in every cell is costly with
+        /// hundreds on screen. Cell bounds are in <paramref name="element"/> coordinates.
         /// </summary>
-        private void BeginEdit(TableCell cell, FrameworkElement element, Rect bounds)
+        private void BeginEdit(TableCell cell, FrameworkElement element, Rect bounds, bool openList = true)
         {
-
             if (ReferenceEquals(_editingCell, cell))
             {
                 return;
@@ -627,7 +922,8 @@ namespace LimbusCalc
 
             if (EditorLayer(element) is not Canvas layer
                 || Tagged<Border>(layer, "CellEditorHost") is not Border host
-                || Tagged<ContentControl>(host, "CellEditorContent") is not ContentControl slot)
+                || Tagged<ContentControl>(host, "CellEditorContent") is not ContentControl slot
+                || TableOf(element) is not TableViewModel table)
             {
                 return;
             }
@@ -647,7 +943,7 @@ namespace LimbusCalc
             host.Width = box.Width;
             host.Height = box.Height;
 
-            // Шрифт — как у клетки под полем: свой у столбца или общий у таблицы.
+            // The editor's font matches the cell underneath: the column's own or the table's.
             if (cell.Column.FontSize is double size)
             {
                 slot.FontSize = size;
@@ -663,13 +959,17 @@ namespace LimbusCalc
 
             _editingCell = cell;
             _editorHost = host;
+            _cellEdit = table.BeginCellEdit(cell);
 
-            // Поле появится, когда пройдёт раскладка; тогда же отдаём ему ввод.
-            Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(() => FocusEditor(slot)));
+            // The editor appears after layout; that's when it gets keyboard focus.
+            Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(() => FocusEditor(slot, openList)));
         }
 
-        /// <summary>Отдаёт ввод только что поставленному полю.</summary>
-        private void FocusEditor(DependencyObject slot)
+        /// <summary>
+        /// Gives keyboard focus to the editor that was just placed. A list opens only on a click:
+        /// when moving through cells with the keyboard it's opened with F4 or Alt+Down.
+        /// </summary>
+        private void FocusEditor(DependencyObject slot, bool openList)
         {
             switch (FirstChild<Control>(slot))
             {
@@ -678,11 +978,15 @@ namespace LimbusCalc
                     box.SelectAll();
                     break;
 
+                case ComboBox chooser when !openList:
+                    chooser.Focus();
+                    break;
+
                 case ComboBox chooser:
                     chooser.Focus();
 
-                    // Раскрывать до того, как список встал на место, нельзя: всплывашка
-                    // цепляет мышь и тут же закрывается обратно.
+                    // Opening before the list is in place doesn't work: the popup captures the
+                    // mouse and closes again immediately.
                     Dispatcher.BeginInvoke(
                         DispatcherPriority.Input,
                         new Action(() => chooser.IsDropDownOpen = true));
@@ -690,8 +994,8 @@ namespace LimbusCalc
             }
         }
 
-        /// <summary>Первый подходящий элемент вглубь дерева.</summary>
-        private static T? FirstChild<T>(DependencyObject root)
+        /// <summary>The first matching element down the visual tree.</summary>
+        private static T? FirstChild<T>(DependencyObject root, Func<T, bool>? match = null)
             where T : DependencyObject
         {
             int count = VisualTreeHelper.GetChildrenCount(root);
@@ -700,12 +1004,12 @@ namespace LimbusCalc
             {
                 DependencyObject child = VisualTreeHelper.GetChild(root, index);
 
-                if (child is T found)
+                if (child is T found && (match is null || match(found)))
                 {
                     return found;
                 }
 
-                if (FirstChild<T>(child) is T deeper)
+                if (FirstChild(child, match) is T deeper)
                 {
                     return deeper;
                 }
@@ -714,7 +1018,164 @@ namespace LimbusCalc
             return null;
         }
 
-        /// <summary>Убирает поле ввода: правка закончилась.</summary>
+        /// <summary>
+        /// The rows list of the table the element belongs to. Goes up to the table template's
+        /// root — above it the binding is no longer to this table — and searches down from there.
+        /// </summary>
+        private static ItemsControl? RowsOf(DependencyObject element, TableViewModel table)
+        {
+            DependencyObject root = element;
+
+            for (DependencyObject? node = element; node is not null; node = VisualTreeHelper.GetParent(node))
+            {
+                if (node is FrameworkElement { DataContext: TableViewModel owner } && ReferenceEquals(owner, table))
+                {
+                    root = node;
+                }
+            }
+
+            return FirstChild<ItemsControl>(root, list => ReferenceEquals(list.ItemsSource, table.Rows));
+        }
+
+        /// <summary>
+        /// Opens an editor for a cell that may be off screen: the row scrolls into view first,
+        /// then the editor is placed over the cell.
+        /// </summary>
+        private void ShowCell(ItemsControl rows, TableRowViewModel row, TableCell cell, bool openList)
+        {
+            EndEdit();
+
+            int index = rows.Items.IndexOf(row);
+
+            if (index < 0)
+            {
+                return;
+            }
+
+            // A row far off screen doesn't exist yet: the list is virtualized.
+            if (rows.ItemContainerGenerator.ContainerFromIndex(index) is null
+                && FirstChild<VirtualizingStackPanel>(rows) is VirtualizingStackPanel panel)
+            {
+                panel.BringIndexIntoViewPublic(index);
+                rows.UpdateLayout();
+            }
+
+            if (rows.ItemContainerGenerator.ContainerFromIndex(index) is not DependencyObject container
+                || FirstChild<TableRowView>(container) is not TableRowView view)
+            {
+                return;
+            }
+
+            Rect bounds = view.BoundsOf(cell);
+
+            if (bounds.IsEmpty)
+            {
+                return;
+            }
+
+            // Scroll horizontally too: the cell may be past the right edge. Run layout right
+            // away, otherwise the scroll would close the editor we're about to open.
+            view.BringIntoView(bounds);
+            rows.UpdateLayout();
+
+            BeginEdit(cell, view, view.BoundsOf(cell), openList);
+        }
+
+        /// <summary>Whether a cell can be edited: not computed, not hidden by the filter or column visibility.</summary>
+        private static bool CanEdit(TableCell cell) =>
+            cell.Column.Kind != TableCellKind.Computed && cell.IsVisible && !cell.Column.IsHidden;
+
+        /// <summary>
+        /// Moves the edit to a neighboring cell: one row up or down in the same column, or one cell
+        /// left or right. Rows and cells hidden by filters, hidden columns and DPSC are skipped.
+        /// With <paramref name="wrap"/> moving past the end of a row continues on the next one.
+        /// </summary>
+        private bool MoveEdit(int rowStep, int columnStep, bool wrap)
+        {
+            if (_editingCell is not { Row: TableRowViewModel row } cell
+                || _editorHost is not FrameworkElement host
+                || TableOf(host) is not TableViewModel table
+                || RowsOf(host, table) is not ItemsControl rows)
+            {
+                return false;
+            }
+
+            List<TableRowViewModel> visible = [.. table.Rows.Where(item => item.IsVisible)];
+            int rowIndex = visible.IndexOf(row);
+            int columnIndex = IndexOf(row.Cells, cell);
+
+            if (rowIndex < 0 || columnIndex < 0)
+            {
+                return false;
+            }
+
+            if (rowStep != 0)
+            {
+                for (int i = rowIndex + rowStep; i >= 0 && i < visible.Count; i += rowStep)
+                {
+                    if (visible[i].CellOf(cell.Column) is TableCell below && CanEdit(below))
+                    {
+                        ShowCell(rows, visible[i], below, openList: false);
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            int width = row.Cells.Count;
+
+            while (true)
+            {
+                columnIndex += columnStep;
+
+                if (columnIndex < 0 || columnIndex >= width)
+                {
+                    rowIndex += columnStep;
+
+                    if (!wrap || rowIndex < 0 || rowIndex >= visible.Count)
+                    {
+                        return false;
+                    }
+
+                    columnIndex = columnStep > 0 ? 0 : width - 1;
+                }
+
+                TableCell next = visible[rowIndex].Cells[columnIndex];
+
+                if (CanEdit(next))
+                {
+                    ShowCell(rows, visible[rowIndex], next, openList: false);
+                    return true;
+                }
+            }
+        }
+
+        private static int IndexOf(IReadOnlyList<TableCell> cells, TableCell cell)
+        {
+            for (int i = 0; i < cells.Count; i++)
+            {
+                if (ReferenceEquals(cells[i], cell))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        /// <summary>
+        /// Whether the caret is at the edge of the text, beyond which is the next cell. A freshly
+        /// opened editor has all text selected, so an arrow moves to the next cell right away.
+        /// </summary>
+        private static bool AtEdge(Control? editor, bool left) => editor switch
+        {
+            TextBox box => box.SelectionLength == box.Text.Length
+                || (box.SelectionLength == 0 && box.CaretIndex == (left ? 0 : box.Text.Length)),
+            _ => true,
+        };
+
+        /// <summary>Removes the editor: the edit is over.</summary>
         private void EndEdit()
         {
             if (_editorHost is not null)
@@ -723,9 +1184,9 @@ namespace LimbusCalc
 
                 if (Tagged<ContentControl>(_editorHost, "CellEditorContent") is ContentControl slot)
                 {
-                    // Разметку убираем вместе со значением. Иначе на клетку того же вида
-                    // поле достанется прежнее: список редкости открывался бы с грешниками
-                    // или с высотой не под своё число строк.
+                    // Clear the template along with the content. Otherwise a cell of the same kind
+                    // would get the old editor: the rarity list would open with sinners, or sized
+                    // for the wrong number of items.
                     slot.Content = null;
                     slot.ContentTemplate = null;
                 }
@@ -733,9 +1194,189 @@ namespace LimbusCalc
 
             _editingCell = null;
             _editorHost = null;
+
+            _cellEdit?.Dispose();
+            _cellEdit = null;
         }
 
-        /// <summary>Ищет слой правки той таблицы, в которой лежит клетка.</summary>
+        /// <summary>
+        /// Keys in the cell editor work like in spreadsheets such as Excel. Escape cancels the edit,
+        /// Enter commits and moves down, Tab and Shift+Tab move sideways, Up/Down move between
+        /// rows, Left/Right move to the next cell when the caret is at the edge of the text.
+        /// Handled in the preview phase, otherwise the arrows and Enter would go to the field or
+        /// list. While a list is open its arrows and Enter are its own: they pick an option.
+        /// </summary>
+        private void CellEditor_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (_editorHost is null)
+            {
+                return;
+            }
+
+            Control? editor = Tagged<ContentControl>(_editorHost, "CellEditorContent") is ContentControl slot
+                ? FirstChild<Control>(slot)
+                : null;
+
+            bool listOpen = editor is ComboBox { IsDropDownOpen: true };
+            ModifierKeys modifiers = Keyboard.Modifiers;
+
+            switch (e.Key)
+            {
+                case Key.Escape:
+                    e.Handled = true;
+                    _cellEdit?.Cancel();
+                    CloseEditor();
+                    break;
+
+                case Key.Tab when modifiers is ModifierKeys.None or ModifierKeys.Shift:
+                    // Nowhere to go from the edge of the table — but focus doesn't leave the table either.
+                    e.Handled = true;
+                    MoveEdit(0, modifiers == ModifierKeys.Shift ? -1 : 1, wrap: true);
+                    break;
+
+                case Key.Enter when !listOpen && modifiers == ModifierKeys.None:
+                    e.Handled = true;
+
+                    if (!MoveEdit(1, 0, wrap: false))
+                    {
+                        CloseEditor();
+                    }
+
+                    break;
+
+                case Key.Up or Key.Down when !listOpen && modifiers == ModifierKeys.None:
+                    // On a closed list the arrows would change the value; here they only move.
+                    e.Handled = true;
+                    MoveEdit(e.Key == Key.Down ? 1 : -1, 0, wrap: false);
+                    break;
+
+                case Key.Left or Key.Right when !listOpen && modifiers == ModifierKeys.None:
+                    bool left = e.Key == Key.Left;
+
+                    if (AtEdge(editor, left))
+                    {
+                        e.Handled = MoveEdit(0, left ? -1 : 1, wrap: false) || editor is ComboBox;
+                    }
+
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Closes the editor. A hidden editor can't hold focus, so it goes to the rows list,
+        /// keeping Ctrl+Z working in the window.
+        /// </summary>
+        private void CloseEditor()
+        {
+            if (_editorHost is not FrameworkElement host)
+            {
+                return;
+            }
+
+            EndEdit();
+
+            if (TableOf(host) is TableViewModel table && RowsOf(host, table) is ItemsControl rows)
+            {
+                rows.Focus();
+            }
+        }
+
+        /// <summary>The table on the open tab; none on the calculator tab.</summary>
+        private TableViewModel? ActiveTable() =>
+            Tabs.SelectedItem is TabItem { Content: ContentPresenter { Content: TableViewModel table } }
+                ? table
+                : null;
+
+        /// <summary>
+        /// Ctrl+Z and Ctrl+Y (or Ctrl+Shift+Z) undo and redo table edits. In a text box these
+        /// keys have their own undo for the typed text, which is left alone.
+        /// </summary>
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Handled || ActiveTable() is not TableViewModel table)
+            {
+                return;
+            }
+
+            ModifierKeys modifiers = Keyboard.Modifiers;
+
+            // Ctrl+F jumps to the open table's search from anywhere.
+            if (e.Key == Key.F && modifiers == ModifierKeys.Control)
+            {
+                e.Handled = true;
+                FocusSearch();
+                return;
+            }
+
+            if (e.OriginalSource is TextBox)
+            {
+                return;
+            }
+            bool undo = e.Key == Key.Z && modifiers == ModifierKeys.Control;
+            bool redo = (e.Key == Key.Y && modifiers == ModifierKeys.Control)
+                || (e.Key == Key.Z && modifiers == (ModifierKeys.Control | ModifierKeys.Shift));
+
+            if (!undo && !redo)
+            {
+                return;
+            }
+
+            e.Handled = true;
+            Step(table, undo);
+        }
+
+        /// <summary>Focuses the open table's search and selects its text, ready to retype.</summary>
+        private void FocusSearch()
+        {
+            if (Tabs.SelectedItem is not TabItem { Content: DependencyObject content }
+                || FirstChild<TextBox>(content, box => AutomationProperties.GetAutomationId(box) == "SearchBox")
+                    is not TextBox search)
+            {
+                return;
+            }
+
+            EndEdit();
+            search.Focus();
+            search.SelectAll();
+        }
+
+        private void Undo_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is FrameworkElement { DataContext: TableViewModel table })
+            {
+                Step(table, undo: true);
+            }
+        }
+
+        private void Redo_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is FrameworkElement { DataContext: TableViewModel table })
+            {
+                Step(table, undo: false);
+            }
+        }
+
+        /// <summary>Closes an open editor first: its edit is a step too and must be undone first.</summary>
+        private void Step(TableViewModel table, bool undo)
+        {
+            if (table.IsLoading)
+            {
+                return;
+            }
+
+            EndEdit();
+
+            if (undo)
+            {
+                table.Undo();
+            }
+            else
+            {
+                table.Redo();
+            }
+        }
+
+        /// <summary>Finds the editor layer of the table that contains the cell.</summary>
         private static Canvas? EditorLayer(DependencyObject cell)
         {
             for (DependencyObject? node = cell; node is not null; node = VisualTreeHelper.GetParent(node))
@@ -750,8 +1391,8 @@ namespace LimbusCalc
         }
 
         /// <summary>
-        /// Ищет помеченный элемент прямо под указанным. Вглубь не идём нарочно:
-        /// под строками таблицы лежат тысячи элементов, а слой правки — на виду.
+        /// Finds a tagged element directly under the given one. Deliberately not recursive:
+        /// the table rows hold thousands of elements, while the editor layer is right on top.
         /// </summary>
         private static T? Tagged<T>(DependencyObject root, string tag)
             where T : FrameworkElement
@@ -772,9 +1413,9 @@ namespace LimbusCalc
 
 
         /// <summary>
-        /// Ушли из поля ввода — оно больше не нужно. Решаем не сразу: при переходе
-        /// щелчком на соседнюю клетку поле переезжает туда, и старое теряет ввод уже
-        /// после того, как новое встало на место. Смотрим, где ввод оказался в итоге.
+        /// The editor lost focus and is no longer needed. Decided later: when clicking another
+        /// cell the editor moves there, and the old one loses focus only after the new one is
+        /// in place. So check where the focus ended up.
         /// </summary>
         private void CellEditor_LostFocus(object sender, RoutedEventArgs e) =>
             Dispatcher.BeginInvoke(
@@ -787,7 +1428,7 @@ namespace LimbusCalc
                     }
                 }));
 
-        /// <summary>Возвращает набор из клетки в калькулятор и переключает на его вкладку.</summary>
+        /// <summary>Sends the cell's setup back to the calculator and switches to its tab.</summary>
         private void CellToCalculator_Click(object sender, RoutedEventArgs e)
         {
             if (sender is not FrameworkElement { DataContext: TableCell cell } || cell.Setup is null)
@@ -799,10 +1440,16 @@ namespace LimbusCalc
             {
                 if (JsonNode.Parse(cell.Setup) is not JsonObject setup)
                 {
-                    throw new InvalidDataException("Сохранённый набор не читается.");
+                    throw new InvalidDataException("The stored setup can't be read.");
+                }
+
+                if (!MayReplaceCalculator("this cell"))
+                {
+                    return;
                 }
 
                 SetupFile.FromJson(_viewModel, setup);
+                _calculatorKept = CalculatorState();
                 Tabs.SelectedIndex = Tabs.Items.Count - 1;
             }
             catch (Exception error)
@@ -812,9 +1459,8 @@ namespace LimbusCalc
         }
 
         /// <summary>
-        /// Переводит клетку на ручную правку. Набор при этом выбрасывается: держать его
-        /// рядом с числом, которое правят руками, незачем — вернуть в калькулятор
-        /// уже нечего.
+        /// Switches the cell to manual editing. The setup is dropped: there's no point keeping
+        /// it next to a number edited by hand, since it no longer matches what would go back.
         /// </summary>
         private void CellManualEdit_Click(object sender, RoutedEventArgs e)
         {
@@ -824,7 +1470,7 @@ namespace LimbusCalc
             }
         }
 
-        /// <summary>Сохраняет весь набор калькулятора в файл.</summary>
+        /// <summary>Saves the whole calculator setup to a file.</summary>
         private void ExportSetup_Click(object sender, RoutedEventArgs e)
         {
             SaveFileDialog dialog = new()
@@ -844,6 +1490,7 @@ namespace LimbusCalc
             try
             {
                 SetupFile.Save(_viewModel, dialog.FileName);
+                _calculatorKept = CalculatorState();
             }
             catch (Exception error)
             {
@@ -851,7 +1498,7 @@ namespace LimbusCalc
             }
         }
 
-        /// <summary>Заменяет текущий набор калькулятора содержимым файла.</summary>
+        /// <summary>Replaces the current calculator setup with the content of a file.</summary>
         private void ImportSetup_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog dialog = new()
@@ -866,9 +1513,15 @@ namespace LimbusCalc
                 return;
             }
 
+            if (!MayReplaceCalculator("the file"))
+            {
+                return;
+            }
+
             try
             {
                 SetupFile.Load(_viewModel, dialog.FileName);
+                _calculatorKept = CalculatorState();
             }
             catch (Exception error)
             {
@@ -876,7 +1529,7 @@ namespace LimbusCalc
             }
         }
 
-        /// <summary>Выгрузка таблицы в файл: куда и в каком виде — выбирает пользователь.</summary>
+        /// <summary>Exports the table to a file; the user picks where and in which format.</summary>
         private void ExportTable_Click(object sender, RoutedEventArgs e)
         {
             if (sender is not FrameworkElement { DataContext: TableViewModel table })
@@ -908,7 +1561,10 @@ namespace LimbusCalc
             }
         }
 
-        /// <summary>Загрузка таблицы из файла. Прежние строки заменяются целиком.</summary>
+        /// <summary>
+        /// Loads a table from a file. If the table already has rows, the user chooses to replace
+        /// them or to add the file's rows after them. Either way it can be undone.
+        /// </summary>
         private void ImportTable_Click(object sender, RoutedEventArgs e)
         {
             if (sender is not FrameworkElement { DataContext: TableViewModel table })
@@ -928,9 +1584,32 @@ namespace LimbusCalc
                 return;
             }
 
+            bool append = false;
+
+            if (table.Rows.Count > 0)
+            {
+                int choice = ConfirmWindow.Choose(
+                    this,
+                    $"Import {table.Title}",
+                    $"The table already has {table.Rows.Count} rows. Replace them with the rows from "
+                        + $"“{Path.GetFileName(dialog.FileName)}”, or add the file's rows after them? "
+                        + "Either way, Undo (Ctrl+Z) brings the table back.",
+                    "Replace",
+                    "Add to table");
+
+                if (choice < 0)
+                {
+                    return;
+                }
+
+                append = choice == 1;
+            }
+
+            EndEdit();
+
             try
             {
-                TableFile.Import(table, dialog.FileName);
+                table.Record("Import", () => TableFile.Import(table, dialog.FileName, append));
             }
             catch (Exception error)
             {
@@ -941,7 +1620,7 @@ namespace LimbusCalc
         private void Report(string title, Exception error) =>
             MessageBox.Show(this, error.Message, title, MessageBoxButton.OK, MessageBoxImage.Warning);
 
-        /// <summary>Левая кнопка по заголовку сортирует по столбцу и переворачивает порядок.</summary>
+        /// <summary>Left click on a header sorts by that column and reverses the order on repeat.</summary>
         private void ColumnHeader_LeftClick(object sender, MouseButtonEventArgs e)
         {
             if (sender is FrameworkElement { DataContext: TableColumn column } element
@@ -952,8 +1631,8 @@ namespace LimbusCalc
         }
 
         /// <summary>
-        /// Правая кнопка по заголовку скилла открывает список приоритетов: чем сравнивать
-        /// клетки в первую очередь. У прочих столбцов сравнивать нечего — там одно значение.
+        /// Right click on a skill column header opens the sort priority list: what to compare
+        /// cells by first. Other columns hold a single value, so there's nothing to prioritize.
         /// </summary>
         private void ColumnHeader_RightClick(object sender, MouseButtonEventArgs e)
         {
@@ -983,7 +1662,7 @@ namespace LimbusCalc
             }
         }
 
-        /// <summary>Тип урона скилла из правого меню клетки.</summary>
+        /// <summary>Damage type of the skill, from the cell's context menu.</summary>
         private void SkillType_Click(object sender, RoutedEventArgs e)
         {
             if (CellOfMenuItem(sender) is TableCell cell
@@ -993,6 +1672,7 @@ namespace LimbusCalc
             }
         }
 
+        /// <summary>Sin of the skill, from the cell's context menu.</summary>
         private void SkillSin_Click(object sender, RoutedEventArgs e)
         {
             if (CellOfMenuItem(sender) is TableCell cell
@@ -1002,18 +1682,27 @@ namespace LimbusCalc
             }
         }
 
+        /// <summary>Removes both marks from the cell.</summary>
         private void ClearSkillMarks_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is FrameworkElement { DataContext: TableCell cell })
+            if (sender is not FrameworkElement { DataContext: TableCell cell })
             {
-                cell.SkillType = null;
-                cell.SkillSin = null;
+                return;
             }
+
+            // Type and sin are removed together, so they must come back together in one undo.
+            using CellEdit? edit = sender is MenuItem { Parent: ContextMenu { PlacementTarget: UIElement row } }
+                && TableOf(row) is TableViewModel table
+                    ? table.BeginCellEdit(cell, "Clear type and sin")
+                    : null;
+
+            cell.SkillType = null;
+            cell.SkillSin = null;
         }
 
         /// <summary>
-        /// Клетка, которой принадлежит пункт подменю. Сам пункт получает данными вариант
-        /// из списка, а клетка достаётся от пункта-родителя.
+        /// The cell a submenu item belongs to. The item itself gets the option as its data;
+        /// the cell comes from the parent item.
         /// </summary>
         private static TableCell? CellOfMenuItem(object sender)
         {
@@ -1026,7 +1715,7 @@ namespace LimbusCalc
             return null;
         }
 
-        /// <summary>Таблица, которой принадлежит элемент разметки.</summary>
+        /// <summary>The table that an element of the markup belongs to.</summary>
         private static TableViewModel? TableOf(DependencyObject element)
         {
             for (DependencyObject? node = element; node is not null; node = VisualTreeHelper.GetParent(node))
@@ -1041,8 +1730,8 @@ namespace LimbusCalc
         }
 
         /// <summary>
-        /// Окно настроек. Модель одна на всё приложение: она же держит кисти обводки,
-        /// и её правки видны сразу, без повторного открытия окна.
+        /// The settings window. There's one settings model for the whole app: it also holds the
+        /// outline brushes, and its changes apply immediately without reopening the window.
         /// </summary>
         private void Settings_Click(object sender, RoutedEventArgs e)
         {
@@ -1056,8 +1745,8 @@ namespace LimbusCalc
         private void RemoveCoin_Click(object sender, RoutedEventArgs e) => _viewModel.RemoveLastCoin();
 
         /// <summary>
-        /// Горизонтальная прокрутка монет глотает колесо, хотя вертикально не двигается.
-        /// Перебрасываем событие наверх, чтобы крутилась общая вертикальная прокрутка.
+        /// The horizontal coin scroller swallows the mouse wheel even though it can't scroll
+        /// vertically. Forward the event up so the main vertical scroller moves.
         /// </summary>
         private void CoinsScroll_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
@@ -1078,8 +1767,8 @@ namespace LimbusCalc
         }
 
         /// <summary>
-        /// Окно подцелей держим одно: значения правятся вживую, и удобнее видеть,
-        /// как меняется итог, чем собирать стопку окон.
+        /// Only one subtargets window at a time: values update live, and watching the total
+        /// change is more useful than a pile of windows.
         /// </summary>
         private void Subtargets_Click(object sender, RoutedEventArgs e)
         {
@@ -1096,7 +1785,7 @@ namespace LimbusCalc
         }
 
         /// <summary>
-        /// Окно распределения держим одно: оно обновляется живьём вместе с расчётом.
+        /// <summary>Only one damage-by-target window: it updates live along with the calculation.</summary>
         /// </summary>
         private void DamageByTarget_Click(object sender, RoutedEventArgs e)
         {
@@ -1115,7 +1804,7 @@ namespace LimbusCalc
 
         private void RemoveBonus_Click(object sender, RoutedEventArgs e)
         {
-            // Строка бонуса лежит в DataContext кнопки: шаблон строится по коллекции.
+            // The bonus row is the button's DataContext: the template is generated from the collection.
             if (sender is FrameworkElement { DataContext: BonusRowViewModel row })
             {
                 _viewModel.RemoveBonus(row);

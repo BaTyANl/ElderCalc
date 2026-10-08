@@ -1,7 +1,7 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- Светлая тема. Ключи должны совпадать с Dark.xaml: словари подменяются целиком. -->
+    <!-- Light theme. Keys must match Dark.xaml: the dictionaries are swapped as a whole. -->
 
     <SolidColorBrush x:Key="AppBackgroundBrush" Color="#F3F4F7"/>
     <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFF"/>
@@ -17,17 +17,20 @@
     <SolidColorBrush x:Key="AccentPressedBrush" Color="#A32E22"/>
     <SolidColorBrush x:Key="OnAccentBrush" Color="#FFFFFF"/>
 
-    <!-- Отдельный цвет флажка крита. -->
+    <!-- Crit checkbox has its own color. -->
     <SolidColorBrush x:Key="CritBrush" Color="#2F6FED"/>
 
-    <!-- Флажок Time Moratorium. -->
+    <!-- Time Moratorium checkbox. -->
     <SolidColorBrush x:Key="MoratoriumBrush" Color="#D69E00"/>
 
-    <!-- Итог при включённом Time Moratorium. На светлом фоне чистый жёлтый нечитаем,
-         поэтому взят янтарный — самый жёлтый оттенок, который ещё различим. -->
+    <!-- The total when Time Moratorium is on. Pure yellow is unreadable on a light
+         background, so this is amber — the most yellow shade that still reads. -->
     <SolidColorBrush x:Key="MoratoriumTextBrush" Color="#E0A008"/>
 
-    <!-- Ползунок прокрутки. -->
+    <!-- Damage color scale in tables: the higher the damage, the stronger the fill. -->
+    <SolidColorBrush x:Key="HeatBrush" Color="#2E9E66"/>
+
+    <!-- Scrollbar thumb. -->
     <SolidColorBrush x:Key="ScrollThumbBrush" Color="#C3C8D2"/>
     <SolidColorBrush x:Key="ScrollThumbHoverBrush" Color="#A2AAB9"/>
 

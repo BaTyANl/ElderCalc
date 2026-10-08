@@ -2,23 +2,23 @@ using LimbusCalc.Calculation;
 
 namespace LimbusCalc.ViewModels;
 
-/// <summary>Пункт выпадающего списка: значение, подпись и иконка.</summary>
+/// <summary>A dropdown item: value, label and icon.</summary>
 public sealed class ElementOption
 {
     public required Element Element { get; init; }
 
     public required string Name { get; init; }
 
-    /// <summary>Путь к иконке; у истинного урона картинки нет.</summary>
+    /// <summary>Path to the icon; true damage has none.</summary>
     public string? IconPath { get; init; }
 
     public override string ToString() => Name;
 }
 
-/// <summary>Готовые наборы пунктов для выпадающих списков.</summary>
+/// <summary>Ready-made item lists for dropdowns.</summary>
 public static class ElementOptions
 {
-    /// <summary>Имя файла иконки не всегда совпадает с названием: gluttony лежит как glut.png.</summary>
+    /// <summary>The icon file name doesn't always match the label: gluttony is glut.png.</summary>
     private static ElementOption Create(Element element, string name, string iconFile) => new()
     {
         Element = element,
@@ -44,7 +44,7 @@ public static class ElementOptions
         Create(Element.Envy, "Envy", "envy"),
     ];
 
-    /// <summary>На что может целиться бонус: типы урона, грехи и истинный урон.</summary>
+    /// <summary>What a bonus can target: damage types, sins and true damage.</summary>
     public static IReadOnlyList<ElementOption> BonusTargets { get; } =
     [
         .. DamageTypes,
@@ -53,8 +53,8 @@ public static class ElementOptions
     ];
 
     /// <summary>
-    /// Порядок сопротивлений: сперва типы урона, затем грехи. В этом же порядке
-    /// идут поля в таблице подцелей и иконки над ними.
+    /// Resistance order: damage types first, then sins. Subtarget fields and the icons
+    /// above them follow the same order.
     /// </summary>
     public static IReadOnlyList<ElementOption> ResistanceOrder { get; } =
     [

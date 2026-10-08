@@ -4,7 +4,7 @@ using LimbusCalc.ViewModels;
 
 namespace LimbusCalc
 {
-    /// <summary>Окно настройки сопротивлений дополнительных целей одной монеты.</summary>
+    /// <summary>Resistances of one coin's extra targets.</summary>
     public partial class SubtargetsWindow : Window
     {
         private SubtargetParametersWindow? _parametersWindow;
@@ -17,8 +17,8 @@ namespace LimbusCalc
         }
 
         /// <summary>
-        /// Окно параметров держим одно: значения правятся вживую, и удобнее видеть,
-        /// как меняется итог, чем собирать стопку окон.
+        /// Only one parameters window at a time: values update live, and watching the total
+        /// change is more useful than a pile of windows.
         /// </summary>
         private void Parameters_Click(object sender, RoutedEventArgs e)
         {

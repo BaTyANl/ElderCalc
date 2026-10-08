@@ -6,15 +6,16 @@ using LimbusCalc.ViewModels;
 namespace LimbusCalc.Storage;
 
 /// <summary>
-/// Сохраняет и восстанавливает весь набор калькулятора: общие параметры, сопротивления
-/// основной цели, строки бонусов, монеты и их подцели.
-/// Общие части подцелей (сопротивления и мораторий) лежат отдельным списком и связаны
-/// с монетами по названию — так же, как они устроены в самом приложении.
+/// Saves and restores the whole calculator setup: shared parameters, main target
+/// resistances, bonus rows, coins and their subtargets.
+/// The shared parts of subtargets (resistances and moratorium) are a separate list linked
+/// to coins by name, the same way they are organized in the app.
 /// </summary>
 public static class SetupFile
 {
     public const string DialogFilter = "JSON file (*.json)|*.json";
 
+    /// <summary>Writes the setup to a file the user picked, indented so it can be read by hand.</summary>
     public static void Save(MainViewModel model, string path)
     {
         ArgumentNullException.ThrowIfNull(model);
@@ -22,18 +23,23 @@ public static class SetupFile
         File.WriteAllText(path, ToJson(model).ToJsonString(JsonFormat.Readable));
     }
 
+    /// <summary>Replaces the calculator's state with the setup from a file.</summary>
     public static void Load(MainViewModel model, string path)
     {
         ArgumentNullException.ThrowIfNull(model);
 
         if (JsonNode.Parse(File.ReadAllText(path)) is not JsonObject setup)
         {
-            throw new InvalidDataException("В файле ожидался набор калькулятора.");
+            throw new InvalidDataException("The file should contain a calculator setup.");
         }
 
         FromJson(model, setup);
     }
 
+    /// <summary>
+    /// The setup as JSON with default values left out — the same form that is stored
+    /// in table cells.
+    /// </summary>
     public static JsonObject ToJson(MainViewModel model)
     {
         ArgumentNullException.ThrowIfNull(model);
@@ -96,7 +102,7 @@ public static class SetupFile
             });
         }
 
-        // Общая часть подцели одна на все монеты, поэтому пишем её один раз на название.
+        // A subtarget's shared part is common to all coins, so it's written once per name.
         JsonArray targets = [];
         HashSet<string> written = [];
 
@@ -142,6 +148,10 @@ public static class SetupFile
     }
 
 
+    /// <summary>
+    /// Puts a stored setup into the calculator. Missing fields mean defaults, so every field
+    /// is reset rather than left as it was.
+    /// </summary>
     public static void FromJson(MainViewModel model, JsonObject setup)
     {
         ArgumentNullException.ThrowIfNull(model);
@@ -163,11 +173,11 @@ public static class SetupFile
             model.SkillSin = sin;
         }
 
-        // Сопротивления ставим всегда: отсутствующее в файле значит 1.0, а не
-        // «оставить как было в калькуляторе».
+        // Resistances are always set: a value missing from the file means 1.0, not
+        // "keep whatever the calculator had".
         ApplyResistances(AllResistances(model), setup["resistances"] as JsonObject);
 
-        // Монеты заводим до бонусов: строка бонуса раздаёт значение каждой монете.
+        // Coins come before bonuses: a bonus row hands its value to every coin.
         JsonArray coins = setup["coins"] as JsonArray ?? [];
 
         while (model.Coins.Count > coins.Count && model.Coins.Count > 1)
@@ -244,7 +254,7 @@ public static class SetupFile
         coin.HasCrit = Flag(stored["hasCrit"]);
         coin.CritPercent = Number(stored["critPercent"], SetupDefaults.CritPercent);
 
-        // Вес меняем последним из простых полей: он заводит подцели.
+        // Weight goes last among the simple fields: it creates the subtargets.
         coin.Weight = Math.Max(1, (int)Number(stored["weight"], SetupDefaults.Weight));
 
         JsonArray subtargets = stored["subtargets"] as JsonArray ?? [];
@@ -258,7 +268,7 @@ public static class SetupFile
 
             SubtargetViewModel subtarget = coin.Subtargets[i];
 
-            // Название первым: по нему подцель попадает в свою общую группу.
+            // Name first: it puts the subtarget into its shared group.
             if ((string?)storedSubtarget["name"] is string name)
             {
                 subtarget.Name = name;
@@ -273,8 +283,8 @@ public static class SetupFile
 
     private static void LoadTargets(MainViewModel model, JsonArray targets)
     {
-        // Сначала всё к значениям по умолчанию: цель, у которой ничего не менялось,
-        // в файл не пишется, и прежнее состояние калькулятора не должно в ней остаться.
+        // Reset everything to defaults first: a target that was never changed isn't written,
+        // and the calculator's previous state must not linger in it.
         foreach (SubtargetViewModel subtarget in AllSubtargets(model))
         {
             ApplyResistances(subtarget.Resistances, null);
@@ -305,7 +315,7 @@ public static class SetupFile
         }
     }
 
-    /// <summary>Сопротивления из файла; которых там нет — нейтральные, 1.0.</summary>
+    /// <summary>Resistances from the file; missing ones are neutral, 1.0.</summary>
     private static void ApplyResistances(
         IEnumerable<ResistanceViewModel> resistances,
         JsonObject? stored)
@@ -335,7 +345,7 @@ public static class SetupFile
         }
         catch (Exception)
         {
-            // В файле на этом месте оказалось не число — берём значение по умолчанию.
+            // Not a number in the file here — use the default.
             return fallback;
         }
     }

@@ -5,9 +5,9 @@ using System.Windows.Input;
 namespace LimbusCalc.Behaviors;
 
 /// <summary>
-/// Пропускает в поле только целое число. В отличие от <see cref="NumericBox"/> ничего
-/// не подставляет вместо пустой строки: в таблице пустая клетка значит «нет данных»,
-/// а не ноль, и превращать её в ноль нельзя.
+/// Lets only an integer into a text box. Unlike <see cref="NumericBox"/> it never
+/// substitutes anything for an empty string: an empty table cell means "no data",
+/// not zero, and must not turn into zero.
 /// </summary>
 public static class IntegerText
 {
@@ -65,7 +65,7 @@ public static class IntegerText
 
     private static bool IsAcceptable(string text)
     {
-        // Пустую строку и одинокий минус пропускаем, иначе минус нельзя было бы набрать.
+        // Allow an empty string and a lone minus, otherwise a minus could never be typed.
         if (text.Length == 0 || text == "-")
         {
             return true;

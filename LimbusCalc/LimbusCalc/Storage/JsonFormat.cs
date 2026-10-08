@@ -2,13 +2,13 @@ using System.Text.Json;
 
 namespace LimbusCalc.Storage;
 
-/// <summary>Как записывать JSON, который пользователь открывает и правит руками.</summary>
+/// <summary>How to write JSON that the user opens and edits by hand.</summary>
 public static class JsonFormat
 {
     /// <summary>
-    /// С отступами и переносами строк. Файл раздувается втрое, но его читают глазами,
-    /// а не только программой. Внутренние файлы в профиле пишутся без отступов:
-    /// их переписывают на каждой правке и никто не открывает.
+    /// Indented, one value per line. The file gets about three times larger, but people read
+    /// it. Internal files in the profile are written without indentation: they are rewritten
+    /// on every edit and nobody opens them.
     /// </summary>
     public static readonly JsonSerializerOptions Readable = new() { WriteIndented = true };
 }

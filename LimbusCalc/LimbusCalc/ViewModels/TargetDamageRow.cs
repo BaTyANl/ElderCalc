@@ -3,63 +3,63 @@ using LimbusCalc.Calculation;
 
 namespace LimbusCalc.ViewModels;
 
-/// <summary>По какому столбцу таблицы распределения она отсортирована.</summary>
+/// <summary>Which column the damage-by-target table is sorted by.</summary>
 public enum TargetSortKey
 {
-    /// <summary>Порядок как в расчёте: основная цель, дальше по позициям.</summary>
+    /// <summary>Calculation order: the main target, then by position.</summary>
     None,
 
-    /// <summary>Название цели — по алфавиту.</summary>
+    /// <summary>Target name, alphabetically.</summary>
     Title,
 
-    /// <summary>Урон одной монеты.</summary>
+    /// <summary>Damage of one coin.</summary>
     Coin,
 
-    /// <summary>Итог по цели.</summary>
+    /// <summary>Total per target.</summary>
     Total,
 }
 
-/// <summary>Строка таблицы распределения: одна цель, по клетке на монету плюс итог.</summary>
+/// <summary>A row of the damage-by-target table: one target, a cell per coin plus the total.</summary>
 public sealed class TargetDamageRow
 {
     public required string Title { get; init; }
 
-    /// <summary>Урон по монетам без Time Moratorium — как и в главном окне.</summary>
+    /// <summary>Damage per coin without Time Moratorium, as in the main window.</summary>
     public required IReadOnlyList<string> CoinDamage { get; init; }
 
     /// <summary>
-    /// Тот же урон числами, для сортировки. Пусто там, где монета по цели не бьёт:
-    /// это не ноль урона, а отсутствие удара, поэтому такие строки уходят вниз.
+    /// The same damage as numbers, for sorting. Empty where the coin doesn't hit the target:
+    /// that's not zero damage but no hit at all, so such rows go to the bottom.
     /// </summary>
     public required IReadOnlyList<double?> CoinValues { get; init; }
 
-    /// <summary>Сумма по монетам без Time Moratorium.</summary>
+    /// <summary>Sum over coins without Time Moratorium.</summary>
     public required double BaseTotal { get; init; }
 
-    /// <summary>Множитель Time Moratorium этой цели; единица — моратория нет.</summary>
+    /// <summary>This target's Time Moratorium multiplier; 1 means no moratorium.</summary>
     public required double MoratoriumBuff { get; init; }
 
-    /// <summary>Итог по цели с учётом Time Moratorium.</summary>
+    /// <summary>Total per target including Time Moratorium.</summary>
     public required double Total { get; init; }
 
-    /// <summary>Мораторий как-то изменил урон по этой цели.</summary>
+    /// <summary>The moratorium changed the damage to this target.</summary>
     public bool Affected => Total != BaseTotal;
 
     /// <summary>
-    /// Все монеты, бьющие по этой цели, дали один и тот же множитель. Если нет,
-    /// единого числа не существует, и равенство показывать нельзя: отношение итогов
-    /// выглядело бы как множитель, которого никто не задавал.
+    /// Every coin hitting this target produced the same multiplier. If not, there is no single
+    /// number, and the equation can't be shown: the ratio of totals would look like a
+    /// multiplier nobody set.
     /// </summary>
     public required bool UniformBuff { get; init; }
 
-    /// <summary>Показывать ли в итоговой клетке равенство вместо одного числа.</summary>
+    /// <summary>Whether the total cell shows an equation instead of a single number.</summary>
     public bool ShowEquation => Affected && UniformBuff;
 
-    /// <summary>Итог задет мораторием, но разложить его равенством нельзя.</summary>
+    /// <summary>The total is affected by the moratorium but can't be shown as an equation.</summary>
     public bool ShowPlainAffected => Affected && !UniformBuff;
 
     /// <summary>
-    /// Первое число в клетке итога: при равенстве это его левая часть, иначе сразу итог.
+    /// The first number in the total cell: the left side of the equation, or the total itself.
     /// </summary>
     public string LeadingText => Format(ShowEquation ? BaseTotal : Total);
 
@@ -72,18 +72,18 @@ public sealed class TargetDamageRow
     private static string Format(double value) =>
         value.ToString("0.##", CultureInfo.InvariantCulture);
 
-    /// <summary>Как называется основная цель каждой монеты.</summary>
+    /// <summary>What the main target of every coin is called.</summary>
     private const string MainTitle = "Main target";
 
     /// <summary>
-    /// Раскладывает результат расчёта по целям. Строка — это враг, а не позиция в списке:
-    /// подцели с одним названием на разных монетах попадают в одну строку, с разными —
-    /// в разные. Монета, которая по этому врагу не бьёт, получает прочерк — это не ноль
-    /// урона, а отсутствие удара.
+    /// Splits the calculation result by target. A row is an enemy, not a list position:
+    /// subtargets with the same name on different coins share a row, different names get
+    /// different rows. A coin that doesn't hit this enemy gets a dash — not zero damage,
+    /// but no hit.
     /// </summary>
     /// <param name="coinSubtargetTitles">
-    /// Названия подцелей по монетам: внешний список — монеты, внутренний — позиции,
-    /// нулевая из которых подцель 2. Безымянную подцель называем по номеру.
+    /// Subtarget names per coin: the outer list is coins, the inner one positions, where
+    /// position zero is subtarget 2. An unnamed subtarget is named by its number.
     /// </param>
     public static IReadOnlyList<TargetDamageRow> Build(
         IReadOnlyList<CoinBreakdown> coins,
@@ -96,8 +96,8 @@ public sealed class TargetDamageRow
             targets = Math.Max(targets, coin.TargetDamage.Count);
         }
 
-        // Порядок строк: основная цель, дальше по позициям слева направо — так новый
-        // враг встаёт туда, где по нему впервые ударили.
+        // Row order: the main target, then by position left to right, so a new enemy lands
+        // where it was first hit.
         List<string> order = [];
         HashSet<string> known = new(StringComparer.OrdinalIgnoreCase);
 
@@ -151,8 +151,8 @@ public sealed class TargetDamageRow
                     coinBase += coin.TargetDamage[t];
                     coinFinal += coin.TargetDamageFinal[t];
 
-                    // Множитель этой монеты по этой цели. Берём заданный формулой, а не
-                    // отношение итогов: округление вниз искажало бы его на мелком уроне.
+                    // This coin's multiplier for this target. Take the one the formula set, not
+                    // the ratio of totals: flooring would distort it on small damage.
                     double buff = t < coin.TargetMoratoriumBuff.Count
                         ? coin.TargetMoratoriumBuff[t]
                         : 1.0;
@@ -189,10 +189,10 @@ public sealed class TargetDamageRow
     }
 
     /// <summary>
-    /// Переставляет строки по выбранному столбцу. Порядок устойчивый: строки с равными
-    /// значениями остаются в том порядке, в каком стоят в расчёте.
+    /// Reorders rows by the chosen column. The sort is stable: rows with equal values keep
+    /// their calculation order.
     /// </summary>
-    /// <param name="coinIndex">Какая монета, если сортируем по столбцу монеты.</param>
+    /// <param name="coinIndex">Which coin, when sorting by a coin column.</param>
     public static IReadOnlyList<TargetDamageRow> Sort(
         IReadOnlyList<TargetDamageRow> rows,
         TargetSortKey key,
@@ -212,8 +212,8 @@ public sealed class TargetDamageRow
                     : rows.OrderBy(row => row.Total)];
 
             case TargetSortKey.Coin:
-                // Цели, до которых монета не достаёт, всегда внизу: у них не нулевой
-                // урон, а прочерк, и в ряду чисел ему места нет.
+                // Targets the coin doesn't reach always go last: they have a dash, not zero
+                // damage, and it doesn't belong among the numbers.
                 bool Hits(TargetDamageRow row) =>
                     coinIndex >= 0
                     && coinIndex < row.CoinValues.Count
@@ -233,8 +233,8 @@ public sealed class TargetDamageRow
     }
 
     /// <summary>
-    /// Как эта монета зовёт свою цель с этой позиции. Название и определяет строку:
-    /// одинаковое — один враг на всех монетах, разное — разные строки.
+    /// What this coin calls its target at this position. The name decides the row:
+    /// the same name is one enemy across coins, different names are different rows.
     /// </summary>
     private static string TitleOf(
         int coin,

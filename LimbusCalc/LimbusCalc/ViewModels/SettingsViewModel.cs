@@ -5,8 +5,8 @@ using LimbusCalc.Theming;
 namespace LimbusCalc.ViewModels;
 
 /// <summary>
-/// Настройка одной обводки: включена ли, каким цветом и насколько густо. Меняется
-/// в окне настроек, а перерисовывается через кисть в ресурсах приложения.
+/// One outline setting: on or off, color and opacity. Edited in the settings window and
+/// repainted through a brush in the application resources.
 /// </summary>
 public sealed class OutlineSettingsViewModel : ObservableObject
 {
@@ -59,14 +59,14 @@ public sealed class OutlineSettingsViewModel : ObservableObject
         }
     }
 
-    /// <summary>Цвет строкой — его можно вписать руками.</summary>
+    /// <summary>The color as text, so it can be typed in.</summary>
     public string Hex
     {
         get => AppSettings.ToHex(Color);
         set => Color = AppSettings.ParseColor(value, Color);
     }
 
-    /// <summary>Непрозрачность в процентах: так понятнее в ползунке.</summary>
+    /// <summary>Opacity in percent: easier to read on a slider.</summary>
     public double OpacityPercent
     {
         get => Math.Round(_opacity * 100.0);
@@ -89,8 +89,8 @@ public sealed class OutlineSettingsViewModel : ObservableObject
     };
 
     /// <summary>
-    /// Кладёт кисть в ресурсы приложения. Клетки берут её через DynamicResource,
-    /// поэтому таблица перекрашивается сразу и переживает смену темы.
+    /// Puts the brush into the application resources. Cells take it through DynamicResource,
+    /// so the table repaints immediately and survives a theme switch.
     /// </summary>
     public void Apply()
     {
@@ -102,16 +102,18 @@ public sealed class OutlineSettingsViewModel : ObservableObject
     }
 }
 
-/// <summary>Окно настроек: тема и обводка клеток справочника.</summary>
+/// <summary>The settings window: theme, table cell look and outlines.</summary>
 public sealed class SettingsViewModel : ObservableObject
 {
     private bool _isDark;
     private bool _showSkillIcons;
+    private bool _showDamageScale;
 
     public SettingsViewModel()
     {
         _isDark = ThemeManager.Current == AppTheme.Dark;
         _showSkillIcons = AppSettings.LoadShowSkillIcons();
+        _showDamageScale = AppSettings.LoadShowDamageScale();
 
         Manual = new OutlineSettingsViewModel(
             "Manual entry",
@@ -130,20 +132,23 @@ public sealed class SettingsViewModel : ObservableObject
 
     public const string CalculatorOutlineKey = "CalculatorOutlineBrush";
 
-    /// <summary>Показывать ли иконки типа и греха в клетках справочника.</summary>
+    /// <summary>Whether skill type and sin icons are shown in table cells.</summary>
     public const string SkillIconVisibilityKey = "SkillIconVisibility";
 
-    /// <summary>Отступы урона в клетке: справа они держат место под иконки.</summary>
+    /// <summary>Whether the damage color scale is shown in tables.</summary>
+    public const string DamageScaleVisibilityKey = "DamageScaleVisibility";
+
+    /// <summary>Damage padding in a cell: the right side reserves room for the icons.</summary>
     public const string DamagePaddingKey = "CellDamagePadding";
 
-    /// <summary>Куда прижат урон: без иконок ему незачем стоять слева.</summary>
+    /// <summary>Damage alignment: without icons there's no reason to keep it on the left.</summary>
     public const string DamageAlignmentKey = "CellDamageAlignment";
 
     public OutlineSettingsViewModel Manual { get; }
 
     public OutlineSettingsViewModel Calculator { get; }
 
-    /// <summary>Готовые цвета: набирать hex руками ради обычного выбора незачем.</summary>
+    /// <summary>Ready-made colors, so a typical choice doesn't need typing a hex value.</summary>
     public static IReadOnlyList<string> Palette { get; } =
     [
         "#DE5040", "#E58B2A", "#E5C22A", "#5BA85B",
@@ -164,8 +169,8 @@ public sealed class SettingsViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Иконки типа и греха в клетках справочника. Без них урону незачем жаться
-    /// к левому краю — он встаёт по центру клетки.
+    /// Skill type and sin icons in table cells. Without them the damage has no reason to hug
+    /// the left edge, so it is centered.
     /// </summary>
     public bool ShowSkillIcons
     {
@@ -180,17 +185,39 @@ public sealed class SettingsViewModel : ObservableObject
         }
     }
 
-    /// <summary>Ставит настройки в ресурсы приложения — вызывается при запуске.</summary>
+    /// <summary>
+    /// Damage color scale: the higher the damage in its column, the stronger the cell fill.
+    /// Strong entries stand out without sorting.
+    /// </summary>
+    public bool ShowDamageScale
+    {
+        get => _showDamageScale;
+        set
+        {
+            if (SetProperty(ref _showDamageScale, value))
+            {
+                ApplyDamageScale();
+                Save();
+            }
+        }
+    }
+
+    /// <summary>Puts the settings into the application resources; called at startup.</summary>
     public void Apply()
     {
         Manual.Apply();
         Calculator.Apply();
         ApplySkillIcons();
+        ApplyDamageScale();
     }
 
+    private void ApplyDamageScale() =>
+        Application.Current.Resources[DamageScaleVisibilityKey] =
+            _showDamageScale ? Visibility.Visible : Visibility.Collapsed;
+
     /// <summary>
-    /// Кладёт вид клетки в ресурсы приложения. Клетки берут это через DynamicResource,
-    /// поэтому таблица перестраивается сразу, без пересборки строк.
+    /// Puts the cell look into the application resources. Cells take it through DynamicResource,
+    /// so the table updates immediately without rebuilding rows.
     /// </summary>
     private void ApplySkillIcons()
     {
@@ -206,5 +233,6 @@ public sealed class SettingsViewModel : ObservableObject
             IsDark ? AppTheme.Dark : AppTheme.Light,
             Manual.ToModel(),
             Calculator.ToModel(),
-            ShowSkillIcons);
+            ShowSkillIcons,
+            ShowDamageScale);
 }

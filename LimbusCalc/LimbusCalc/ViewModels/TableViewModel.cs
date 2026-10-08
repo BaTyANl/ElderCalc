@@ -1,39 +1,56 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 
 namespace LimbusCalc.ViewModels;
 
-/// <summary>Чем заполняется клетка столбца.</summary>
+/// <summary>What a column's cells hold.</summary>
 public enum TableCellKind
 {
-    /// <summary>Свободный текст.</summary>
+    /// <summary>Free text.</summary>
     Text,
 
-    /// <summary>Только целое число.</summary>
+    /// <summary>Whole numbers only.</summary>
     Integer,
 
-    /// <summary>Выбор из готового списка значений.</summary>
+    /// <summary>A choice from a fixed list of values.</summary>
     Options,
 
-    /// <summary>Считается по соседним клеткам; руками не правится.</summary>
+    /// <summary>Calculated from other cells of the row; not editable.</summary>
     Computed,
 }
 
-/// <summary>Откуда в клетке взялся урон.</summary>
+/// <summary>Where a cell's damage came from.</summary>
 public enum TableCellSource
 {
-    /// <summary>Пусто: урона нет.</summary>
+    /// <summary>Empty: no damage.</summary>
     Empty,
 
-    /// <summary>Значение вписано руками.</summary>
+    /// <summary>Typed in by hand.</summary>
     Manual,
 
-    /// <summary>Значение выгружено из калькулятора, и набор лежит вместе с ним.</summary>
+    /// <summary>Exported from the calculator; the setup is stored with it.</summary>
     Calculator,
 }
 
-/// <summary>Чем сравниваются клетки скиллов при сортировке.</summary>
+/// <summary>State of the table's file, shown next to the file buttons.</summary>
+public enum TableSaveState
+{
+    /// <summary>The file matches what's on screen.</summary>
+    Saved,
+
+    /// <summary>An edit is waiting to be written or is being written right now.</summary>
+    Saving,
+
+    /// <summary>Writing failed; it is retried on the next edit and on exit.</summary>
+    Failed,
+
+    /// <summary>The file couldn't be read or set aside, so it must not be overwritten.</summary>
+    Off,
+}
+
+/// <summary>What skill cells are compared by when sorting.</summary>
 public enum SkillSortKey
 {
     Damage,
@@ -41,7 +58,7 @@ public enum SkillSortKey
     Sin,
 }
 
-/// <summary>Пункт списка приоритетов сортировки: сам признак и его подпись.</summary>
+/// <summary>An item of the sort priority list: the key and its label.</summary>
 public sealed class SkillSortOption
 {
     public required SkillSortKey Key { get; init; }
@@ -49,19 +66,21 @@ public sealed class SkillSortOption
     public required string Name { get; init; }
 }
 
-/// <summary>Столбец справочной таблицы: подпись в шапке, ширина и вид клеток.</summary>
+/// <summary>A reference table column: header title, width and cell kind.</summary>
 public sealed class TableColumn : ObservableObject
 {
     private string _indicator = string.Empty;
     private double? _actualWidth;
+    private bool _isHidden;
+    private double[] _scale = [];
 
     private string? _key;
 
     public required string Title { get; init; }
 
     /// <summary>
-    /// Под этим именем столбец лежит в файле и находится по названию. Обычно совпадает
-    /// с подписью, но у DPSC подпись одна на четыре столбца, а ключи разные.
+    /// The name the column is stored under in the file and looked up by. Usually the same as
+    /// the title, but the four DPSC columns share one title and need different keys.
     /// </summary>
     public string Key
     {
@@ -69,54 +88,54 @@ public sealed class TableColumn : ObservableObject
         init => _key = value;
     }
 
-    /// <summary>Ширина столбца; у растяжимого — наименьшая допустимая.</summary>
+    /// <summary>Column width; for the stretching column, the minimum width.</summary>
     public required double Width { get; init; }
 
     public TableCellKind Kind { get; init; } = TableCellKind.Text;
 
     /// <summary>
-    /// Принимает ли столбец выгрузку из калькулятора. Заодно значит, что в клетке
-    /// лежит урон: тип и грех назначают только таким.
+    /// Whether the column accepts exports from the calculator. It also means the cell holds
+    /// damage: only such cells get a type and a sin.
     /// </summary>
     public bool AcceptsSetup { get; init; }
 
-    /// <summary>Что делится и на что — у <see cref="TableCellKind.Computed"/>.</summary>
+    /// <summary>What is divided by what, for <see cref="TableCellKind.Computed"/>.</summary>
     public string? DividendKey { get; init; }
 
     public string? DivisorKey { get; init; }
 
-    /// <summary>Варианты для <see cref="TableCellKind.Options"/>; у прочих пусто.</summary>
+    /// <summary>Choices for <see cref="TableCellKind.Options"/>; empty for other kinds.</summary>
     public IReadOnlyList<string> Options { get; init; } = [];
 
     /// <summary>
-    /// Прежние названия столбца. Нужны при чтении файлов: столбец могли переименовать
-    /// уже после того, как выгрузку сохранили, и терять из-за этого данные незачем.
+    /// Former names of the column, used when reading files: the column may have been renamed
+    /// after an export was saved, and that's no reason to lose data.
     /// </summary>
     public IReadOnlyList<string> Aliases { get; init; } = [];
 
-    /// <summary>Отзывается ли столбец на это название — своё или прежнее.</summary>
+    /// <summary>Whether the column answers to this name — its own or a former one.</summary>
     public bool Matches(string title) =>
         Key == title || Title == title || Aliases.Contains(title);
 
-    /// <summary>Столбец попадает в выпадающие списки, и там его подписывают этим.</summary>
+    /// <summary>How the column is labeled in dropdowns.</summary>
     public override string ToString() => Title;
 
     /// <summary>
-    /// Шрифт клеток столбца. Не задан — как у всей таблицы. Мельче обычного там,
-    /// где длинным названиям тесно: у E.G.O. они бывают с оригиналом в скобках.
+    /// Font size of the column's cells; when null, the table's size is used. Smaller where
+    /// long names are cramped: E.G.O. names often include the original in brackets.
     /// </summary>
     public double? FontSize { get; init; }
 
-    /// <summary>Столбец забирает всю ширину, не занятую остальными.</summary>
+    /// <summary>The column takes all width the others leave.</summary>
     public bool Stretch { get; init; }
 
     /// <summary>
-    /// Сколько занимают остальные столбцы. Считается один раз при сборке таблицы —
-    /// растяжимому столбцу этого хватает, чтобы вычислить свою ширину по ширине окна.
+    /// How much the other columns take. Calculated when the table is built and when columns
+    /// are hidden; that's enough for the stretching column to size itself to the window.
     /// </summary>
     public double OtherWidth { get; private set; }
 
-    /// <summary>Стрелка направления у столбца, по которому сейчас сортируем.</summary>
+    /// <summary>Sort direction arrow on the column the table is sorted by.</summary>
     public string Indicator
     {
         get => _indicator;
@@ -124,13 +143,13 @@ public sealed class TableColumn : ObservableObject
     }
 
     /// <summary>
-    /// Ширина, с которой столбец рисуется сейчас: у растяжимого она зависит от окна.
-    /// Клетки берут её отсюда — так шапка, строки и строка средних всегда согласованы,
-    /// откуда бы ни считалась ширина видимой области.
+    /// The width the column is drawn with right now; for the stretching column it depends on
+    /// the window. Cells take it from here, so the header, rows and averages always agree
+    /// no matter where the viewport width was measured.
     /// </summary>
     public double ActualWidth
     {
-        get => _actualWidth ?? Width;
+        get => _isHidden ? 0.0 : _actualWidth ?? Width;
         internal set
         {
             if (_actualWidth != value)
@@ -141,22 +160,114 @@ public sealed class TableColumn : ObservableObject
         }
     }
 
+    /// <summary>A description shown over the column header; null means nothing to explain.</summary>
+    public string? Description { get; init; }
+
+    /// <summary>
+    /// Whether the column is hidden. Its data stays and is still saved — it just isn't shown.
+    /// A hidden column has zero width, so the header, rows and averages shift together.
+    /// </summary>
+    public bool IsHidden
+    {
+        get => _isHidden;
+        internal set
+        {
+            if (SetProperty(ref _isHidden, value))
+            {
+                OnPropertyChanged(nameof(ActualWidth));
+            }
+        }
+    }
+
+    /// <summary>The name column can't be hidden: rows would be impossible to tell apart.</summary>
+    public bool CanHide => !Matches("Name");
+
+    /// <summary>
+    /// Values of the visible cells in ascending order; the damage color scale is based on them.
+    /// Empty for columns without a scale or without numbers.
+    /// </summary>
+    public IReadOnlyList<double> Scale => _scale;
+
+    /// <summary>
+    /// Where a value sits on the column's scale: 0 is the lowest, 1 the highest. Based on rank
+    /// among the others rather than magnitude: a single outlier like 606 among typical 20–100
+    /// would otherwise squash the whole scale to zero and hide the differences.
+    /// </summary>
+    public double? ScaleOf(double value)
+    {
+        if (_scale.Length == 0)
+        {
+            return null;
+        }
+
+        // A single value in the column is also the best one.
+        if (_scale.Length == 1)
+        {
+            return 1.0;
+        }
+
+        // Equal values share one rank: the middle of their run.
+        int first = LowerBound(value);
+        int last = LowerBound(Math.BitIncrement(value)) - 1;
+        double rank = last < first ? first : (first + last) / 2.0;
+
+        return Math.Clamp(rank / (_scale.Length - 1), 0.0, 1.0);
+    }
+
+    private int LowerBound(double value)
+    {
+        int low = 0;
+        int high = _scale.Length;
+
+        while (low < high)
+        {
+            int middle = (low + high) / 2;
+
+            if (_scale[middle] < value)
+            {
+                low = middle + 1;
+            }
+            else
+            {
+                high = middle;
+            }
+        }
+
+        return low;
+    }
+
+    /// <summary>Whether the column is on the color scale: damage and its cost per sin.</summary>
+    public bool HasScale => AcceptsSetup || Kind == TableCellKind.Computed;
+
+    internal void SetScale(double[] sorted)
+    {
+        if (_scale.AsSpan().SequenceEqual(sorted))
+        {
+            return;
+        }
+
+        _scale = sorted;
+        OnPropertyChanged(nameof(Scale));
+    }
+
     internal static void MeasureStretch(IReadOnlyList<TableColumn> columns)
     {
         foreach (TableColumn column in columns)
         {
             if (column.Stretch)
             {
-                column.OtherWidth = columns.Where(other => other != column).Sum(other => other.Width);
+                column.OtherWidth = columns
+                    .Where(other => other != column && !other.IsHidden)
+                    .Sum(other => other.Width);
             }
         }
     }
 }
 
 /// <summary>
-/// Клетка таблицы. Значение хранится текстом: пустая клетка — это именно пусто,
-/// а не ноль, и при сортировке такие уходят вниз. У клетки скилла можно указать
-/// тип урона и грех — по ним тоже сортируют.
+/// A table cell. The value is stored as text: an empty cell means "no data", not zero,
+/// and such cells sort to the bottom. A skill cell can have a damage type and a sin,
+/// which are sortable too.
 /// </summary>
 public sealed class TableCell : ObservableObject
 {
@@ -166,21 +277,27 @@ public sealed class TableCell : ObservableObject
     private ElementOption? _skillSin;
     private bool _isVisible = true;
 
-    /// <summary>Столбец, которому клетка принадлежит: из него берётся ширина и вид.</summary>
+    /// <summary>The column the cell belongs to; width and kind come from it.</summary>
     public required TableColumn Column { get; init; }
 
     /// <summary>
-    /// Строка, в которой клетка стоит. Нужна счётным столбцам: они берут значения
-    /// у соседей по строке, а искать строку перебором на каждую правку дорого.
+    /// The row the cell is in. Computed columns need it to read their neighbors, and searching
+    /// for the row on every edit would be expensive.
     /// </summary>
     internal TableRowViewModel? Row { get; set; }
+
+    /// <summary>
+    /// The cell's content is about to change. Raised before the edit while the old content
+    /// can still be captured: the table builds its undo history from it.
+    /// </summary>
+    internal event EventHandler? Changing;
 
     public string Value
     {
         get => _value;
         set
         {
-            if (SetProperty(ref _value, value))
+            if (Change(ref _value, value))
             {
                 OnPropertyChanged(nameof(Source));
             }
@@ -188,15 +305,15 @@ public sealed class TableCell : ObservableObject
     }
 
     /// <summary>
-    /// Набор калькулятора, из которого получено значение, как он лежит в файле.
-    /// Пусто — значение вписано руками; вернуть такое в калькулятор нечем.
+    /// The calculator setup the value came from, as stored in the file.
+    /// Null means the value was typed by hand and there's nothing to send back to the calculator.
     /// </summary>
     public string? Setup
     {
         get => _setup;
         set
         {
-            if (SetProperty(ref _setup, value))
+            if (Change(ref _setup, value))
             {
                 OnPropertyChanged(nameof(HasSetup));
                 OnPropertyChanged(nameof(CanEditMarks));
@@ -205,43 +322,67 @@ public sealed class TableCell : ObservableObject
         }
     }
 
-    /// <summary>Есть ли что вернуть в калькулятор.</summary>
+    /// <summary>Whether there's a setup to send back to the calculator.</summary>
     public bool HasSetup => !string.IsNullOrEmpty(Setup);
 
     /// <summary>
-    /// Можно ли назначать тип и грех вручную. Они есть только у урона, а у клетки
-    /// с набором приезжают из калькулятора — править их отдельно нечего.
+    /// Whether type and sin can be set by hand. Only damage cells have them, and a cell with a
+    /// setup gets them from the calculator, so there's nothing to edit separately.
     /// </summary>
     public bool CanEditMarks => Column.AcceptsSetup && !HasSetup;
 
     /// <summary>
-    /// Откуда взялся урон. Клетку с набором руками не правят: иначе число и набор
-    /// разошлись бы, и было бы неясно, что именно вернётся в калькулятор.
+    /// Where the damage came from. A cell with a setup isn't edited by hand: otherwise the
+    /// number and the setup would disagree, and it'd be unclear what goes back to the calculator.
     /// </summary>
     public TableCellSource Source =>
         IsEmpty ? TableCellSource.Empty
         : HasSetup ? TableCellSource.Calculator
         : TableCellSource.Manual;
 
-    /// <summary>Тип урона скилла; не задан — клетка просто число.</summary>
+    /// <summary>Damage type of the skill; when null the cell is just a number.</summary>
     public ElementOption? SkillType
     {
         get => _skillType;
-        set => SetProperty(ref _skillType, value);
+        set => Change(ref _skillType, value);
     }
 
-    /// <summary>Грех скилла.</summary>
+    /// <summary>Sin of the skill.</summary>
     public ElementOption? SkillSin
     {
         get => _skillSin;
-        set => SetProperty(ref _skillSin, value);
+        set => Change(ref _skillSin, value);
+    }
+
+    /// <summary>Everything entered in the cell — an edit can be undone from this snapshot.</summary>
+    internal TableCellState State => new(Value, Setup, SkillType, SkillSin);
+
+    /// <summary>Puts previously captured content back into the cell.</summary>
+    internal void Restore(TableCellState state)
+    {
+        Value = state.Value;
+        SkillType = state.SkillType;
+        SkillSin = state.SkillSin;
+        Setup = state.Setup;
+    }
+
+    /// <summary>Like <see cref="ObservableObject.SetProperty"/>, but raises <see cref="Changing"/> first.</summary>
+    private bool Change<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value))
+        {
+            return false;
+        }
+
+        Changing?.Invoke(this, EventArgs.Empty);
+        return SetProperty(ref field, value, propertyName);
     }
 
     public bool IsEmpty => string.IsNullOrWhiteSpace(Value);
 
     /// <summary>
-    /// Проходит ли значение через фильтр. Не прошедшая клетка остаётся пустой:
-    /// её урон не показывают и в среднее не берут.
+    /// Whether the value passes the filter. A cell that doesn't stays blank: its damage
+    /// isn't shown or counted in the average.
     /// </summary>
     public bool IsVisible
     {
@@ -249,28 +390,28 @@ public sealed class TableCell : ObservableObject
         internal set => SetProperty(ref _isVisible, value);
     }
 
-    /// <summary>Число клетки или пусто, если там не число.</summary>
+    /// <summary>The cell's number, or null if it isn't a number.</summary>
     public double? Number =>
         double.TryParse(Value, NumberStyles.Float, CultureInfo.InvariantCulture, out double parsed)
             ? parsed
             : null;
 }
 
-/// <summary>Строка таблицы: по клетке на столбец, в том же порядке.</summary>
+/// <summary>A table row: one cell per column, in the same order.</summary>
 public sealed class TableRowViewModel : ObservableObject
 {
     private bool _isVisible = true;
 
     public required IReadOnlyList<TableCell> Cells { get; init; }
 
-    /// <summary>Проходит ли строка через фильтр.</summary>
+    /// <summary>Whether the row passes the filter.</summary>
     public bool IsVisible
     {
         get => _isVisible;
         internal set => SetProperty(ref _isVisible, value);
     }
 
-    /// <summary>Клетка нужного столбца или пусто, если такого столбца нет.</summary>
+    /// <summary>The cell of the given column, or null if there is no such column.</summary>
     public TableCell? CellOf(TableColumn column)
     {
         foreach (TableCell cell in Cells)
@@ -285,8 +426,8 @@ public sealed class TableRowViewModel : ObservableObject
     }
 
     /// <summary>
-    /// То же по названию столбца — так строка читается из файла. Прежние названия
-    /// столбца тоже подходят, иначе старые выгрузки теряли бы столбец.
+    /// The same by column name — this is how rows are read from a file. Former column names
+    /// match too, otherwise older exports would lose the column.
     /// </summary>
     public TableCell? CellOf(string columnTitle)
     {
@@ -303,8 +444,8 @@ public sealed class TableRowViewModel : ObservableObject
 }
 
 /// <summary>
-/// Клетка итоговой строки под таблицей. Стоит в том же столбце, что и данные,
-/// поэтому ширину берёт оттуда же.
+/// A cell of the averages row under the table. It sits in the same column as the data,
+/// so it takes the width from there.
 /// </summary>
 public sealed class TableAverage : ObservableObject
 {
@@ -319,9 +460,42 @@ public sealed class TableAverage : ObservableObject
     }
 }
 
+/// <summary>An item of the columns list: a "show" checkbox.</summary>
+public sealed class ColumnChoiceViewModel : ObservableObject
+{
+    private readonly TableViewModel _table;
+
+    internal ColumnChoiceViewModel(TableViewModel table, TableColumn column)
+    {
+        _table = table;
+        Column = column;
+        column.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(TableColumn.IsHidden))
+            {
+                OnPropertyChanged(nameof(IsShown));
+            }
+        };
+    }
+
+    public TableColumn Column { get; }
+
+    /// <summary>
+    /// The label in the list. The four DPSC columns share one header title, so the key
+    /// ("1T Damage DPSC") is used here — otherwise they couldn't be told apart.
+    /// </summary>
+    public string Title => Column.Key;
+
+    public bool IsShown
+    {
+        get => !Column.IsHidden;
+        set => _table.SetColumnHidden(Column, !value);
+    }
+}
+
 /// <summary>
-/// Справочная таблица с заданным набором столбцов. Общая и для ID, и для E.G.O.:
-/// отличаются они только столбцами, поведение одно.
+/// A reference table with a given set of columns. Shared by ID and E.G.O.: they differ only
+/// in columns, the behavior is the same.
 /// </summary>
 public sealed class TableViewModel : ObservableObject
 {
@@ -331,29 +505,147 @@ public sealed class TableViewModel : ObservableObject
     private int _bulkDepth;
     private bool _bulkChanged;
     private bool _isLoading;
+    private bool _replaying;
+    private TableSaveState _saveState;
+    private string _saveProblem = string.Empty;
 
-    /// <summary>Подпись над таблицей.</summary>
+    /// <summary>
+    /// The cell being edited in the editor. All its edits until the editor closes are one
+    /// history step: otherwise every typed digit would be undone separately.
+    /// </summary>
+    private TableCell? _editingCell;
+
+    private CellStep? _editingStep;
+
+    private string _filterSummary = string.Empty;
+    private IReadOnlyList<ColumnChoiceViewModel>? _columnChoices;
+
+    /// <summary>Viewport width from the last layout; the Name column stretches to it.</summary>
+    private double _viewportWidth;
+
+    private string _editingLabel = string.Empty;
+
+    /// <summary>The title above the table.</summary>
     public required string Title { get; init; }
 
     public required IReadOnlyList<TableColumn> Columns { get; init; }
 
-    /// <summary>Отбор строк и значений; создаётся вместе с таблицей.</summary>
+    /// <summary>Row and value filter; created together with the table.</summary>
     public required TableFilterViewModel Filter { get; init; }
 
-    /// <summary>Есть ли столбец грешника — от него зависит, показывать ли их список.</summary>
+    /// <summary>Whether there's a Sinner column — decides whether the sinner filter is shown.</summary>
     public bool HasSinners => Columns.Any(column => column.Title == "Sinner");
 
-    /// <summary>Есть ли столбец редкости — от него зависит, показывать ли её фильтр.</summary>
+    /// <summary>Whether there's a Rarity column — decides whether its filter is shown.</summary>
     public bool HasRarity => Columns.Any(column => column.Title == "Rarity");
 
-    /// <summary>Есть ли столбец вида E.G.O. — от него зависит, показывать ли его фильтр.</summary>
+    /// <summary>Whether there's an E.G.O. Type column — decides whether its filter is shown.</summary>
     public bool HasEgoType => Columns.Any(column => column.Title == "Type");
+
+    /// <summary>How many rows are left after filtering: "12 of 210 rows".</summary>
+    public string FilterSummary
+    {
+        get => _filterSummary;
+        private set => SetProperty(ref _filterSummary, value);
+    }
+
+    /// <summary>Columns with "show" checkboxes; the name column isn't listed.</summary>
+    public IReadOnlyList<ColumnChoiceViewModel> ColumnChoices =>
+        _columnChoices ??= [.. Columns.Where(column => column.CanHide).Select(column => new ColumnChoiceViewModel(this, column))];
+
+    /// <summary>Label of the columns button: how many are hidden.</summary>
+    public string ColumnsLabel
+    {
+        get
+        {
+            int hidden = Columns.Count(column => column.IsHidden);
+
+            return hidden == 0 ? "Columns" : $"Columns: {hidden} hidden";
+        }
+    }
+
+    /// <summary>The sort column and direction — to remember between launches.</summary>
+    public string? SortKey => _sortColumn?.Key;
+
+    public bool SortDescending => _sortDescending;
+
+    /// <summary>
+    /// Hides or shows a column. The stretching column takes the freed space, so widths are
+    /// recalculated right away for the same viewport.
+    /// </summary>
+    public void SetColumnHidden(TableColumn column, bool hidden)
+    {
+        ArgumentNullException.ThrowIfNull(column);
+
+        if (!column.CanHide || column.IsHidden == hidden)
+        {
+            return;
+        }
+
+        column.IsHidden = hidden;
+        TableColumn.MeasureStretch(Columns);
+        UpdateColumnWidths(_viewportWidth);
+        OnPropertyChanged(nameof(ColumnsLabel));
+    }
+
+    public void ShowAllColumns()
+    {
+        foreach (TableColumn column in Columns)
+        {
+            SetColumnHidden(column, false);
+        }
+    }
+
+    /// <summary>Hides everything that can be hidden, leaving only the name to pick columns from.</summary>
+    public void HideAllColumns()
+    {
+        foreach (TableColumn column in Columns)
+        {
+            SetColumnHidden(column, true);
+        }
+    }
+
+    /// <summary>
+    /// Restores the sort remembered from the last launch. The column with that key may no
+    /// longer exist — then the table stays unsorted.
+    /// </summary>
+    public void RestoreSort(string? columnKey, bool descending, IReadOnlyList<SkillSortKey> priority)
+    {
+        ArgumentNullException.ThrowIfNull(priority);
+
+        for (int target = 0; target < priority.Count; target++)
+        {
+            int index = IndexOfPriority(priority[target]);
+
+            if (index >= 0 && target < SortPriority.Count && index != target)
+            {
+                SortPriority.Move(index, target);
+            }
+        }
+
+        _sortColumn = Columns.FirstOrDefault(column => column.Key == columnKey);
+        _sortDescending = _sortColumn is not null && descending;
+        ApplySort();
+    }
+
+    private int IndexOfPriority(SkillSortKey key)
+    {
+        for (int i = 0; i < SortPriority.Count; i++)
+        {
+            if (SortPriority[i].Key == key)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
 
     public ObservableCollection<TableRowViewModel> Rows { get; } = [];
 
     /// <summary>
-    /// Чем сравнивать клетки скиллов, от главного признака к последнему.
-    /// По умолчанию урон, затем тип, затем грех; порядок правится в меню столбца.
+    /// What skill cells are compared by, from the main key to the last.
+    /// Damage, then type, then sin by default; the order is edited from the column menu.
     /// </summary>
     public ObservableCollection<SkillSortOption> SortPriority { get; } =
     [
@@ -363,8 +655,8 @@ public sealed class TableViewModel : ObservableObject
     ];
 
     /// <summary>
-    /// Строка под таблицей: средний урон по каждому столбцу скилла. Заводится по
-    /// столбцам один раз, дальше только пересчитывается — чтобы привязка не рвалась.
+    /// The row under the table: average damage per skill column. Created once per column and
+    /// only recalculated afterwards, so bindings don't break.
     /// </summary>
     public IReadOnlyList<TableAverage> Averages
     {
@@ -380,15 +672,15 @@ public sealed class TableViewModel : ObservableObject
         }
     }
 
-    /// <summary>Есть ли что удалять — по этому свойству гаснет кнопка удаления.</summary>
+    /// <summary>Whether there's anything to delete; disables the Clear button when false.</summary>
     public bool HasRows => Rows.Count > 0;
 
-    /// <summary>Таблица пуста — вместо строк показываем подсказку.</summary>
+    /// <summary>The table is empty — a hint is shown instead of rows.</summary>
     public bool IsEmpty => Rows.Count == 0;
 
     /// <summary>
-    /// Таблица ещё читается из файла. Пока это так, её закрывает заглушка: правка
-    /// до конца чтения была бы тут же затёрта прочитанным.
+    /// The table is still being read from its file. Until then a cover hides it: an edit
+    /// made before reading finishes would be overwritten by what was read.
     /// </summary>
     public bool IsLoading
     {
@@ -396,13 +688,94 @@ public sealed class TableViewModel : ObservableObject
         set => SetProperty(ref _isLoading, value);
     }
 
+    /// <summary>What can be undone and redone.</summary>
+    public TableHistory History { get; } = new();
+
+    /// <summary>Whether the table's file is written — for the indicator next to the file buttons.</summary>
+    public TableSaveState SaveState
+    {
+        get => _saveState;
+        set => SetProperty(ref _saveState, value);
+    }
+
+    /// <summary>Why it isn't written; shown when the indicator is clicked.</summary>
+    public string SaveProblem
+    {
+        get => _saveProblem;
+        set => SetProperty(ref _saveProblem, value);
+    }
+
     /// <summary>
-    /// Содержимое изменилось: добавили или убрали строку, поправили клетку, пересортировали.
-    /// По этому событию таблица уходит на диск.
+    /// The content changed: a row was added or removed, a cell edited, the rows re-sorted.
+    /// This event sends the table to disk.
     /// </summary>
     public event EventHandler? Changed;
 
+    /// <summary>
+    /// Whether edits go into the history. Bulk changes are how tables load from a file —
+    /// there's nothing to undo there, and <see cref="Record"/> records a whole load as one step.
+    /// Undo itself edits cells too, and must not be recorded as a new edit.
+    /// </summary>
+    private bool IsRecording => _bulkDepth == 0 && !_replaying;
+
+    /// <summary>Appends an empty row. Recorded in the history unless the table is loading.</summary>
     public TableRowViewModel AddRow()
+    {
+        TableRowViewModel row = NewRow();
+
+        if (IsRecording)
+        {
+            History.Push(new RowStep { Row = row, Index = Rows.Count, Insert = false, Label = "Add row" });
+        }
+
+        InsertRow(Rows.Count, row);
+        return row;
+    }
+
+    /// <summary>
+    /// The copy goes right below the row, with all numbers, marks and setups. "(copy)" is
+    /// appended to the name — otherwise the two rows couldn't be told apart, neither in the
+    /// table nor when exporting from the calculator.
+    /// </summary>
+    public TableRowViewModel Duplicate(TableRowViewModel source)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+
+        int index = Rows.IndexOf(source);
+
+        if (index < 0)
+        {
+            throw new ArgumentException("The row is not in this table.", nameof(source));
+        }
+
+        TableRowViewModel copy = NewRow();
+
+        // The table isn't listening to the copy's cells yet, so this isn't recorded.
+        for (int i = 0; i < copy.Cells.Count; i++)
+        {
+            if (copy.Cells[i].Column.Kind != TableCellKind.Computed)
+            {
+                copy.Cells[i].Restore(source.Cells[i].State);
+            }
+        }
+
+        if (copy.CellOf("Name") is TableCell name && !name.IsEmpty)
+        {
+            name.Value = $"{name.Value.Trim()} (copy)";
+        }
+
+        Recompute(copy);
+
+        if (IsRecording)
+        {
+            History.Push(new RowStep { Row = copy, Index = index + 1, Insert = false, Label = $"Duplicate {NameOf(source)}" });
+        }
+
+        InsertRow(index + 1, copy);
+        return copy;
+    }
+
+    private TableRowViewModel NewRow()
     {
         TableRowViewModel row = new()
         {
@@ -412,19 +785,227 @@ public sealed class TableViewModel : ObservableObject
         foreach (TableCell cell in row.Cells)
         {
             cell.Row = row;
-            cell.PropertyChanged += OnCellChanged;
         }
 
-        Rows.Add(row);
-        OnRowsChanged();
         return row;
     }
 
-    /// <summary>Убирает строку целиком вместе с наборами, что лежали в её клетках.</summary>
+    /// <summary>Removes a whole row together with the setups stored in its cells.</summary>
     public void Remove(TableRowViewModel row)
     {
         ArgumentNullException.ThrowIfNull(row);
 
+        int index = Rows.IndexOf(row);
+
+        if (index < 0)
+        {
+            return;
+        }
+
+        if (IsRecording)
+        {
+            History.Push(new RowStep { Row = row, Index = index, Insert = true, Label = $"Delete {NameOf(row)}" });
+        }
+
+        DetachRow(row);
+    }
+
+    /// <summary>Removes every row as a single undoable step.</summary>
+    public void Clear() =>
+        Record("Clear table", () =>
+        {
+            while (Rows.Count > 0)
+            {
+                DetachRow(Rows[^1]);
+            }
+        });
+
+    /// <summary>
+    /// Changes the table's rows as one history step — used for loading files and clearing.
+    /// If it fails midway the previous rows come back: half a table is worse than none.
+    /// </summary>
+    public void Record(string label, Action change)
+    {
+        ArgumentNullException.ThrowIfNull(change);
+
+        bool recording = IsRecording;
+        List<TableRowViewModel> before = [.. Rows];
+
+        try
+        {
+            using IDisposable bulk = BeginBulkChange();
+
+            change();
+        }
+        catch
+        {
+            ReplaceRows(before);
+            throw;
+        }
+
+        if (recording && !before.SequenceEqual(Rows))
+        {
+            History.Push(new RowsStep { Rows = before, Label = label });
+        }
+    }
+
+    /// <summary>Undoes the last edit; does nothing if there's nothing to undo.</summary>
+    public bool Undo()
+    {
+        // An open cell edit is a step too. Close it before taking a step from the history.
+        EndCellEdit(null);
+        return Replay(History.TakeUndo(), History.PutRedo);
+    }
+
+    /// <summary>Redoes the last undone edit.</summary>
+    public bool Redo()
+    {
+        EndCellEdit(null);
+        return Replay(History.TakeRedo(), History.PutUndo);
+    }
+
+    private bool Replay(TableStep? step, Action<TableStep> keepInverse)
+    {
+        if (step is null)
+        {
+            return false;
+        }
+
+        TableStep? inverse = null;
+        Replaying(() => inverse = step.Revert(this));
+        keepInverse(inverse!);
+        return true;
+    }
+
+    /// <summary>Edits the table bypassing the history, as one bulk change.</summary>
+    private void Replaying(Action change)
+    {
+        _replaying = true;
+
+        try
+        {
+            using IDisposable bulk = BeginBulkChange();
+
+            change();
+        }
+        finally
+        {
+            _replaying = false;
+        }
+    }
+
+    /// <summary>
+    /// Opens a cell edit: everything that happens to the cell until it closes is undone as one
+    /// step, and <see cref="CellEdit.Cancel"/> puts it back as it was. Also used for edits
+    /// from code that change several properties of a cell at once.
+    /// </summary>
+    public CellEdit BeginCellEdit(TableCell cell, string? label = null)
+    {
+        ArgumentNullException.ThrowIfNull(cell);
+
+        EndCellEdit(null);
+
+        _editingCell = cell;
+        _editingStep = null;
+        _editingLabel = label ?? EditLabel(cell);
+
+        return new CellEdit(this, cell);
+    }
+
+    /// <summary>Closes the edit. If the value is back to what it was, no step is needed.</summary>
+    internal void EndCellEdit(TableCell? cell)
+    {
+        if (_editingCell is null || (cell is not null && !ReferenceEquals(cell, _editingCell)))
+        {
+            return;
+        }
+
+        if (_editingStep is not null)
+        {
+            if (_editingStep.Before == _editingCell.State)
+            {
+                History.Drop(_editingStep);
+            }
+            else
+            {
+                History.ForgetRedo();
+            }
+        }
+
+        _editingCell = null;
+        _editingStep = null;
+    }
+
+    internal void CancelCellEdit(TableCell cell)
+    {
+        if (!ReferenceEquals(cell, _editingCell))
+        {
+            return;
+        }
+
+        if (_editingStep is CellStep step)
+        {
+            Replaying(() => cell.Restore(step.Before));
+        }
+
+        EndCellEdit(cell);
+    }
+
+    private void OnCellChanging(object? sender, EventArgs e)
+    {
+        // Computed cells recalculate themselves; there's no point undoing them separately.
+        if (sender is not TableCell cell || cell.Column.Kind == TableCellKind.Computed || !IsRecording)
+        {
+            return;
+        }
+
+        if (ReferenceEquals(cell, _editingCell))
+        {
+            if (_editingStep is null)
+            {
+                _editingStep = new CellStep { Cell = cell, Before = cell.State, Label = _editingLabel };
+                History.Push(_editingStep, keepRedo: true);
+            }
+
+            return;
+        }
+
+        History.Push(new CellStep { Cell = cell, Before = cell.State, Label = EditLabel(cell) });
+    }
+
+    private static string EditLabel(TableCell cell)
+    {
+        string name = cell.Row is null ? string.Empty : NameOf(cell.Row);
+
+        return cell.Column.Matches("Name") || cell.Row is null || name == "row"
+            ? $"Edit {cell.Column.Title}"
+            : $"Edit {cell.Column.Title} of {name}";
+    }
+
+    /// <summary>How to name a row in a tooltip: by its name, or just "row" without one.</summary>
+    private static string NameOf(TableRowViewModel row)
+    {
+        string name = row.CellOf("Name")?.Value.Trim() ?? string.Empty;
+
+        return name.Length == 0 ? "row" : $"“{name}”";
+    }
+
+    /// <summary>Puts a row into the table and starts listening to its cells.</summary>
+    internal void InsertRow(int index, TableRowViewModel row)
+    {
+        foreach (TableCell cell in row.Cells)
+        {
+            cell.PropertyChanged += OnCellChanged;
+            cell.Changing += OnCellChanging;
+        }
+
+        Rows.Insert(index, row);
+        OnRowsChanged();
+    }
+
+    /// <summary>Removes a row; its cells no longer report to the table.</summary>
+    internal void DetachRow(TableRowViewModel row)
+    {
         if (!Rows.Remove(row))
         {
             return;
@@ -433,24 +1014,31 @@ public sealed class TableViewModel : ObservableObject
         foreach (TableCell cell in row.Cells)
         {
             cell.PropertyChanged -= OnCellChanged;
+            cell.Changing -= OnCellChanging;
         }
 
         OnRowsChanged();
     }
 
-    public void Clear()
+    /// <summary>Replaces all rows of the table with the given ones.</summary>
+    internal void ReplaceRows(IReadOnlyList<TableRowViewModel> rows)
     {
         using IDisposable bulk = BeginBulkChange();
 
         while (Rows.Count > 0)
         {
-            Remove(Rows[^1]);
+            DetachRow(Rows[^1]);
+        }
+
+        foreach (TableRowViewModel row in rows)
+        {
+            InsertRow(Rows.Count, row);
         }
     }
 
     /// <summary>
-    /// Отсортировать по этому столбцу; повторное нажатие переворачивает порядок.
-    /// Клетки без данных уходят вниз в обе стороны: там нечего сравнивать.
+    /// Sorts by this column; clicking it again reverses the order.
+    /// Cells without data go to the bottom either way: there's nothing to compare.
     /// </summary>
     public void SortBy(TableColumn column)
     {
@@ -469,7 +1057,7 @@ public sealed class TableViewModel : ObservableObject
         ApplySort();
     }
 
-    /// <summary>Двигает признак в списке приоритетов: -1 вверх, +1 вниз.</summary>
+    /// <summary>Moves a key in the priority list: -1 up, +1 down.</summary>
     public void MovePriority(SkillSortOption option, int delta)
     {
         int index = SortPriority.IndexOf(option);
@@ -482,7 +1070,7 @@ public sealed class TableViewModel : ObservableObject
 
         SortPriority.Move(index, target);
 
-        // Порядок признаков поменялся — таблица должна перестроиться сразу.
+        // The key order changed, so the table must be re-sorted right away.
         if (_sortColumn?.Kind == TableCellKind.Integer)
         {
             ApplySort();
@@ -490,23 +1078,25 @@ public sealed class TableViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Пересчитывает ширины столбцов под видимую область: растяжимый забирает остаток.
-    /// Вызывается при изменении размера — шапка, строки и средние берут ширины отсюда,
-    /// поэтому остаются согласованными.
+    /// Recalculates column widths for the viewport: the stretching column takes the rest.
+    /// Called on resize — the header, rows and averages take their widths from here,
+    /// so they stay aligned.
     /// </summary>
     public void UpdateColumnWidths(double viewportWidth)
     {
+        _viewportWidth = viewportWidth;
+
         foreach (TableColumn column in Columns)
         {
-            // Единица — на внешнюю рамку таблицы, иначе строка вылезает за неё
-            // и появляется лишняя горизонтальная прокрутка.
+            // One pixel goes to the table's outer border; without it the row overflows
+            // and an unnecessary horizontal scrollbar appears.
             column.ActualWidth = column.Stretch && viewportWidth > 0.0
                 ? Math.Max(column.Width, viewportWidth - column.OtherWidth - 1.0)
                 : column.Width;
         }
     }
 
-    /// <summary>Пересортировать по текущему столбцу; без выбранного столбца ничего не делает.</summary>
+    /// <summary>Re-sorts by the current column; does nothing when no column is chosen.</summary>
     public void ApplySort()
     {
         UpdateIndicators();
@@ -519,8 +1109,8 @@ public sealed class TableViewModel : ObservableObject
         TableColumn column = _sortColumn;
         RowComparer comparer = new(column, SortPriority);
 
-        // Пустые клетки — не наименьшее значение, а отсутствие данных: они
-        // остаются внизу независимо от направления.
+        // Empty cells aren't the smallest value but missing data: they stay at the bottom
+        // in both directions.
         IEnumerable<TableRowViewModel> filled = Rows.Where(row => !IsCellEmpty(row, column));
         IEnumerable<TableRowViewModel> blank = Rows.Where(row => IsCellEmpty(row, column));
 
@@ -559,9 +1149,9 @@ public sealed class TableViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Открывает пакетную правку: фильтр и средние пересчитываются один раз в конце,
-    /// а не после каждой клетки. На загрузке справочника это разница в десятки раз —
-    /// иначе каждая из тысяч правок заново обходит всю таблицу.
+    /// Starts a bulk change: filters and averages are recalculated once at the end instead
+    /// of after every cell. When loading a table that's tens of times faster — otherwise
+    /// every one of thousands of edits walks the whole table again.
     /// </summary>
     public IDisposable BeginBulkChange()
     {
@@ -579,7 +1169,7 @@ public sealed class TableViewModel : ObservableObject
 
         _bulkChanged = false;
 
-        // Во время пакета правки не отзывались, поэтому считаем всё разом здесь.
+        // Edits didn't react during the bulk change, so everything is recalculated here.
         RecomputeAll();
 
         OnPropertyChanged(nameof(HasRows));
@@ -590,16 +1180,15 @@ public sealed class TableViewModel : ObservableObject
 
     private void OnCellChanged(object? sender, PropertyChangedEventArgs e)
     {
-        // Видимость клетке ставит сам фильтр. Это не правка данных: ни пересчитывать
-        // фильтр заново, ни сохранять файл не нужно — а на тысяче клеток такой
-        // повторный обход стоил секунд.
+        // Visibility is set by the filter itself. It's not a data edit: neither re-filtering
+        // nor saving is needed — and on a thousand cells such a second pass cost seconds.
         if (e.PropertyName == nameof(TableCell.IsVisible))
         {
             return;
         }
 
-        // Правка обычной клетки могла поменять то, что считается по ней. Счётные
-        // клетки при этом не пересчитывают сами себя — на них обход и заканчивается.
+        // Editing a regular cell may change what is calculated from it. Computed cells don't
+        // trigger a recalculation themselves, so the chain stops there.
         if (sender is TableCell { Row: TableRowViewModel row } changed
             && changed.Column.Kind != TableCellKind.Computed)
         {
@@ -612,14 +1201,14 @@ public sealed class TableViewModel : ObservableObject
             return;
         }
 
-        // Правка метки или значения может вывести строку из-под фильтра.
+        // Editing a mark or a value may move the row in or out of the filter.
         ApplyFilter();
         Changed?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>
-    /// Пересчитывает счётные клетки строки. Делить не на что или нечего — клетка
-    /// остаётся пустой: ноль тут значил бы «посчитано и вышло ноль».
+    /// Recalculates the row's computed cells. With nothing to divide or nothing to divide by
+    /// the cell stays empty: zero would mean "calculated and came out as zero".
     /// </summary>
     private static void Recompute(TableRowViewModel row)
     {
@@ -642,7 +1231,7 @@ public sealed class TableViewModel : ObservableObject
     private static double? Value(TableRowViewModel row, string? columnKey) =>
         columnKey is null ? null : row.CellOf(columnKey)?.Number;
 
-    /// <summary>Пересчитывает счётные клетки во всей таблице — после чтения файла.</summary>
+    /// <summary>Recalculates computed cells in the whole table — after reading a file.</summary>
     private void RecomputeAll()
     {
         foreach (TableRowViewModel row in Rows)
@@ -680,17 +1269,16 @@ public sealed class TableViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Прогоняет строки через фильтр: грешник отбирает строки целиком, тип и грех —
-    /// отдельные значения. Строка, у которой не осталось ни одного подходящего
-    /// значения, скрывается вся.
+    /// Runs the rows through the filter: sinner selects whole rows, type and sin select
+    /// individual values. A row with no matching value left is hidden entirely.
     /// </summary>
     public void ApplyFilter()
     {
         foreach (TableRowViewModel row in Rows)
         {
-            // Грешник, редкость, вид E.G.O. и поиск отбирают строку целиком,
-            // тип урона и грех — её значения.
-            // Столбец названия у ID и E.G.O. называется по-разному, но откликается на «Name».
+            // Sinner, rarity, E.G.O. type and search select whole rows; damage type and sin
+            // select its values. The name column is named differently in ID and E.G.O.,
+            // but both answer to "Name".
             bool rowOk = Filter.AllowsName(row.CellOf("Name")?.Value)
                 && Filter.AllowsSinner(row.CellOf("Sinner")?.Value)
                 && Filter.AllowsRarity(row.CellOf("Rarity")?.Value)
@@ -700,8 +1288,8 @@ public sealed class TableViewModel : ObservableObject
 
             foreach (TableCell cell in row.Cells)
             {
-                // По типу урона и греху отбирается только урон. Sin Cost и прочие числа
-                // без меток остаются видны, иначе фильтр гасил бы их вместе с уроном.
+                // Only damage is filtered by type and sin. Sin Cost and other numbers without
+                // marks stay visible, otherwise the filter would hide them along with damage.
                 if (!cell.Column.AcceptsSetup)
                 {
                     cell.IsVisible = true;
@@ -716,11 +1304,44 @@ public sealed class TableViewModel : ObservableObject
         }
 
         UpdateAverages();
+        UpdateScales();
+
+        FilterSummary = Filter.IsActive
+            ? $"{Rows.Count(row => row.IsVisible)} of {Rows.Count} rows"
+            : string.Empty;
     }
 
     /// <summary>
-    /// Считает средний урон по столбцам скиллов. Пустые клетки в счёт не идут:
-    /// незаполненный скилл — это не нулевой урон, и занижать им среднее незачем.
+    /// The color scale per column: everything visible, in ascending order. Values hidden by the
+    /// filter don't affect the scale — they aren't visible either.
+    /// </summary>
+    private void UpdateScales()
+    {
+        foreach (TableColumn column in Columns)
+        {
+            if (!column.HasScale)
+            {
+                continue;
+            }
+
+            List<double> values = [];
+
+            foreach (TableRowViewModel row in Rows)
+            {
+                if (row.IsVisible && row.CellOf(column) is { IsVisible: true, Number: double value })
+                {
+                    values.Add(value);
+                }
+            }
+
+            values.Sort();
+            column.SetScale([.. values]);
+        }
+    }
+
+    /// <summary>
+    /// Average damage per skill column. Empty cells don't count: an unfilled skill isn't zero
+    /// damage, and there's no reason to drag the average down with it.
     /// </summary>
     private void UpdateAverages()
     {
@@ -750,7 +1371,7 @@ public sealed class TableViewModel : ObservableObject
 
             foreach (TableRowViewModel row in Rows)
             {
-                // Среднее считается по тому, что видно: скрытое фильтром в счёт не идёт.
+                // The average covers what's visible: values hidden by the filter don't count.
                 if (!row.IsVisible)
                 {
                     continue;
@@ -771,7 +1392,7 @@ public sealed class TableViewModel : ObservableObject
         }
     }
 
-    /// <summary>Сравнение строк по одному столбцу с учётом приоритетов для скиллов.</summary>
+    /// <summary>Compares rows by one column, using the priorities for skill columns.</summary>
     private sealed class RowComparer(TableColumn column, IEnumerable<SkillSortOption> priority)
         : IComparer<TableRowViewModel>
     {
@@ -791,13 +1412,13 @@ public sealed class TableViewModel : ObservableObject
             {
                 TableCellKind.Options => IndexOfOption(left).CompareTo(IndexOfOption(right)),
                 TableCellKind.Integer => CompareSkills(left, right),
-                // У счётного столбца меток нет — сравнивать нечего, кроме числа.
+                // Computed columns have no marks — there's nothing to compare but the number.
                 TableCellKind.Computed => (left.Number ?? 0.0).CompareTo(right.Number ?? 0.0),
                 _ => string.Compare(left.Value, right.Value, StringComparison.OrdinalIgnoreCase),
             };
         }
 
-        /// <summary>Редкость сравнивается порядком вариантов: 0 младше 00, то — 000.</summary>
+        /// <summary>Rarity compares by option order: 0 is below 00, which is below 000.</summary>
         private int IndexOfOption(TableCell cell)
         {
             for (int i = 0; i < column.Options.Count; i++)
@@ -833,7 +1454,7 @@ public sealed class TableViewModel : ObservableObject
             return 0;
         }
 
-        /// <summary>Незаданный тип или грех идёт перед всеми заданными.</summary>
+        /// <summary>An unset type or sin comes before all set ones.</summary>
         private static int IndexIn(IReadOnlyList<ElementOption> options, ElementOption? option)
         {
             if (option is null)
@@ -853,14 +1474,14 @@ public sealed class TableViewModel : ObservableObject
         }
     }
 
-    /// <summary>Все двенадцать грешников в порядке номеров — в нём же они сортируются.</summary>
+    /// <summary>All twelve sinners in number order — they sort in this order too.</summary>
     public static IReadOnlyList<string> Sinners { get; } =
     [
         "Yi Sang", "Faust", "Don Quixote", "Ryoshu", "Meursault", "Hong Lu",
         "Heathcliff", "Ishmael", "Rodion", "Sinclair", "Outis", "Gregor",
     ];
 
-    /// <summary>Столбцы таблицы личностей. Свободное место забирает Name.</summary>
+    /// <summary>Columns of the ID table. Name takes the free space.</summary>
     public static TableViewModel CreateIdTable() => Create("ID",
     [
         new TableColumn
@@ -887,7 +1508,7 @@ public sealed class TableViewModel : ObservableObject
         .. SkillColumns("S1-1", "S1-2", "S2-1", "S2-2", "S3-1", "S3-2", "S3-3", "S3-4", "C-1", "C-2"),
     ]);
 
-    /// <summary>Столбцы таблицы E.G.O. За каждым уроном идёт свой DPSC.</summary>
+    /// <summary>Columns of the E.G.O. table. Every damage column is followed by its DPSC.</summary>
     public static TableViewModel CreateEgoTable() => Create("E.G.O.",
     [
         new TableColumn
@@ -895,7 +1516,7 @@ public sealed class TableViewModel : ObservableObject
             Title = "Danger Level",
             Width = 116,
             Kind = TableCellKind.Options,
-            // Порядок — от младшего к старшему: по нему столбец и сортируется.
+            // Ordered from lowest to highest: the column sorts by this order.
             Options = ["ZAYIN", "TETH", "HE", "WAW", "ALEPH"],
         },
         new TableColumn
@@ -912,25 +1533,32 @@ public sealed class TableViewModel : ObservableObject
             Kind = TableCellKind.Options,
             Options = ["Awakening", "Corrosion"],
         },
-        // Ширина, снятая с трёх узких столбцов слева, отдана названию.
+        // The width taken from the three narrow columns on the left went to the name.
         new TableColumn { Title = "Name", Width = 270, Stretch = true, FontSize = 12 },
         new TableColumn { Title = "Sin Cost", Width = 92, Kind = TableCellKind.Integer },
-        .. DamageWithCost("1T Damage"),
-        .. DamageWithCost("3T Damage"),
-        .. DamageWithCost("7T Damage"),
-        .. DamageWithCost("Max Damage", aliases: ["Max T Damage"]),
+        .. DamageWithCost("1T Damage", "Single target"),
+        .. DamageWithCost("3T Damage", "Single enemy with 3 parts"),
+        .. DamageWithCost("7T Damage", "7 different enemies"),
+        .. DamageWithCost(
+            "Max Damage",
+            "Highest potential damage (could be impossible to achieve in normal gameplay)",
+            aliases: ["Max T Damage"]),
     ]);
 
     /// <summary>
-    /// Урон и его цена за грех: DPSC считается сам и руками не правится. Подпись у всех
-    /// четырёх одна, а храниться им надо порознь — отсюда отдельный ключ.
+    /// Damage and its cost per sin: DPSC is calculated and can't be edited. All four share
+    /// one header title but must be stored separately — hence a separate key.
     /// </summary>
-    private static IEnumerable<TableColumn> DamageWithCost(string title, IReadOnlyList<string>? aliases = null)
+    private static IEnumerable<TableColumn> DamageWithCost(
+        string title,
+        string description,
+        IReadOnlyList<string>? aliases = null)
     {
         yield return new TableColumn
         {
             Title = title,
-            // Прежнее название держим, чтобы старые файлы читались без потерь.
+            Description = description,
+            // The former name is kept so older files read without loss.
             Aliases = aliases ?? [],
             Width = 110,
             Kind = TableCellKind.Integer,
@@ -941,6 +1569,7 @@ public sealed class TableViewModel : ObservableObject
         {
             Key = $"{title} DPSC",
             Title = "DPSC",
+            Description = "Damage per Sin Cost",
             Width = 76,
             Kind = TableCellKind.Computed,
             DividendKey = title,
@@ -952,7 +1581,7 @@ public sealed class TableViewModel : ObservableObject
     {
         TableColumn.MeasureStretch(columns);
 
-        // Варианты редкости берём у самого столбца: фильтр не должен знать их отдельно.
+        // Rarity options come from the column itself: the filter shouldn't know them separately.
         IReadOnlyList<string> rarities =
             columns.FirstOrDefault(column => column.Title == "Rarity")?.Options ?? [];
 
@@ -970,7 +1599,7 @@ public sealed class TableViewModel : ObservableObject
         return table;
     }
 
-    /// <summary>Столбцы скиллов: целое число с выгрузкой из калькулятора.</summary>
+    /// <summary>Skill columns: whole numbers that accept calculator exports.</summary>
     private static IEnumerable<TableColumn> SkillColumns(params string[] titles) =>
         titles.Select(title => new TableColumn
         {

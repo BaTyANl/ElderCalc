@@ -5,7 +5,7 @@ using LimbusCalc.Theming;
 
 namespace LimbusCalc.Converters;
 
-/// <summary>Проценты из ползунка в долю единицы: непрозрачность задаётся ею.</summary>
+/// <summary>Slider percent to a 0..1 fraction, which is what opacity takes.</summary>
 public sealed class PercentConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>
@@ -15,7 +15,7 @@ public sealed class PercentConverter : IValueConverter
         value is double share ? share * 100.0 : 100.0;
 }
 
-/// <summary>Цвет из строки вида #RRGGBB — так задана палитра.</summary>
+/// <summary>A color from a #RRGGBB string — the palette is defined that way.</summary>
 public sealed class HexColorConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>

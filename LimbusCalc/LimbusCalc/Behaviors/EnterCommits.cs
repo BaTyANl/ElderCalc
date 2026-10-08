@@ -6,9 +6,9 @@ using System.Windows.Input;
 namespace LimbusCalc.Behaviors;
 
 /// <summary>
-/// Ввод по Enter: значение применяется и поле отпускает фокус. Нужно и тем полям,
-/// которые отдают значение только по уходу фокуса, — иначе набранное повисало бы
-/// в поле, пока пользователь не щёлкнет мимо.
+/// Enter commits the value and releases focus. Fields that update their source only on
+/// lost focus need this too, otherwise the typed value would hang in the field until
+/// the user clicks elsewhere.
 /// </summary>
 public static class EnterCommits
 {
@@ -47,12 +47,12 @@ public static class EnterCommits
             return;
         }
 
-        // Привязка могла ждать ухода фокуса — подталкиваем её сами.
+        // The binding may be waiting for lost focus, so push the value ourselves.
         box.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
 
-        // Снимаем и логический фокус, и клавиатурный: первое запускает всё, что
-        // навешано на LostFocus, второе убирает курсор из поля. Одного мало —
-        // окно вернуло бы фокус обратно в то же поле.
+        // Clear both logical and keyboard focus: the first fires LostFocus handlers, the
+        // second removes the caret. Either alone is not enough — the window would put
+        // focus straight back into the same field.
         if (FocusManager.GetFocusScope(box) is DependencyObject focusScope)
         {
             FocusManager.SetFocusedElement(focusScope, null);

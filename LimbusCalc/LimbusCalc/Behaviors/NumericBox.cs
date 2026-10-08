@@ -6,11 +6,10 @@ using System.Windows.Input;
 namespace LimbusCalc.Behaviors;
 
 /// <summary>
-/// Числовое поле ввода. Привязываться нужно к <see cref="ValueProperty"/>, а не к Text:
-/// обычная двусторонняя привязка Text переписывает содержимое на каждом нажатии,
-/// из-за чего курсор прыгает в начало, а формат съедает только что набранную точку
-/// (12.0 сворачивается в 12). Здесь текст не трогается, пока поле в фокусе.
-/// Разделителем принимается и точка, и запятая — раскладка значения не имеет.
+/// A numeric text box. Bind to <see cref="ValueProperty"/>, not to Text: a regular two-way
+/// Text binding rewrites the content on every key press, which jumps the caret to the start
+/// and lets the format swallow a freshly typed dot (12. collapses to 12). Here the text is
+/// left alone while the box has focus. Both a dot and a comma work as the decimal separator.
 /// </summary>
 public static class NumericBox
 {
@@ -19,14 +18,14 @@ public static class NumericBox
             "Value",
             typeof(double),
             typeof(NumericBox),
-            // Значение по умолчанию — NaN, а не ноль: обработчик вызывается только при
-            // изменении, и поле со стартовым нулём иначе не подключилось бы вовсе.
+            // The default is NaN, not zero: the callback fires only on change, so a box
+            // that starts at zero would otherwise never get attached.
             new FrameworkPropertyMetadata(
                 double.NaN,
                 FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
                 OnValueChanged));
 
-    /// <summary>Разрешать только целые: дробный разделитель набрать нельзя.</summary>
+    /// <summary>Allow whole numbers only: the decimal separator can't be typed.</summary>
     public static readonly DependencyProperty IsIntegerProperty =
         DependencyProperty.RegisterAttached(
             "IsInteger",
@@ -62,8 +61,8 @@ public static class NumericBox
 
         Attach(box);
 
-        // Пока пользователь печатает, текст остаётся его: иначе курсор уедет,
-        // а незавершённое число вроде "12." будет затёрто.
+        // While the user is typing the text is theirs: otherwise the caret would jump
+        // and an unfinished number like "12." would be overwritten.
         if (box.IsKeyboardFocusWithin)
         {
             return;
@@ -97,15 +96,14 @@ public static class NumericBox
             return;
         }
 
-        // Недонабранное ("-", "12.") просто пропускаем: значение изменится,
-        // когда строка станет числом.
+        // Skip unfinished input ("-", "12."): the value changes once the text is a number.
         if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out double parsed))
         {
             SetValue(box, GetIsInteger(box) ? Math.Truncate(parsed) : parsed);
         }
     }
 
-    /// <summary>По выходу из поля приводим текст к нормальному виду: "12." станет "12".</summary>
+    /// <summary>On leaving the box the text is normalized: "12." becomes "12".</summary>
     private static void OnLostFocus(object sender, RoutedEventArgs e)
     {
         TextBox box = (TextBox)sender;
@@ -136,7 +134,7 @@ public static class NumericBox
 
     private static bool IsAcceptable(string text, bool integer)
     {
-        // Пустую строку и одинокий минус пропускаем, иначе минус нельзя было бы набрать.
+        // Allow an empty string and a lone minus, otherwise a minus could never be typed.
         if (text.Length == 0 || text == "-")
         {
             return true;

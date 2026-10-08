@@ -17,7 +17,7 @@
         Background="{DynamicResource AppBackgroundBrush}">
 
     <Window.Resources>
-        <!-- Настройка одной обводки: галочка, палитра, цвет строкой и густота. -->
+        <!-- One outline setting: checkbox, palette, hex color and opacity. -->
         <DataTemplate x:Key="OutlineSettingsTemplate">
             <StackPanel Margin="0,0,0,14">
                 <StackPanel Orientation="Horizontal">
@@ -97,6 +97,17 @@
                            VerticalAlignment="Center"/>
             </StackPanel>
             <TextBlock Text="Without them the damage stands in the middle of the cell."
+                       Foreground="{DynamicResource SubtleTextBrush}"
+                       TextWrapping="Wrap" Margin="26,4,0,0"/>
+
+            <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                <CheckBox VerticalAlignment="Center"
+                          AutomationProperties.AutomationId="DamageScaleCheckBox"
+                          IsChecked="{Binding ShowDamageScale, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Damage color scale in tables" Margin="8,0,0,0"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+            <TextBlock Text="The higher the damage in its column, the stronger the tint. Counts only what the filters show."
                        Foreground="{DynamicResource SubtleTextBrush}"
                        TextWrapping="Wrap" Margin="26,4,0,0"/>
 

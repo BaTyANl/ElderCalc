@@ -8,28 +8,28 @@ using LimbusCalc.ViewModels;
 
 namespace LimbusCalc.Storage;
 
-/// <summary>Чем закончилось чтение таблицы из профиля.</summary>
+/// <summary>How reading a table from the profile ended.</summary>
 public enum TableLoadOutcome
 {
-    /// <summary>Файл прочитан.</summary>
+    /// <summary>The file was read.</summary>
     Loaded,
 
-    /// <summary>Файла нет — таблица начинается пустой.</summary>
+    /// <summary>No file: the table starts empty.</summary>
     Missing,
 
-    /// <summary>Файл испорчен, взята прошлая версия из резервной копии.</summary>
+    /// <summary>The file was broken; the previous version was taken from the backup.</summary>
     RestoredFromBackup,
 
-    /// <summary>Не прочитался ни файл, ни копия — таблица пустая.</summary>
+    /// <summary>Neither the file nor the backup could be read: the table is empty.</summary>
     Failed,
 }
 
-/// <summary>Одна клетка, как она прочитана из файла, — ещё без привязки к таблице.</summary>
+/// <summary>One cell as read from the file, not yet attached to a table.</summary>
 public sealed record TableCellData(string Value, ElementOption? Type, ElementOption? Sin, string? Setup);
 
 /// <summary>
-/// Содержимое таблицы, прочитанное из файла: строки как пары «ключ столбца — клетка».
-/// Собирается в фоновом потоке, а в таблицу ставится уже в потоке окна.
+/// Table content read from a file: rows as "column key — cell" pairs.
+/// Built on a background thread and put into the table on the UI thread.
 /// </summary>
 public sealed class TableData(IReadOnlyList<IReadOnlyList<KeyValuePair<string, TableCellData>>> rows)
 {
@@ -39,8 +39,8 @@ public sealed class TableData(IReadOnlyList<IReadOnlyList<KeyValuePair<string, T
 }
 
 /// <summary>
-/// Итог чтения. <see cref="CanSave"/> ложно, когда испорченный файл не удалось
-/// даже скопировать в сторону: писать поверх него значило бы потерять его насовсем.
+/// The result of reading. <see cref="CanSave"/> is false when the broken file couldn't even
+/// be copied aside: writing over it would lose it for good.
 /// </summary>
 public sealed record TableLoadResult(
     TableLoadOutcome Outcome,
@@ -50,9 +50,9 @@ public sealed record TableLoadResult(
     bool CanSave);
 
 /// <summary>
-/// Копия содержимого таблицы на момент сохранения. Снимается в потоке окна за
-/// доли миллисекунды: строки клеток неизменяемы, копировать приходится только ссылки.
-/// Пишется потом в фоне, пока в таблице продолжают работать.
+/// A copy of the table's content at save time. Taken on the UI thread in a fraction of a
+/// millisecond: cell strings are immutable, so only references are copied. It is written
+/// out in the background while the user keeps working.
 /// </summary>
 public sealed class TableSnapshot
 {
@@ -70,13 +70,12 @@ internal readonly record struct SnapshotCell(
     string? Setup);
 
 /// <summary>
-/// Хранит справочные таблицы между запусками. Каждая таблица лежит в своём файле
-/// в профиле пользователя: программу могут положить в папку без права записи,
-/// а отдельные файлы проще передавать и подменять по одному.
-/// Содержимое файла — список строк, где каждая строка представлена объектом
-/// с ключами столбцов: так файл переживает добавление и перестановку столбцов.
-/// Пустые и счётные клетки не пишутся — первые при чтении и так пусты, вторые
-/// пересчитываются.
+/// Stores the reference tables between launches. Each table has its own file in the user
+/// profile: the exe may sit in a read-only folder, and separate files are easier to share
+/// and replace one at a time.
+/// The file is a list of rows, each an object keyed by column, so it survives columns
+/// being added or reordered. Empty and computed cells aren't written: the former are
+/// empty on reading anyway and the latter are recalculated.
 /// </summary>
 public static class TableStorage
 {
@@ -89,23 +88,23 @@ public static class TableStorage
         "ElderCalc");
 
     /// <summary>
-    /// Кириллица и скобки в названиях остаются как есть, а не превращаются в \uXXXX:
-    /// файл читают и глазами. Для HTML такое не годится, но это не HTML.
+    /// Cyrillic and brackets in names stay as they are instead of becoming \uXXXX:
+    /// people read this file too. That's unsafe for HTML, but this isn't HTML.
     /// </summary>
     private static readonly JavaScriptEncoder Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
 
-    /// <summary>Полный путь к файлу таблицы — его показываем пользователю.</summary>
+    /// <summary>Full path of a table file; this is what the user is shown.</summary>
     public static string PathOf(string fileName) => Path.Combine(Folder, fileName);
 
-    /// <summary>Прошлая версия файла; её оставляет каждое сохранение.</summary>
+    /// <summary>The previous version of the file; every save leaves one.</summary>
     public static string BackupOf(string path) => path + ".bak";
 
-    // ---------------------------------------------------------------- чтение
+    // ---------------------------------------------------------------- reading
 
     /// <summary>
-    /// Читает таблицу из профиля. Можно звать из любого потока: к таблице на экране
-    /// не прикасается. Испорченный файл откладывается в сторону под своим именем,
-    /// и вместо него берётся резервная копия, если она читается.
+    /// Reads a table from the profile. Safe to call from any thread: it doesn't touch the
+    /// table on screen. A broken file is set aside under its own name and the backup is
+    /// used instead, if it can be read.
     /// </summary>
     public static TableLoadResult Read(string fileName)
     {
@@ -138,7 +137,7 @@ public static class TableStorage
                 }
                 catch (Exception)
                 {
-                    // Копия тоже не читается — остаёмся с пустой таблицей ниже.
+                    // The backup is unreadable too — fall through to an empty table.
                 }
             }
 
@@ -151,7 +150,7 @@ public static class TableStorage
         }
     }
 
-    /// <summary>Разбирает список строк в данные таблицы. Годится для фонового потока.</summary>
+    /// <summary>Parses a list of rows into table data. Safe on a background thread.</summary>
     public static TableData Parse(JsonArray rows)
     {
         ArgumentNullException.ThrowIfNull(rows);
@@ -182,18 +181,22 @@ public static class TableStorage
     }
 
     /// <summary>
-    /// Ставит прочитанное в таблицу вместо её содержимого. Только в потоке окна.
-    /// Ключи, которых у таблицы нет, пропускаются: столбец могли убрать.
+    /// Puts the read data into the table in place of its content. UI thread only.
+    /// Keys the table doesn't have are skipped: the column may have been removed. With
+    /// <paramref name="append"/> the rows go after the existing ones instead.
     /// </summary>
-    public static void Apply(TableViewModel table, TableData data)
+    public static void Apply(TableViewModel table, TableData data, bool append = false)
     {
         ArgumentNullException.ThrowIfNull(table);
         ArgumentNullException.ThrowIfNull(data);
 
-        // Пакетом: фильтр, средние и счётные клетки считаются один раз в конце.
+        // In bulk: filters, averages and computed cells are recalculated once at the end.
         using IDisposable bulk = table.BeginBulkChange();
 
-        table.Clear();
+        if (!append)
+        {
+            table.Clear();
+        }
 
         foreach (IReadOnlyList<KeyValuePair<string, TableCellData>> stored in data.Rows)
         {
@@ -214,8 +217,9 @@ public static class TableStorage
         }
     }
 
-    /// <summary>Заменяет содержимое таблицы прочитанным списком строк.</summary>
-    public static void FromJson(TableViewModel table, JsonArray rows) => Apply(table, Parse(rows));
+    /// <summary>Replaces the table's content with a parsed list of rows.</summary>
+    public static void FromJson(TableViewModel table, JsonArray rows, bool append = false) =>
+        Apply(table, Parse(rows), append);
 
     private static TableData ParseFile(string path)
     {
@@ -223,12 +227,12 @@ public static class TableStorage
 
         return JsonNode.Parse(stream) is JsonArray rows
             ? Parse(rows)
-            : throw new InvalidDataException("В файле ожидался список строк таблицы.");
+            : throw new InvalidDataException("The file should contain a list of table rows.");
     }
 
     /// <summary>
-    /// Обычная клетка лежит одним значением — числом или строкой. Клетка урона
-    /// с типом, грехом или набором — объектом, где отсутствующее поле значит «нет».
+    /// A plain cell is stored as a single value, a number or a string. A damage cell with a
+    /// type, sin or setup is an object, where a missing field means "none".
     /// </summary>
     private static TableCellData ParseCell(JsonNode value)
     {
@@ -237,8 +241,8 @@ public static class TableStorage
             return new TableCellData(ReadText(value), null, null, null);
         }
 
-        // Наборы, записанные раньше целиком, ужимаем прямо тут: следующее
-        // сохранение запишет уже короткими.
+        // Setups written in full by older versions are compacted right here, so the next
+        // save writes them short.
         string? setup = skill["setup"] is JsonObject stored
             ? SetupDefaults.Compact(stored).ToJsonString()
             : null;
@@ -251,8 +255,8 @@ public static class TableStorage
     }
 
     /// <summary>
-    /// Кладёт испорченный файл рядом под именем с датой, чтобы следующее сохранение
-    /// его не затёрло. Не вышло — пусто: тогда в этот файл писать нельзя.
+    /// Moves a broken file aside under a dated name so the next save doesn't overwrite it.
+    /// Returns null on failure — then this file must not be written to.
     /// </summary>
     private static string? KeepBrokenCopy(string path)
     {
@@ -273,10 +277,9 @@ public static class TableStorage
     }
 
     /// <summary>
-    /// Значение клетки текстом. В файле оно могло оказаться и числом, и строкой —
-    /// например, после выгрузки из таблицы или правки руками. Узел спрашиваем через
-    /// TryGetValue: разобранный из файла и собранный в памяти устроены по-разному,
-    /// и приведение к JsonElement на втором просто падает.
+    /// A cell's value as text. In the file it may be a number or a string — for example after
+    /// an export or a manual edit. The node is queried with TryGetValue because nodes parsed
+    /// from a file and nodes built in memory differ, and casting the latter to JsonElement throws.
     /// </summary>
     private static string ReadText(JsonNode value)
     {
@@ -303,9 +306,9 @@ public static class TableStorage
                 ? ElementOptions.For(parsed)
                 : null;
 
-    // ---------------------------------------------------------------- запись
+    // ---------------------------------------------------------------- writing
 
-    /// <summary>Снимок таблицы для записи. Только в потоке окна; дальше — где угодно.</summary>
+    /// <summary>A snapshot of the table for writing. Take it on the UI thread; use it anywhere.</summary>
     public static TableSnapshot Snapshot(TableViewModel table)
     {
         ArgumentNullException.ThrowIfNull(table);
@@ -318,7 +321,7 @@ public static class TableStorage
 
             foreach (TableCell cell in row.Cells)
             {
-                // Счётное пересчитается при чтении, пустое и так будет пустым.
+                // Computed cells are recalculated on reading; empty ones stay empty anyway.
                 if (cell.Column.Kind == TableCellKind.Computed
                     || (cell.IsEmpty && cell.SkillType is null && cell.SkillSin is null && !cell.HasSetup))
                 {
@@ -341,9 +344,9 @@ public static class TableStorage
     }
 
     /// <summary>
-    /// Пишет таблицу в профиль так, чтобы сбой посреди записи ничего не испортил:
-    /// сначала во временный файл, потом подмена, а прежняя версия остаётся копией.
-    /// Можно звать из фонового потока. Ошибку не глотает — о ней должны узнать.
+    /// Writes a table to the profile so a crash mid-write can't corrupt anything: first to a
+    /// temporary file, then a swap, and the previous version stays as a backup.
+    /// Safe on a background thread. Doesn't swallow errors — the caller must hear about them.
     /// </summary>
     public static void Save(string fileName, TableSnapshot snapshot)
     {
@@ -356,7 +359,7 @@ public static class TableStorage
 
         using (FileStream stream = new(temporary, FileMode.Create, FileAccess.Write, FileShare.None))
         {
-            // Без отступов: файл читает программа, а лишние пробелы его раздувают.
+            // No indentation: a program reads this file, and whitespace only bloats it.
             Write(stream, snapshot, indented: false);
             stream.Flush(flushToDisk: true);
         }
@@ -365,9 +368,9 @@ public static class TableStorage
     }
 
     /// <summary>
-    /// Пишет снимок в поток как JSON. Наборы в сжатом виде вставляются как есть,
-    /// без разбора; для выгрузки с отступами их приходится разобрать, чтобы
-    /// отступы легли и внутри.
+    /// Writes a snapshot to a stream as JSON. Compact setups are inserted as they are,
+    /// without parsing; for an indented export they have to be parsed so the indentation
+    /// applies inside them too.
     /// </summary>
     public static void Write(Stream stream, TableSnapshot snapshot, bool indented)
     {
@@ -398,7 +401,7 @@ public static class TableStorage
         writer.WriteEndArray();
     }
 
-    /// <summary>Содержимое таблицы в том же виде, в каком оно ложится в файл.</summary>
+    /// <summary>The table's content in the same shape it takes in the file.</summary>
     public static JsonArray ToJson(TableViewModel table)
     {
         using MemoryStream stream = new();
@@ -408,8 +411,8 @@ public static class TableStorage
     }
 
     /// <summary>
-    /// Простая клетка — одно значение. Клетка урона с типом, грехом или набором —
-    /// объект, в котором пишется только то, что есть.
+    /// A plain cell is a single value. A damage cell with a type, sin or setup is an object
+    /// that holds only what is present.
     /// </summary>
     private static void WriteCell(Utf8JsonWriter writer, SnapshotCell cell, bool indented)
     {
@@ -462,7 +465,7 @@ public static class TableStorage
         writer.WriteEndObject();
     }
 
-    /// <summary>Число пишется числом; если в клетке вдруг не число — строкой, чтобы не потерять.</summary>
+    /// <summary>Numbers are written as numbers; anything else as a string so nothing is lost.</summary>
     private static void WriteNumber(Utf8JsonWriter writer, string value)
     {
         if (double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out double number))
@@ -476,8 +479,8 @@ public static class TableStorage
     }
 
     /// <summary>
-    /// Ставит новый файл на место старого одним действием системы, а старый оставляет
-    /// копией. Где подмена не поддерживается, делаем то же двумя шагами.
+    /// Puts the new file in place of the old one in a single system call and keeps the old
+    /// one as a backup. Where the swap isn't supported, does the same in two steps.
     /// </summary>
     private static void ReplaceWithBackup(string temporary, string path, string backup)
     {
@@ -487,6 +490,11 @@ public static class TableStorage
             return;
         }
 
+        // The backup is ours, and a read-only flag on it is inherited from the main file,
+        // not anyone's decision. Left in place, no save would ever succeed again, even
+        // once the file itself is writable.
+        AllowWriting(backup);
+
         try
         {
             File.Replace(temporary, path, backup, ignoreMetadataErrors: true);
@@ -494,7 +502,18 @@ public static class TableStorage
         catch (Exception error) when (error is IOException or UnauthorizedAccessException or PlatformNotSupportedException)
         {
             File.Copy(path, backup, overwrite: true);
+            AllowWriting(backup);
             File.Move(temporary, path, overwrite: true);
+        }
+    }
+
+    private static void AllowWriting(string file)
+    {
+        FileInfo info = new(file);
+
+        if (info.Exists && info.IsReadOnly)
+        {
+            info.IsReadOnly = false;
         }
     }
 }

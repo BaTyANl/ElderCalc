@@ -4,9 +4,9 @@ using System.Windows.Data;
 namespace LimbusCalc.Converters;
 
 /// <summary>
-/// Число в текстовом поле. Показывает с точкой, а на вводе принимает и точку, и запятую,
-/// чтобы английский интерфейс не мешал набирать с русской раскладкой.
-/// ConverterParameter задаёт формат вывода (например F2).
+/// A number in a text box. Displayed with a dot, but input accepts both a dot and a comma,
+/// so a Russian keyboard layout doesn't get in the way of the English UI.
+/// ConverterParameter sets the display format (for example F2).
 /// </summary>
 public sealed class NumberConverter : IValueConverter
 {
@@ -38,7 +38,7 @@ public sealed class NumberConverter : IValueConverter
             return wantsInteger ? 0 : 0.0;
         }
 
-        // Пока строка недонабрана ("-", "1."), оставляем прежнее значение вместо ошибки.
+        // While the text is still incomplete ("-", "1.") keep the old value instead of failing.
         if (!double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out double result))
         {
             return Binding.DoNothing;

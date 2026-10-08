@@ -21,7 +21,7 @@
             <TextBlock Text="{Binding Number, StringFormat='Subtargets resistances — coin {0}'}"
                        Style="{StaticResource CardTitleText}"/>
 
-            <!-- Шапка с иконками: подписи столбцов общие для всех подцелей. -->
+            <!-- Header with icons: the column labels are shared by all subtargets. -->
             <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                 <Border Width="104"/>
                 <ItemsControl ItemsSource="{Binding ResistanceHeaders}">
@@ -39,16 +39,16 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
-                <!-- Ширина отступа та же, что у кнопок Reset в строках, — столбец сходится. -->
+                <!-- Same left margin as the Reset buttons in the rows, so the column lines up. -->
                 <Button Content="Reset ALL" Style="{StaticResource SmallButton}"
                         Margin="10,0,0,0" VerticalAlignment="Center"
                         ToolTip="Copy the main target resistances and parameters into every subtarget"
                         Click="ResetAll_Click"/>
             </StackPanel>
 
-            <!-- Целей бывает много: список прокручивается, а шапка с иконками
-                 остаётся на месте. Колонки фиксированной ширины и прижаты влево,
-                 поэтому появление полосы прокрутки их не сдвигает. -->
+            <!-- There can be many targets: the list scrolls while the icon header stays put.
+                 Columns have fixed widths and are left-aligned, so the scrollbar appearing
+                 doesn't shift them. -->
             <ScrollViewer MaxHeight="440" VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled">
             <ItemsControl ItemsSource="{Binding Subtargets}">

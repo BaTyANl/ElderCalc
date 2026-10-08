@@ -1,8 +1,8 @@
 namespace LimbusCalc.Calculation;
 
 /// <summary>
-/// Тип урона, грех или истинный урон. Один перечисляемый тип на всё, потому что
-/// бонус может целиться в любое из этого, а иконки и подписи задаются в одном месте.
+/// A damage type, a sin or true damage. One enum covers all of them because a bonus
+/// can target any of these, and icons and labels are defined in one place.
 /// </summary>
 public enum Element
 {
@@ -18,16 +18,16 @@ public enum Element
     Pride,
     Envy,
 
-    /// <summary>Истинный урон: сопротивления его не снижают.</summary>
+    /// <summary>True damage: resistances never reduce it.</summary>
     True,
 }
 
-/// <summary>Сопротивления одной цели. Чего нет в наборе — считается за 1.0.</summary>
+/// <summary>Resistances of one target. Anything not set counts as 1.0.</summary>
 public sealed class ResistanceSet
 {
     private readonly Dictionary<Element, double> _values = [];
 
-    /// <summary>Истинный урон сопротивлениями не задевается никогда.</summary>
+    /// <summary>True damage is never affected by resistances.</summary>
     public double this[Element element]
     {
         get => element != Element.True && _values.TryGetValue(element, out double value) ? value : 1.0;
@@ -35,19 +35,19 @@ public sealed class ResistanceSet
     }
 }
 
-/// <summary>Как бонус применяется к урону монеты.</summary>
+/// <summary>How a bonus is applied to a coin's damage.</summary>
 public enum BonusKind
 {
-    /// <summary>Прибавка в единицах, до умножения на вес.</summary>
+    /// <summary>A flat addition in units, applied before multiplying by weight.</summary>
     Flat,
 
-    /// <summary>Прибавка в процентах от основы.</summary>
+    /// <summary>An addition in percent of the base damage.</summary>
     Percent,
 }
 
 /// <summary>
-/// Бонус монеты. <see cref="Target"/> пока только хранится: он понадобится,
-/// когда появятся сопротивления.
+/// A coin bonus. <see cref="Target"/> picks the resistance that scales it: a bonus aimed
+/// at Sloth is multiplied by the target's Sloth resistance, not by the skill's type or sin.
 /// </summary>
 public sealed class CoinBonus
 {

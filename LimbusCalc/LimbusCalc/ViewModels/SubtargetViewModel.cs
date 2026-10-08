@@ -3,7 +3,7 @@ using LimbusCalc.Calculation;
 namespace LimbusCalc.ViewModels;
 
 /// <summary>
-/// Значения основной цели монеты. Подцель заводится их копией и возвращается к ним по сбросу.
+/// Main target values of a coin. A subtarget starts as a copy of them and returns to them on reset.
 /// </summary>
 public readonly record struct MainTargetParameters(
     double ModDynPercent,
@@ -14,11 +14,11 @@ public readonly record struct MainTargetParameters(
     int TimeMoratoriumStacks);
 
 /// <summary>
-/// Дополнительная цель монеты. Нумерация начинается со второй: первая — основная.
-/// Врага задаёт название: подцели с одинаковым названием — это один и тот же враг,
-/// поэтому сопротивления и Time Moratorium они делят через <see cref="Shared"/>.
-/// Переименование сразу переносит подцель в группу нового названия.
-/// Модификаторы атаки (dyn mod, крит, разница уровней) у каждой монеты свои.
+/// An extra target of a coin. Numbering starts from the second: the first is the main target.
+/// The name identifies the enemy: subtargets with the same name are the same enemy, so they
+/// share resistances and Time Moratorium through <see cref="Shared"/>. Renaming moves the
+/// subtarget into the new name's group right away.
+/// Attack modifiers (dyn mod, crit, level difference) are per coin.
 /// </summary>
 public sealed class SubtargetViewModel : ObservableObject
 {
@@ -30,6 +30,7 @@ public sealed class SubtargetViewModel : ObservableObject
     private bool _hasCrit;
     private double _critPercent = 20.0;
 
+    /// <summary>Position among the coin's targets: 2 for the first subtarget, since 1 is the main target.</summary>
     public int Number
     {
         get => _number;
@@ -43,13 +44,13 @@ public sealed class SubtargetViewModel : ObservableObject
         }
     }
 
-    /// <summary>Как цель называется по умолчанию; к нему возвращает сброс.</summary>
+    /// <summary>The default name; a reset returns to it.</summary>
     public string DefaultName => $"Subtarget {Number}";
 
     /// <summary>
-    /// Название цели, его можно поменять в списке подцелей. Оно же определяет врага:
-    /// стоит вписать название подцели с другой монеты — и сюда подтянутся её
-    /// сопротивления и мораторий.
+    /// The target's name, editable in the subtargets list. It also identifies the enemy:
+    /// type the name of another coin's subtarget and its resistances and moratorium
+    /// come along.
     /// </summary>
     public string Name
     {
@@ -63,8 +64,8 @@ public sealed class SubtargetViewModel : ObservableObject
 
             OnPropertyChanged(nameof(ParametersTitle));
 
-            // При первом присваивании из инициализатора общей части ещё нет —
-            // её кладут туда же, в инициализатор, и переезжать некуда.
+            // On the first assignment from the initializer there's no shared part yet —
+            // the initializer sets it too, so there's nothing to move.
             if (_shared is not null)
             {
                 Shared = SharedFor(this);
@@ -72,10 +73,11 @@ public sealed class SubtargetViewModel : ObservableObject
         }
     }
 
+    /// <summary>Title of the parameters window for this subtarget.</summary>
     public string ParametersTitle =>
         string.IsNullOrWhiteSpace(Name) ? $"{DefaultName} parameters" : $"{Name} parameters";
 
-    /// <summary>Общая с другими монетами часть цели: группа этого названия.</summary>
+    /// <summary>The part shared with other coins: the group of this name.</summary>
     public required SharedTargetViewModel Shared
     {
         get => _shared;
@@ -89,14 +91,14 @@ public sealed class SubtargetViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Где взять общую часть для текущего названия подцели. Группами заведует список
-    /// монет: он один на всё окно и знает про все названия сразу.
+    /// Where to get the shared part for the current name. The coin list manages the groups:
+    /// there's one for the whole window and it knows every name.
     /// </summary>
     public required Func<SubtargetViewModel, SharedTargetViewModel> SharedFor { get; init; }
 
     public IReadOnlyList<ResistanceViewModel> Resistances => Shared.Resistances;
 
-    /// <summary>Динамический модификатор в процентах: 63 означает +63%.</summary>
+    /// <summary>Dynamic modifier in percent: 63 means +63%.</summary>
     public double ModDynPercent
     {
         get => _modDynPercent;
@@ -115,7 +117,7 @@ public sealed class SubtargetViewModel : ObservableObject
         set => SetProperty(ref _hasCrit, value);
     }
 
-    /// <summary>Крит-модификатор в процентах: 20 означает +20%.</summary>
+    /// <summary>Crit modifier in percent: 20 means +20%.</summary>
     public double CritPercent
     {
         get => _critPercent;
@@ -123,18 +125,18 @@ public sealed class SubtargetViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Откуда брать сопротивления основной цели при сбросе. Подцель не знает про
-    /// панель Parameters, поэтому источник ей выдаёт список монет.
+    /// Where to take the main target's resistances on reset. The subtarget doesn't know about
+    /// the Parameters panel, so the coin list supplies the source.
     /// </summary>
     public required Func<Element, double> MainResistance { get; init; }
 
-    /// <summary>Откуда брать модификаторы основной цели при сбросе.</summary>
+    /// <summary>Where to take the main target's modifiers on reset.</summary>
     public required Func<MainTargetParameters> MainParameters { get; init; }
 
     /// <summary>
-    /// Вернуть подцель к состоянию основной цели и к названию по умолчанию.
-    /// Название меняем первым: сбрасывать нужно ту группу, в которой окажемся,
-    /// а не ту, из которой уходим. Она общая — сброс виден и на других монетах.
+    /// Returns the subtarget to the main target's state and its default name.
+    /// The name changes first: the group to reset is the one we end up in, not the one we
+    /// leave. It's shared, so the reset shows on other coins too.
     /// </summary>
     public void ResetToMain()
     {
@@ -155,7 +157,7 @@ public sealed class SubtargetViewModel : ObservableObject
         Shared.TimeMoratoriumStacks = main.TimeMoratoriumStacks;
     }
 
-    /// <param name="passiveModDynPercent">Общая надбавка к Dyn mod; складывается с собственной.</param>
+    /// <param name="passiveModDynPercent">A shared Dyn mod bonus; added to the subtarget's own.</param>
     public SubtargetOverride ToModel(double passiveModDynPercent)
     {
         SubtargetOverride model = new()

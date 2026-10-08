@@ -16,10 +16,11 @@
         WindowState="Maximized"
         FontSize="13"
         FontFamily="{StaticResource AppFontFamily}"
-        Background="{DynamicResource AppBackgroundBrush}">
+        Background="{DynamicResource AppBackgroundBrush}"
+        KeyDown="Window_KeyDown">
 
     <Window.Resources>
-        <!-- Пункт меню с типом урона или грехом: иконка и подпись. -->
+        <!-- Damage type or sin menu item: icon and label. -->
         <DataTemplate x:Key="ElementMenuItemTemplate">
             <StackPanel Orientation="Horizontal">
                 <Image Source="{Binding IconPath}" Width="18" Height="18" Margin="0,0,8,0"
@@ -28,7 +29,7 @@
             </StackPanel>
         </DataTemplate>
 
-        <!-- Пункт фильтра: у варианта «любой» иконки нет, и место под неё не занимаем. -->
+        <!-- Filter item: the "any" option has no icon, and no room is reserved for one. -->
         <DataTemplate x:Key="ElementFilterTemplate">
             <StackPanel Orientation="Horizontal">
                 <Image Source="{Binding IconPath}" Width="16" Height="16" Margin="0,0,6,0"
@@ -37,9 +38,8 @@
             </StackPanel>
         </DataTemplate>
 
-        <!-- Меню клетки урона одно на всё окно и создаётся при первом открытии.
-             Раньше оно висело в шаблоне клетки: на каждую клетку заводилось своё
-             меню с десятком пунктов и картинками, и прокрутка этим и тормозила. -->
+        <!-- One damage cell menu for the whole window, created on first use. A menu per cell,
+             with a dozen items and images each, used to be what slowed scrolling down. -->
         <ContextMenu x:Key="CellMenu">
             <MenuItem Header="Export to ElderCalc"
                       Visibility="{Binding HasSetup, Converter={StaticResource BoolToVisibility}}"
@@ -75,17 +75,19 @@
                       Click="ClearSkillMarks_Click"/>
         </ContextMenu>
 
-        <!-- Меню строки. Висит на клетках, которые описывают саму строку — редкость,
-             грешник, название: у клеток с уроном своё меню, и мешать их незачем. -->
+        <!-- Row menu. Opens on cells that describe the row itself — rarity, sinner, name:
+             damage cells have their own menu, and the two shouldn't be mixed. -->
         <ContextMenu x:Key="RowMenu">
+            <MenuItem Header="Duplicate row"
+                      AutomationProperties.AutomationId="DuplicateRowItem"
+                      Click="DuplicateRow_Click"/>
             <MenuItem Header="Delete row"
                       AutomationProperties.AutomationId="DeleteRowItem"
                       Click="DeleteRow_Click"/>
         </ContextMenu>
 
-        <!-- Редактор клетки: заводится по клику и живёт один на таблицу.
-             В самих клетках полей ввода нет — на экране их было бы под три сотни,
-             и прокрутка упиралась именно в них. -->
+        <!-- Cell editors: created on click, one per table. Cells have no text boxes of their
+             own — there would be about three hundred on screen, and scrolling stalled on them. -->
         <DataTemplate x:Key="TextEditorTemplate">
             <TextBox Style="{StaticResource TableCellTextBox}"
                      LostFocus="CellEditor_LostFocus"
@@ -117,19 +119,74 @@
                       SelectedItem="{Binding Value}"/>
         </DataTemplate>
 
-        <!-- Справочная таблица: столбцы задаёт модель, поэтому разметка одна
-             и для ID, и для E.G.O. Обработчики кнопок живут в этом окне,
-             из-за чего шаблон и лежит здесь, а не в общем словаре стилей. -->
+        <!-- The table's save indicator. Usually a quiet label; when a save fails it turns red
+             and explains what happened when clicked. -->
+        <Style x:Key="SaveStatusButton" TargetType="Button">
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,16,0"/>
+            <Setter Property="Foreground" Value="{DynamicResource SubtleTextBrush}"/>
+            <Setter Property="Content" Value="Saved"/>
+            <Setter Property="ToolTip" Value="Every change is saved automatically"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <TextBlock x:Name="Label" Background="Transparent"
+                                   Foreground="{TemplateBinding Foreground}"
+                                   Text="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}"/>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Tag" Value="Problem">
+                                <Setter TargetName="Label" Property="TextDecorations" Value="Underline"/>
+                                <Setter TargetName="Label" Property="FontWeight" Value="SemiBold"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding SaveState}" Value="Saving">
+                    <Setter Property="Content" Value="Saving…"/>
+                    <Setter Property="ToolTip" Value="The latest changes are being written to disk"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding SaveState}" Value="Failed">
+                    <Setter Property="Content" Value="Not saved"/>
+                    <Setter Property="Tag" Value="Problem"/>
+                    <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+                    <Setter Property="Cursor" Value="Hand"/>
+                    <Setter Property="ToolTip" Value="The table could not be saved. Click for details"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding SaveState}" Value="Off">
+                    <Setter Property="Content" Value="Saving off"/>
+                    <Setter Property="Tag" Value="Problem"/>
+                    <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+                    <Setter Property="Cursor" Value="Hand"/>
+                    <Setter Property="ToolTip" Value="Changes to this table are not saved. Click for details"/>
+                </DataTrigger>
+                <!-- While the table loads there's nothing to save and nothing to report. -->
+                <DataTrigger Binding="{Binding IsLoading}" Value="True">
+                    <Setter Property="Visibility" Value="Hidden"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Reference table: the model defines the columns, so ID and E.G.O. share this markup.
+             The button handlers live in this window, which is why the template is here rather
+             than in the shared style dictionary. -->
         <DataTemplate x:Key="ReferenceTableTemplate">
             <Border Style="{StaticResource Card}">
                 <Grid>
                 <DockPanel>
                     <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
-                        <!-- Работа с файлом — у правого края, отдельно от правки строк. -->
+                        <!-- File actions on the right, apart from row editing. -->
                         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                            <!-- Whether the file is saved: the table saves itself, and without the
+                                 indicator there's no telling whether it did. Clicking matters only when it didn't. -->
+                            <Button Style="{StaticResource SaveStatusButton}"
+                                    AutomationProperties.AutomationId="SaveStatus"
+                                    Click="SaveStatus_Click"/>
                             <Button Content="Import" Style="{StaticResource SmallButton}"
                                     AutomationProperties.AutomationId="ImportButton"
-                                    ToolTip="Replace the table with an .xlsx or .json file"
+                                    ToolTip="Load rows from an .xlsx or .json file"
                                     Click="ImportTable_Click"/>
                             <Button Content="Export" Margin="8,0,0,0"
                                     Style="{StaticResource SmallButton}"
@@ -150,10 +207,32 @@
                                     IsEnabled="{Binding HasRows}"
                                     ToolTip="Remove every row from this table"
                                     Click="ClearTable_Click"/>
+
+                            <!-- Undo sits a little apart: it doesn't edit rows, it reverts an edit. -->
+                            <Button Content="Undo" Margin="16,0,0,0"
+                                    Style="{StaticResource SmallButton}"
+                                    AutomationProperties.AutomationId="UndoButton"
+                                    IsEnabled="{Binding History.CanUndo}"
+                                    ToolTip="{Binding History.UndoHint}"
+                                    ToolTipService.ShowOnDisabled="True"
+                                    Click="Undo_Click"/>
+                            <Button Content="Redo" Margin="8,0,0,0"
+                                    Style="{StaticResource SmallButton}"
+                                    AutomationProperties.AutomationId="RedoButton"
+                                    IsEnabled="{Binding History.CanRedo}"
+                                    ToolTip="{Binding History.RedoHint}"
+                                    ToolTipService.ShowOnDisabled="True"
+                                    Click="Redo_Click"/>
+                            <!-- Which columns to show: extra ones can be hidden, their data stays. -->
+                            <Button Content="{Binding ColumnsLabel}" Margin="16,0,0,0"
+                                    Style="{StaticResource SmallButton}"
+                                    AutomationProperties.AutomationId="ColumnsButton"
+                                    ToolTip="Choose which columns to show"
+                                    Click="Columns_Click"/>
                         </StackPanel>
                     </DockPanel>
 
-                    <!-- Фильтр: тип и грех отбирают отдельные значения, грешники — строки. -->
+                    <!-- Filters: type and sin select individual values, sinners select rows. -->
                     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,10"
                                 DataContext="{Binding Filter}">
                         <TextBlock Text="Filter" VerticalAlignment="Center"
@@ -186,7 +265,7 @@
                                              RelativeSource={RelativeSource AncestorType=ContentPresenter},
                                              Converter={StaticResource BoolToVisibility}}"
                                 Click="FilterList_Click"/>
-                        <!-- Вид E.G.O. — Awakening или Corrosion; у ID такого столбца нет. -->
+                        <!-- E.G.O. kind: Awakening or Corrosion; ID has no such column. -->
                         <Button Margin="8,0,0,0" Style="{StaticResource SmallButton}"
                                 AutomationProperties.AutomationId="FilterEgoTypeButton"
                                 Tag="{Binding EgoTypeList}"
@@ -196,24 +275,31 @@
                                              Converter={StaticResource BoolToVisibility}}"
                                 Click="FilterList_Click"/>
 
-                        <!-- Поиск по названию — такой же отбор, поэтому стоит в одном
-                             ряду с фильтрами, но чуть на отлёте: он не список с галочками. -->
+                        <!-- Name search is a filter too, so it sits in the same row, set slightly
+                             apart since it's not a checkbox list. -->
                         <TextBlock Text="Search" VerticalAlignment="Center"
                                    Foreground="{DynamicResource SubtleTextBrush}"
                                    Margin="24,0,8,0"/>
                         <TextBox Width="220" VerticalAlignment="Center"
                                  AutomationProperties.AutomationId="SearchBox"
-                                 ToolTip="Show only rows whose name contains this"
+                                 ToolTip="Show only rows whose name contains this (Ctrl+F)"
                                  Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}"/>
 
-                        <!-- Сброс стоит на отлёте от отбора: он его не задаёт,
-                             а снимает разом. Пока ничего не задано, нажимать нечего. -->
+                        <!-- Reset sits apart from the filters: it doesn't set them, it clears them
+                             all at once. With nothing set there's nothing to clear. -->
                         <Button Content="Clear filters" Margin="24,0,0,0"
                                 Style="{StaticResource SmallButton}"
                                 AutomationProperties.AutomationId="FilterResetButton"
                                 ToolTip="Drop every filter on this table"
                                 IsEnabled="{Binding IsActive}"
                                 Click="FilterReset_Click"/>
+
+                        <!-- How many rows are left after filtering; otherwise it's not obvious some are hidden. -->
+                        <TextBlock Margin="16,0,0,0" VerticalAlignment="Center"
+                                   AutomationProperties.AutomationId="FilterSummary"
+                                   Foreground="{DynamicResource SubtleTextBrush}"
+                                   Text="{Binding DataContext.FilterSummary,
+                                          RelativeSource={RelativeSource AncestorType=ContentPresenter}}"/>
                     </StackPanel>
 
                     <TextBlock DockPanel.Dock="Top" Margin="2,0,0,0"
@@ -221,8 +307,8 @@
                                Foreground="{DynamicResource SubtleTextBrush}"
                                Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVisibility}}"/>
 
-                    <!-- Шапка вынесена из прокрутки строк и потому видна всегда.
-                         Вбок она едет вместе с ними: смещение переносится в коде. -->
+                    <!-- The header is outside the rows' scroll viewer, so it's always visible.
+                         It follows them horizontally: the offset is copied in code. -->
                     <Border DockPanel.Dock="Top"
                             BorderBrush="{DynamicResource OutlineBrush}"
                             BorderThickness="1,1,0,0"
@@ -234,13 +320,22 @@
                                         BorderThickness="0,0,0,2"
                                         HorizontalAlignment="Left">
                                     <ItemsControl ItemsSource="{Binding Columns}">
+                                        <ItemsControl.ItemContainerStyle>
+                                            <Style TargetType="ContentPresenter">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsHidden}" Value="True">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ItemsControl.ItemContainerStyle>
                                         <ItemsControl.ItemsPanel>
                                             <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
                                         </ItemsControl.ItemsPanel>
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <!-- Левая кнопка сортирует по столбцу, правая
-                                                     на столбце скилла открывает приоритеты. -->
+                                                <!-- Left click sorts by the column; right click on
+                                                     a skill column opens the sort priorities. -->
                                                 <Border Padding="8,6" Background="Transparent"
                                                         Width="{Binding ActualWidth}"
                                                         Cursor="Hand"
@@ -248,9 +343,10 @@
                                                         BorderThickness="0,0,1,0"
                                                         SnapsToDevicePixels="True"
                                                         MouseLeftButtonUp="ColumnHeader_LeftClick"
-                                                        MouseRightButtonUp="ColumnHeader_RightClick">
-                                                    <!-- Подпись числового столбца стоит над своими
-                                                         числами, то есть по центру клетки. -->
+                                                        MouseRightButtonUp="ColumnHeader_RightClick"
+                                                        ToolTip="{Binding Description}">
+                                                    <!-- A numeric column's title sits above its numbers,
+                                                         i.e. centered in the cell. -->
                                                     <StackPanel Orientation="Horizontal">
                                                         <StackPanel.Style>
                                                             <Style TargetType="StackPanel">
@@ -278,8 +374,8 @@
                         </ScrollViewer>
                     </Border>
 
-                    <!-- Итоговая строка: средний урон по каждому столбцу скилла.
-                         Стоит под таблицей и не уезжает при прокрутке строк. -->
+                    <!-- Averages row: average damage per skill column. Sits under the table and
+                         doesn't move when the rows scroll vertically. -->
                     <Border DockPanel.Dock="Bottom"
                             BorderBrush="{DynamicResource OutlineBrush}"
                             BorderThickness="1,0,0,1"
@@ -292,6 +388,15 @@
                                     BorderThickness="0,2,0,0"
                                     HorizontalAlignment="Left">
                                 <ItemsControl ItemsSource="{Binding Averages}">
+                                    <ItemsControl.ItemContainerStyle>
+                                        <Style TargetType="ContentPresenter">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Column.IsHidden}" Value="True">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ItemsControl.ItemContainerStyle>
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
@@ -307,7 +412,7 @@
                                                     <TextBlock.Style>
                                                         <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
                                                             <Style.Triggers>
-                                                                <!-- Среднее стоит так же, как урон над ним. -->
+                                                                <!-- The average is aligned like the damage above it. -->
                                                                 <DataTrigger Binding="{Binding Column.Kind}" Value="Integer">
                                                                     <Setter Property="HorizontalAlignment" Value="Stretch"/>
                                                                     <Setter Property="TextAlignment" Value="{DynamicResource CellDamageAlignment}"/>
@@ -318,7 +423,7 @@
                                                                     <Setter Property="TextAlignment" Value="Center"/>
                                                                     <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
                                                                 </DataTrigger>
-                                                                <!-- Число, которое не урон (Sin Cost), стоит по центру. -->
+                                                                <!-- A number that isn't damage (Sin Cost) is centered. -->
                                                                 <MultiDataTrigger>
                                                                     <MultiDataTrigger.Conditions>
                                                                         <Condition Binding="{Binding Column.Kind}" Value="Integer"/>
@@ -338,23 +443,24 @@
                         </ScrollViewer>
                     </Border>
 
-                    <!-- Строки. Список виртуализирован: создаются только видимые строки,
-                         иначе двести айди — это две с половиной тысячи клеток разом.
-                         Прокрутка живёт внутри списка, иначе виртуализация не работает. -->
+                    <!-- Rows. The list is virtualized: only visible rows are created; otherwise two
+                         hundred IDs would mean two and a half thousand cells at once. The scroll
+                         viewer lives inside the list, or virtualization doesn't work. -->
                     <Border BorderBrush="{DynamicResource OutlineBrush}"
                             BorderThickness="1,0,0,0"
                             SnapsToDevicePixels="True">
                         <Grid>
                                 <ItemsControl ItemsSource="{Binding Rows}"
+                                              FocusVisualStyle="{x:Null}"
                                               VirtualizingPanel.IsVirtualizing="True"
                                               VirtualizingPanel.VirtualizationMode="Recycling"
                                               VirtualizingPanel.ScrollUnit="Pixel"
                                               ScrollViewer.CanContentScroll="True">
                                     <ItemsControl.Template>
                                         <ControlTemplate TargetType="ItemsControl">
-                                            <!-- Ползунок тянут быстро, а перерисовка каждой
-                                                 промежуточной строки в это время никому не нужна:
-                                                 строки встают на место, когда ползунок отпустили. -->
+                                            <!-- The thumb is dragged fast, and redrawing every row
+                                                 in between helps nobody: the rows settle once the
+                                                 thumb is released. -->
                                             <ScrollViewer x:Name="TableScroll"
                                                           CanContentScroll="True"
                                                           IsDeferredScrollingEnabled="True"
@@ -379,19 +485,20 @@
                                     </ItemsControl.ItemContainerStyle>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <!-- Строка рисует свои клетки сама: один элемент
-                                                 на строку вместо шаблона на каждую клетку. -->
+                                            <!-- The row draws its own cells: one element per row
+                                                 instead of a template per cell. -->
                                             <views:TableRowView MouseLeftButtonDown="RowView_MouseLeftButtonDown"
                                                                 ContextMenuOpening="RowView_ContextMenuOpening"/>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
 
-                            <!-- Слой правки: поле ввода встаёт поверх той клетки,
-                                 по которой щёлкнули, и закрывается при прокрутке. -->
+                            <!-- Editor layer: the editor appears over the clicked cell and closes
+                                 when the rows scroll. -->
                             <Canvas Tag="CellEditorLayer" ClipToBounds="True">
-                                <!-- Фон непрозрачный: под полем ввода лежит подпись клетки. -->
+                                <!-- Opaque background: the cell's text is underneath the editor. -->
                                 <Border Tag="CellEditorHost" Visibility="Collapsed"
+                                        PreviewKeyDown="CellEditor_PreviewKeyDown"
                                         Background="{DynamicResource SurfaceBrush}">
                                     <ContentControl Tag="CellEditorContent"/>
                                 </Border>
@@ -400,8 +507,8 @@
                     </Border>
                 </DockPanel>
 
-                <!-- Пока таблица читается из файла, её закрывает заглушка: правка до конца
-                     чтения была бы тут же затёрта прочитанным. -->
+                <!-- While the table is read from its file a cover hides it: an edit made before
+                     reading finishes would be overwritten by what was read. -->
                 <Border Background="{DynamicResource SurfaceBrush}"
                         AutomationProperties.AutomationId="TableLoading"
                         Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}">
@@ -416,9 +523,9 @@
 
     <Grid Margin="16">
 
-        <!-- Настройки встали в один ряд с вкладками: отдельная шапка ради названия
-             не нужна, оно и так в заголовке окна. Иконка перекрашивается под тему
-             маской — сама картинка чёрная и на тёмном фоне пропала бы. -->
+        <!-- Settings sit in the row with the tabs: a separate header just for the title isn't
+             needed, it's in the window title anyway. The icon is recolored for the theme with an
+             opacity mask — the image itself is black and would vanish on a dark background. -->
         <Button x:Name="SettingsButton" Width="34" Height="34" Padding="0"
                 HorizontalAlignment="Right" VerticalAlignment="Top"
                 Margin="0,2,2,0" Panel.ZIndex="1"
@@ -435,7 +542,7 @@
 
         <TabControl x:Name="Tabs" SelectedIndex="2">
 
-        <!-- Справочники: столбцы у них разные, разметка одна и та же. -->
+        <!-- Reference tables: different columns, same markup. -->
         <TabItem Header="ID">
             <ContentPresenter Content="{Binding IdTable}"
                               ContentTemplate="{StaticResource ReferenceTableTemplate}"/>
@@ -457,7 +564,7 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Общие параметры: занимают всю высоту, включая ряд с итогом справа. -->
+        <!-- Shared parameters: take the full height, including the total row on the right. -->
         <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Style="{StaticResource Card}">
             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                 <StackPanel>
@@ -480,7 +587,7 @@
 
                     <Border Style="{StaticResource RowDivider}" Margin="0,14"/>
 
-                    <!-- Сопротивления цели: типы в ряд, грехи трапецией 3 + 4. -->
+                    <!-- Target resistances: types in a row, sins as a 3 + 4 trapezoid. -->
                     <Border Background="{DynamicResource SurfaceAltBrush}" CornerRadius="10" Padding="6,10">
                         <StackPanel>
                             <TextBlock FontSize="14" FontWeight="SemiBold" TextAlignment="Center"
@@ -516,7 +623,7 @@
                         </StackPanel>
                     </Border>
 
-                    <!-- Time Moratorium: урон растёт за стаки и считается уроном sloth. -->
+                    <!-- Time Moratorium: damage grows per stack and counts as Sloth damage. -->
                     <Border Background="{DynamicResource SurfaceAltBrush}" CornerRadius="10"
                             Padding="10" Margin="0,10,0,0">
                         <StackPanel>
@@ -542,24 +649,24 @@
             </ScrollViewer>
         </Border>
 
-        <!-- Монеты: подписи слева, каждая монета — своя колонка -->
+        <!-- Coins: labels on the left, one column per coin. -->
         <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource Card}" Margin="14,0,0,0">
-            <!-- Общая вертикальная прокрутка: подписи и монеты должны ехать вместе.
-                 Прозрачный фон обязателен: без него пустые места не ловят мышь,
-                 и колесо работает только над самими полями. -->
+            <!-- Shared vertical scrolling: labels and coins must move together.
+                 The transparent background is required: without it empty space doesn't
+                 catch the mouse, and the wheel works only over the fields themselves. -->
             <ScrollViewer x:Name="CoinsVerticalScroll" Background="Transparent"
                           VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                 <DockPanel Background="Transparent">
-                    <!-- Высоты строк здесь и в шаблоне монеты обязаны совпадать.
-                         Первые два отступа заменяют заголовок карточки и строку "Coin N",
-                         которые живут справа от разделителя. -->
+                    <!-- Row heights here must match the coin template. The first two spacers
+                         stand in for the card title and the "Coin N" row, which live to the
+                         right of the divider. -->
                     <StackPanel DockPanel.Dock="Left" Width="180" Margin="0,0,12,0" VerticalAlignment="Top">
                         <Border Height="40"/>
                         <Border Height="26"/>
                         <Border Height="34"><TextBlock Text="Heads" Style="{StaticResource RowLabelText}"/></Border>
                         <Border Height="34"><TextBlock Text="Coin Power" Style="{StaticResource RowLabelText}"/></Border>
                         <Border Height="34"><TextBlock Text="Dyn mod (%)" Style="{StaticResource RowLabelText}"/></Border>
-                        <!-- Верхняя граница подгруппы; высоты обязаны совпадать с шаблоном монеты. -->
+                        <!-- Top border of a subgroup; heights must match the coin template. -->
                         <Border Height="14">
                             <Border Height="1" VerticalAlignment="Center" Background="{DynamicResource OutlineBrush}"/>
                         </Border>
@@ -570,14 +677,14 @@
                         <Border Height="34"><TextBlock Text="Crit mod (%)" Style="{StaticResource RowLabelText}"/></Border>
                         <Border Height="34"><TextBlock Text="Lvl diff" Style="{StaticResource RowLabelText}"/></Border>
                         <Border Height="34"><TextBlock Text="Clash count" Style="{StaticResource RowLabelText}"/></Border>
-                        <!-- Нижняя граница подгруппы; высота обязана совпадать с шаблоном монеты. -->
+                        <!-- Bottom border of a subgroup; the height must match the coin template. -->
                         <Border Height="14">
                             <Border Height="1" VerticalAlignment="Center" Background="{DynamicResource OutlineBrush}"/>
                         </Border>
 
                         <Border Height="34"><TextBlock Text="Bonus" Style="{StaticResource GroupCaptionText}"/></Border>
 
-                        <!-- Строки бонусов: вид и цель задаются здесь, значения — в колонках монет. -->
+                        <!-- Bonus rows: kind and target are set here, values in the coin columns. -->
                         <ItemsControl ItemsSource="{Binding BonusRows}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -623,13 +730,13 @@
                         <Border Height="26"><TextBlock Text="Damage" Style="{StaticResource RowLabelText}"/></Border>
                     </StackPanel>
 
-                    <!-- Вертикальный разделитель между подписями и колонками монет. -->
+                    <!-- Vertical divider between the labels and the coin columns. -->
                     <Border DockPanel.Dock="Left" Width="1" Margin="0,0,14,0"
                             Background="{DynamicResource OutlineBrush}"/>
 
                     <DockPanel>
-                        <!-- Высота с отступом равна 40: столько же занимает верхний
-                             пустой ряд в колонке подписей. -->
+                        <!-- Height with margin is 40: the same as the empty top row in
+                             the label column. -->
                         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal"
                                     Height="30" Margin="0,0,0,10">
                             <TextBlock Text="Coins" FontSize="15" FontWeight="SemiBold"
@@ -642,12 +749,12 @@
                                     Click="RemoveCoin_Click"/>
                         </StackPanel>
 
-                        <!-- Колесо над монетами отдаём внешней прокрутке: сюда оно не нужно. -->
+                        <!-- The wheel over the coins goes to the outer scroller; it isn't needed here. -->
                         <ScrollViewer Background="Transparent"
                                       HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled"
                                       PreviewMouseWheel="CoinsScroll_PreviewMouseWheel">
-                            <!-- Колонки монет разрезаны на две части, а между ними — общая
-                                 строка Clash count. Так она сама тянется по ширине колонок. -->
+                            <!-- Coin columns are split in two with the shared Clash count row in
+                                 between. That way it stretches across the columns by itself. -->
                             <StackPanel VerticalAlignment="Top" HorizontalAlignment="Left">
                             <ItemsControl x:Name="CoinTopRows" ItemsSource="{Binding Coins}"
                                           VerticalAlignment="Top" HorizontalAlignment="Left">
@@ -679,7 +786,7 @@
                                                          behaviors:NumericBox.Value="{Binding ModDynPercent}"/>
                                             </Border>
 
-                                            <!-- Верхняя граница подгруппы; заголовок к ней стоит слева. -->
+                                            <!-- Top border of a subgroup; its caption is on the left. -->
                                             <Border Height="14">
                                                 <Border Height="1" VerticalAlignment="Center"
                                                         Background="{DynamicResource OutlineBrush}"/>
@@ -705,8 +812,8 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
 
-                            <!-- Clash count один на скилл. Ширину берём у ряда колонок,
-                                 поэтому поле само растёт при добавлении монет. -->
+                            <!-- Clash count is one per skill. Its width comes from the row of
+                                 columns, so the field grows as coins are added. -->
                             <Border Height="34" HorizontalAlignment="Left"
                                     Width="{Binding ActualWidth, ElementName=CoinTopRows}">
                                 <TextBox Margin="0,2,10,2" TextAlignment="Center"
@@ -715,9 +822,9 @@
                                          behaviors:NumericBox.Value="{Binding ClashCount}"/>
                             </Border>
 
-                            <!-- Выравнивание влево обязательно: иначе колонки растянулись бы
-                                 по ширине общего поля, а оно берёт ширину у них — и при
-                                 удалении монеты ряд уже не сузился бы. -->
+                            <!-- Left alignment is required: otherwise the columns would stretch
+                                 to the width of the shared field, which takes its width from
+                                 them — and removing a coin wouldn't shrink the row. -->
                             <ItemsControl ItemsSource="{Binding Coins}" VerticalAlignment="Top"
                                           HorizontalAlignment="Left">
                                 <ItemsControl.ItemsPanel>
@@ -728,16 +835,16 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <StackPanel Width="96" Margin="0,0,10,0">
-                                            <!-- Нижняя граница подгруппы. -->
+                                            <!-- Bottom border of a subgroup. -->
                                             <Border Height="14">
                                                 <Border Height="1" VerticalAlignment="Center"
                                                         Background="{DynamicResource OutlineBrush}"/>
                                             </Border>
 
-                                            <!-- Пустой ряд под заголовком группы бонусов слева. -->
+                                            <!-- Empty row under the bonus group caption on the left. -->
                                             <Border Height="34"/>
 
-                                            <!-- Значения бонусов; строки те же, что в колонке подписей. -->
+                                            <!-- Bonus values; the same rows as in the label column. -->
                                             <ItemsControl ItemsSource="{Binding Bonuses}">
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>
@@ -749,7 +856,7 @@
                                                 </ItemsControl.ItemTemplate>
                                             </ItemsControl>
 
-                                            <!-- Отступ под кнопками добавления бонуса слева. -->
+                                            <!-- Space under the add-bonus buttons on the left. -->
                                             <Border Height="38"/>
 
                                             <Border Height="14">
@@ -763,7 +870,7 @@
                                                          behaviors:NumericBox.IsInteger="True"
                                                          behaviors:NumericBox.Value="{Binding Weight}"/>
                                             </Border>
-                                            <!-- Сопротивления дополнительных целей; при весе 1 их нет. -->
+                                            <!-- Extra target resistances; none at weight 1. -->
                                             <Border Height="36">
                                                 <Button Width="28" Height="28" Padding="0"
                                                         Style="{StaticResource IconTileButton}"
@@ -792,7 +899,7 @@
                                                            Text="{Binding ModStat, Converter={StaticResource Num}, ConverterParameter=F3, Mode=OneWay}"/>
                                             </Border>
                                             <Border Height="26">
-                                                <!-- 0.## отбрасывает нулевую дробную часть: 1.00 выводится как 1. -->
+                                                <!-- 0.## drops a zero fraction: 1.00 shows as 1. -->
                                                 <TextBlock Style="{StaticResource ResultValueText}" FontWeight="SemiBold"
                                                            Text="{Binding Damage, Converter={StaticResource Num}, ConverterParameter=0.##, Mode=OneWay}"/>
                                             </Border>
@@ -807,10 +914,10 @@
             </ScrollViewer>
         </Border>
 
-        <!-- Итог: под колонками монет, а не во всю ширину окна. -->
+        <!-- Total: under the coin columns, not across the whole window. -->
         <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource Card}" Margin="14,14,0,0">
           <DockPanel>
-            <!-- Работа с файлом набора — у правого края строки итога. -->
+            <!-- Setup file actions on the right of the total row. -->
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"
                         VerticalAlignment="Center">
                 <Button Content="Export as JSON" Style="{StaticResource SmallButton}"
@@ -837,12 +944,12 @@
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                 <TextBlock Text="Total damage" FontSize="15" Foreground="{DynamicResource SubtleTextBrush}"
                            VerticalAlignment="Center"/>
-                <!-- Урон до моратория — красным, он же и есть итог, когда мораторий выключен. -->
+                <!-- Damage before the moratorium, in red; it is the total when the moratorium is off. -->
                 <TextBlock FontSize="24" FontWeight="Bold" Margin="14,0,0,0" VerticalAlignment="Center"
                            Foreground="{DynamicResource AccentBrush}"
                            Text="{Binding TotalLeading, Converter={StaticResource Num}, ConverterParameter=0.##, Mode=OneWay}"/>
 
-                <!-- Остальная часть равенства появляется только при включённом мораторие. -->
+                <!-- The rest of the equation appears only with the moratorium on. -->
                 <TextBlock FontSize="24" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center"
                            Text="&#215;"
                            Foreground="{DynamicResource TextBrush}"
@@ -860,7 +967,7 @@
                            Visibility="{Binding ShowMoratoriumEquation, Converter={StaticResource BoolToVisibility}}"
                            Text="{Binding Total, Converter={StaticResource Num}, ConverterParameter=0.##, Mode=OneWay}"/>
 
-                <!-- Распределение урона по целям; при одной цели распределять нечего. -->
+                <!-- Damage split by target; with a single target there's nothing to split. -->
                 <Button Width="30" Height="30" Padding="0" Margin="18,0,0,0"
                         VerticalAlignment="Center"
                         Style="{StaticResource IconTileButton}"
@@ -879,7 +986,46 @@
 
         </TabControl>
 
-        <!-- Один список фильтра: тип, грех или грешники — что открыли, то и показывает. -->
+        <!-- Which columns to show. The name can't be hidden, so it isn't listed. -->
+        <Popup x:Name="ColumnsPopup" StaysOpen="False" AllowsTransparency="True"
+               Placement="Bottom" VerticalOffset="4">
+            <Border Style="{StaticResource Card}" Width="240" Margin="6">
+                <StackPanel>
+                    <TextBlock Text="Columns" Style="{StaticResource CardTitleText}"/>
+                    <TextBlock Text="Hidden columns keep their data."
+                               Foreground="{DynamicResource SubtleTextBrush}"
+                               FontSize="12" Margin="0,0,0,8"/>
+                    <ScrollViewer MaxHeight="420" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding ColumnChoices}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Margin="0,3">
+                                        <CheckBox VerticalAlignment="Center"
+                                                  AutomationProperties.AutomationId="{Binding Title}"
+                                                  IsChecked="{Binding IsShown, UpdateSourceTrigger=PropertyChanged}"/>
+                                        <TextBlock Text="{Binding Title}" Margin="8,0,0,0"
+                                                   VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                        <Button Content="Show all"
+                                Style="{StaticResource SmallButton}"
+                                AutomationProperties.AutomationId="ShowAllColumnsButton"
+                                Click="ShowAllColumns_Click"/>
+                        <Button Content="Hide all" Margin="8,0,0,0"
+                                Style="{StaticResource SmallButton}"
+                                AutomationProperties.AutomationId="HideAllColumnsButton"
+                                ToolTip="Hide every column except the name"
+                                Click="HideAllColumns_Click"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Popup>
+
+        <!-- One filter list: type, sin or sinners — whichever was opened. -->
         <Popup x:Name="FilterPopup" StaysOpen="False" AllowsTransparency="True"
                Placement="Bottom" VerticalOffset="4">
             <Border Style="{StaticResource Card}" Width="220" Margin="6">
@@ -907,7 +1053,7 @@
             </Border>
         </Popup>
 
-        <!-- Приоритет сортировки скиллов: открывается правой кнопкой по заголовку. -->
+        <!-- Skill sort priority: opened by right-clicking a column header. -->
         <Popup x:Name="SortPriorityPopup" StaysOpen="False" AllowsTransparency="True"
                Placement="Bottom" VerticalOffset="4">
             <Border Style="{StaticResource Card}" Width="250" Margin="6">

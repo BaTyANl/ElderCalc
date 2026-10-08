@@ -1,8 +1,8 @@
 namespace LimbusCalc.ViewModels;
 
 /// <summary>
-/// Заголовок столбца таблицы распределения. По нажатию таблица сортируется по этому
-/// столбцу; повторное нажатие переворачивает порядок.
+/// A column header of the damage-by-target table. Clicking it sorts by this column;
+/// clicking again reverses the order.
 /// </summary>
 public sealed class TargetColumnViewModel
 {
@@ -10,12 +10,12 @@ public sealed class TargetColumnViewModel
 
     public required TargetSortKey Key { get; init; }
 
-    /// <summary>Номер монеты для <see cref="TargetSortKey.Coin"/>; иначе -1.</summary>
+    /// <summary>Coin index for <see cref="TargetSortKey.Coin"/>; -1 otherwise.</summary>
     public required int CoinIndex { get; init; }
 
-    /// <summary>Стрелка направления у столбца, по которому сейчас сортируем.</summary>
+    /// <summary>Sort direction arrow on the column the table is sorted by.</summary>
     public required string Indicator { get; init; }
 
-    /// <summary>Подпись целиком: название и, если сортируем по нему, стрелка.</summary>
+    /// <summary>The full header: the title plus the arrow when sorted by this column.</summary>
     public string Header => Indicator.Length == 0 ? Title : $"{Title} {Indicator}";
 }

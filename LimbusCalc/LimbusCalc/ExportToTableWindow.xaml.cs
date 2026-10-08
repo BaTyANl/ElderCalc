@@ -5,10 +5,10 @@ using LimbusCalc.ViewModels;
 
 namespace LimbusCalc
 {
-    /// <summary>Выбор строки справочника и скилла, куда уходит набор калькулятора.</summary>
+    /// <summary>Picks the table row and skill cell that receive the calculator setup.</summary>
     public partial class ExportToTableWindow : Window
     {
-        /// <summary>Правим поле сами — на такую правку подсказки открывать не нужно.</summary>
+        /// <summary>Set while we change the text ourselves, so the suggestions don't pop up.</summary>
         private bool _settingText;
 
         public ExportToTableWindow(ExportToTableViewModel viewModel)
@@ -29,7 +29,7 @@ namespace LimbusCalc
             IdentityBox.Focus();
         }
 
-        /// <summary>Набрали букву — показываем, что под неё подходит.</summary>
+        /// <summary>A letter was typed: show what matches it.</summary>
         private void Identity_TextChanged(object sender, RoutedEventArgs e)
         {
             if (_settingText)
@@ -41,9 +41,9 @@ namespace LimbusCalc
         }
 
         /// <summary>
-        /// Стрелки водят по подсказкам, Enter берёт выбранную, Escape закрывает список.
-        /// Перехватываем до общего обработчика Enter: он снимает ввод с поля, а нам
-        /// нужно сначала подставить название.
+        /// Arrows move through the suggestions, Enter takes the selected one, Escape closes the
+        /// list. Handled before the shared Enter handler, which releases focus from the field,
+        /// because the name has to be filled in first.
         /// </summary>
         private void Identity_KeyDown(object sender, KeyEventArgs e)
         {
@@ -77,7 +77,7 @@ namespace LimbusCalc
 
         private void Suggestion_Click(object sender, MouseButtonEventArgs e) => Commit();
 
-        /// <summary>Переставляет выбор по списку, открывая его при первой стрелке.</summary>
+        /// <summary>Moves the selection through the list, opening it on the first arrow press.</summary>
         private void Move(int step)
         {
             if (Model.Targets.Count == 0)
@@ -97,8 +97,8 @@ namespace LimbusCalc
         }
 
         /// <summary>
-        /// Берёт выбранную подсказку: её название встаёт в поле, а список закрывается.
-        /// Ввод остаётся в поле — набранное всегда можно поправить.
+        /// Takes the selected suggestion: its name goes into the field and the list closes.
+        /// Focus stays in the field so the text can always be corrected.
         /// </summary>
         private void Commit()
         {

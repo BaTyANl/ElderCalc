@@ -3,8 +3,8 @@ using LimbusCalc.Calculation;
 namespace LimbusCalc.ViewModels;
 
 /// <summary>
-/// Строка бонуса в таблице монет: вид и цель задаются один раз слева,
-/// а значение у каждой монеты своё (<see cref="CoinBonusViewModel"/>).
+/// A bonus row in the coin table: kind and target are set once on the left,
+/// and each coin has its own value (<see cref="CoinBonusViewModel"/>).
 /// </summary>
 public sealed class BonusRowViewModel : ObservableObject
 {
@@ -12,10 +12,10 @@ public sealed class BonusRowViewModel : ObservableObject
 
     public required BonusKind Kind { get; init; }
 
-    /// <summary>Подпись вида бонуса в колонке слева.</summary>
+    /// <summary>Label of the bonus kind in the left column.</summary>
     public string KindLabel => Kind == BonusKind.Flat ? "flat" : "%";
 
-    /// <summary>На что бонус целится; в расчёте пока не участвует.</summary>
+    /// <summary>What the bonus targets: the resistance to this element scales it.</summary>
     public ElementOption Target
     {
         get => _target;
@@ -25,7 +25,7 @@ public sealed class BonusRowViewModel : ObservableObject
     public IReadOnlyList<ElementOption> TargetOptions => ElementOptions.BonusTargets;
 }
 
-/// <summary>Значение бонуса у конкретной монеты.</summary>
+/// <summary>The bonus value of one particular coin.</summary>
 public sealed class CoinBonusViewModel : ObservableObject
 {
     private double _value;

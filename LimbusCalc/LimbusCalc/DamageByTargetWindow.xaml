@@ -15,18 +15,17 @@
         FontFamily="{StaticResource AppFontFamily}"
         Background="{DynamicResource AppBackgroundBrush}">
 
-    <!-- Общая область размеров: столбец итога подстраивается под самую широкую запись
-         (с мораторием это целое равенство), и подпись встаёт ровно над ней. -->
+    <!-- Shared size scope: the total column fits its widest entry (with the moratorium that is
+         a whole equation), and the header sits exactly above it. -->
     <Border Style="{StaticResource Card}" Margin="14" Grid.IsSharedSizeScope="True">
         <StackPanel>
             <TextBlock Text="Damage by target" Style="{StaticResource CardTitleText}"/>
 
-            <!-- Шапка: каждая подпись — кнопка сортировки по своему столбцу. -->
+            <!-- Header: every label is a sort button for its column. -->
             <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                <!-- Столбец названий: подцель можно переименовать, поэтому он пошире. -->
+                <!-- Name column: subtargets can be renamed, so it is wider. -->
                 <Border Width="150">
-                    <!-- Без боковых отступов: подпись должна начинаться ровно там же,
-                         где содержимое столбца под ней. -->
+                    <!-- No side padding: the label must start exactly where the column content does. -->
                     <Button DataContext="{Binding TitleColumn}"
                             Content="{Binding Header}"
                             Style="{StaticResource TableHeaderButton}"
@@ -51,8 +50,8 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
                 <Border Width="20"/>
-                <!-- Отбивка итога от монет. Отрицательный отступ снизу дотягивает черту
-                     до строк, чтобы линия шла сплошной, а не кусками. -->
+                <!-- Separates the total from the coins. The negative bottom margin stretches the
+                     line down to the rows so it reads as one solid line. -->
                 <Border Width="1" Background="{DynamicResource OutlineBrush}"
                         Margin="0,0,0,-6"/>
                 <Border Width="19"/>
@@ -61,10 +60,9 @@
                         <ColumnDefinition SharedSizeGroup="TotalLeading"/>
                         <ColumnDefinition SharedSizeGroup="TotalEquation"/>
                     </Grid.ColumnDefinitions>
-                    <!-- Отрицательные поля дают подписи выйти за узкий столбец: иначе,
-                         когда урон в одну-две цифры, ей не хватило бы места и она
-                         прижималась бы к левому краю вместо середины. В ширину столбца
-                         подпись при этом не считается. -->
+                    <!-- Negative margins let the label extend past a narrow column: with one- or
+                         two-digit damage it would otherwise lack room and hug the left edge
+                         instead of centering. The label doesn't count toward the column width. -->
                     <Button Grid.ColumnSpan="2"
                             DataContext="{Binding TotalColumn}"
                             Content="{Binding Header}"
@@ -74,11 +72,11 @@
                             ToolTip="Sort targets by total damage"
                             Click="Sort_Click"/>
                 </Grid>
-                <!-- Запас справа: подпись Total шире столбца и не должна упираться в край. -->
+                <!-- Room on the right: the Total label is wider than its column. -->
                 <Border Width="24"/>
             </StackPanel>
 
-            <!-- Целей бывает много, поэтому список прокручивается. -->
+            <!-- There can be many targets, so the list scrolls. -->
             <ScrollViewer MaxHeight="460" VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled">
                 <ItemsControl ItemsSource="{Binding DamageByTarget}">
@@ -86,8 +84,8 @@
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Margin="0,4">
                                 <Border Width="150" Padding="0,0,8,0">
-                                    <!-- Длинное название не должно разъезжать таблицу:
-                                         обрезаем, а целиком показываем подсказкой. -->
+                                    <!-- A long name must not stretch the table: trim it and
+                                         show the full name in a tooltip. -->
                                     <TextBlock Text="{Binding Title}" VerticalAlignment="Center"
                                                TextTrimming="CharacterEllipsis"
                                                ToolTip="{Binding Title}"/>
@@ -112,15 +110,15 @@
                                         Margin="0,-4"/>
                                 <Border Width="19"/>
 
-                                <!-- Итог по цели. С мораторием показываем разбор равенством. -->
+                                <!-- Total per target. With the moratorium it is shown as an equation. -->
                                 <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition SharedSizeGroup="TotalLeading"/>
                                     <ColumnDefinition SharedSizeGroup="TotalEquation"/>
                                 </Grid.ColumnDefinitions>
-                                    <!-- Урон до моратория живёт в своём столбце: так красные
-                                         числа стоят друг под другом, сколько бы цифр в них ни было.
-                                         Выравнивание по левому краю — числа начинаются с одного места. -->
+                                    <!-- Damage before the moratorium has its own column, so the red
+                                         numbers line up however many digits they have. Left-aligned
+                                         so the numbers start at the same place. -->
                                     <TextBlock Grid.Column="0" FontWeight="Bold" VerticalAlignment="Center"
                                                HorizontalAlignment="Left" TextAlignment="Left"
                                                Text="{Binding LeadingText}">

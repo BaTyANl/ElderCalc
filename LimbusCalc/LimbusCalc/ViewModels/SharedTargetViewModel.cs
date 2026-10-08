@@ -1,16 +1,16 @@
 namespace LimbusCalc.ViewModels;
 
 /// <summary>
-/// Общая часть дополнительной цели: подцель с одним номером — это один враг,
-/// поэтому его сопротивления и Time Moratorium одни на все монеты скилла.
-/// Всё остальное (dyn mod, крит, разница уровней) у каждой монеты своё.
+/// The shared part of an extra target: a subtarget with a given number is one enemy, so its
+/// resistances and Time Moratorium are the same for every coin of the skill. Everything else
+/// (dyn mod, crit, level difference) is per coin.
 /// </summary>
 public sealed class SharedTargetViewModel : ObservableObject
 {
     private bool _timeMoratorium;
     private int _timeMoratoriumStacks = 1;
 
-    /// <summary>Сопротивления в порядке <see cref="ElementOptions.ResistanceOrder"/>.</summary>
+    /// <summary>Resistances in <see cref="ElementOptions.ResistanceOrder"/> order.</summary>
     public required IReadOnlyList<ResistanceViewModel> Resistances { get; init; }
 
     public bool TimeMoratorium
@@ -19,7 +19,7 @@ public sealed class SharedTargetViewModel : ObservableObject
         set => SetProperty(ref _timeMoratorium, value);
     }
 
-    /// <summary>Число стаков; допустимы только 1 и 2.</summary>
+    /// <summary>Number of stacks; only 1 and 2 are allowed.</summary>
     public int TimeMoratoriumStacks
     {
         get => _timeMoratoriumStacks;
@@ -34,7 +34,7 @@ public sealed class SharedTargetViewModel : ObservableObject
             }
             else if (value != clamped)
             {
-                // Значение уже на границе, но ввели за её пределами — вернём поле к границе.
+                // Already at the limit but the input went past it: snap the field back.
                 OnPropertyChanged();
             }
         }

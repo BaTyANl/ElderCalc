@@ -4,7 +4,7 @@ using LimbusCalc.ViewModels;
 
 namespace LimbusCalc
 {
-    /// <summary>Настройки приложения: тема и обводка клеток справочника.</summary>
+    /// <summary>App settings: theme, table cell look and outlines.</summary>
     public partial class SettingsWindow : Window
     {
         public SettingsWindow(SettingsViewModel viewModel)
@@ -22,8 +22,8 @@ namespace LimbusCalc
         }
 
         /// <summary>
-        /// Цвет из палитры. Какой обводке он достался, говорит сама кнопка:
-        /// в Tag у неё лежит настройка, а в данных — цвет.
+        /// A palette color. The button itself tells which outline it belongs to:
+        /// the outline setting is in its Tag and the color is its data.
         /// </summary>
         private void Swatch_Click(object sender, RoutedEventArgs e)
         {

@@ -6,24 +6,24 @@ using System.Windows.Media;
 
 namespace LimbusCalc.Theming;
 
-/// <summary>Обводка клетки таблицы: показывать ли её, каким цветом и насколько густо.</summary>
+/// <summary>A table cell outline: whether it's shown, its color and its opacity.</summary>
 public sealed class OutlineSettings
 {
     public required bool Enabled { get; set; }
 
     public required Color Color { get; set; }
 
-    /// <summary>Непрозрачность от 0 до 1.</summary>
+    /// <summary>Opacity from 0 to 1.</summary>
     public required double Opacity { get; set; }
 }
 
 /// <summary>
-/// Настройки приложения между запусками: тема и обводка клеток. Файл лежит в профиле
-/// пользователя, а не рядом с программой: её могут положить в папку без права записи.
+/// App settings between launches: theme, cell look and outlines. The file lives in the user
+/// profile rather than next to the exe, which may sit in a read-only folder.
 /// </summary>
 public static class AppSettings
 {
-    /// <summary>Чем открывается приложение, пока пользователь ничего не выбрал.</summary>
+    /// <summary>What the app opens with until the user picks something.</summary>
     public const AppTheme DefaultTheme = AppTheme.Dark;
 
     private static readonly string SettingsPath = Path.Combine(
@@ -32,8 +32,8 @@ public static class AppSettings
         "settings.json");
 
     /// <summary>
-    /// Обводка клеток, заполненных руками, — приглушённый серый. По умолчанию выключена:
-    /// обводки включают в настройках, когда нужно видеть, откуда взялся урон.
+    /// Outline of manually filled cells: muted gray. Off by default; outlines are turned on
+    /// in settings when you need to see where the damage came from.
     /// </summary>
     public static OutlineSettings DefaultManualOutline() => new()
     {
@@ -42,7 +42,7 @@ public static class AppSettings
         Opacity = 1.0,
     };
 
-    /// <summary>Обводка клеток из калькулятора — акцентный красный; тоже выключена поначалу.</summary>
+    /// <summary>Outline of cells from the calculator: accent red; also off at first.</summary>
     public static OutlineSettings DefaultCalculatorOutline() => new()
     {
         Enabled = false,
@@ -50,8 +50,20 @@ public static class AppSettings
         Opacity = 1.0,
     };
 
-    /// <summary>Иконки типа и греха в клетках справочника показываем, пока не сказано иное.</summary>
+    /// <summary>Skill type and sin icons in table cells are shown unless turned off.</summary>
     public const bool DefaultShowSkillIcons = true;
+
+    /// <summary>The damage color scale starts off: it's a view for comparing, not for entering data.</summary>
+    public const bool DefaultShowDamageScale = false;
+
+    public static bool LoadShowDamageScale()
+    {
+        JsonObject? stored = Read();
+
+        return stored?["ShowDamageScale"] is JsonNode node
+            ? Flag(node, DefaultShowDamageScale)
+            : DefaultShowDamageScale;
+    }
 
     public static bool LoadShowSkillIcons()
     {
@@ -91,12 +103,13 @@ public static class AppSettings
         };
     }
 
-    /// <summary>Пишет настройки целиком: файл маленький, собирать его по частям незачем.</summary>
+    /// <summary>Writes all settings at once: the file is tiny, no need to merge it piece by piece.</summary>
     public static void Save(
         AppTheme theme,
         OutlineSettings manual,
         OutlineSettings calculator,
-        bool showSkillIcons)
+        bool showSkillIcons,
+        bool showDamageScale)
     {
         ArgumentNullException.ThrowIfNull(manual);
         ArgumentNullException.ThrowIfNull(calculator);
@@ -114,6 +127,7 @@ public static class AppSettings
             {
                 ["Theme"] = theme.ToString(),
                 ["ShowSkillIcons"] = showSkillIcons,
+                ["ShowDamageScale"] = showDamageScale,
                 ["ManualOutline"] = Write(manual),
                 ["CalculatorOutline"] = Write(calculator),
             };
@@ -125,8 +139,7 @@ public static class AppSettings
         }
         catch (Exception)
         {
-            // Настройки не критичны: не смогли сохранить — в следующий раз откроемся
-            // со значениями по умолчанию.
+            // Settings aren't critical: if saving fails, the next launch uses the defaults.
         }
     }
 
@@ -147,7 +160,7 @@ public static class AppSettings
         }
         catch (Exception)
         {
-            // Испорченный или недоступный файл не должен мешать запуску.
+            // A broken or inaccessible file must not prevent startup.
             return null;
         }
     }
@@ -155,7 +168,7 @@ public static class AppSettings
     public static string ToHex(Color color) =>
         $"#{color.R:X2}{color.G:X2}{color.B:X2}";
 
-    /// <summary>Разбирает цвет вида #RRGGBB; при любой ошибке возвращает запасной.</summary>
+    /// <summary>Parses a #RRGGBB color; returns the fallback on any error.</summary>
     public static Color ParseColor(string? text, Color fallback)
     {
         if (string.IsNullOrWhiteSpace(text))

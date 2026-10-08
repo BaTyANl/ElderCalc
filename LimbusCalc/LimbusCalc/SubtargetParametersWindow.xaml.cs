@@ -4,7 +4,7 @@ using LimbusCalc.ViewModels;
 
 namespace LimbusCalc
 {
-    /// <summary>Окно модификаторов одной дополнительной цели.</summary>
+    /// <summary>Modifiers of one extra target.</summary>
     public partial class SubtargetParametersWindow : Window
     {
         public SubtargetParametersWindow(SubtargetViewModel subtarget)

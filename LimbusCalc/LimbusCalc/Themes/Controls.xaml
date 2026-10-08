@@ -3,18 +3,17 @@
                     xmlns:conv="clr-namespace:LimbusCalc.Converters"
                     xmlns:behaviors="clr-namespace:LimbusCalc.Behaviors">
 
-    <!-- Общий на всё приложение: на него ссылаются и шаблоны отсюда, и разметка окна. -->
+    <!-- Converters shared across the app: used by templates here and by window markup. -->
     <conv:NumberConverter x:Key="Num"/>
-    <conv:ColumnWidthConverter x:Key="ColumnWidth"/>
     <conv:PercentConverter x:Key="Percent"/>
     <conv:HexColorConverter x:Key="HexColor"/>
     <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
 
-    <!-- Ссылка на вшитый шрифт: до "#" идёт папка ресурса, после — имя семейства
-         внутри файла (не имя файла). Начертания WPF подбирает по FontWeight сам. -->
+    <!-- Embedded font: the part before "#" is the resource folder, after it the family name
+         inside the file (not the file name). WPF picks the weight by FontWeight itself. -->
     <FontFamily x:Key="AppFontFamily">/Assets/Fonts/#Kreon</FontFamily>
 
-    <!-- Цвета берутся через DynamicResource, иначе смена темы не подхватится на лету. -->
+    <!-- Colors go through DynamicResource, otherwise a theme switch wouldn't apply live. -->
 
     <Style TargetType="TextBlock">
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
@@ -34,7 +33,7 @@
         <Setter Property="Margin" Value="0,10,0,4"/>
     </Style>
 
-    <!-- Заголовок подгруппы в колонке подписей. -->
+    <!-- Subgroup caption in the label column. -->
     <Style x:Key="GroupCaptionText" TargetType="TextBlock">
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
         <Setter Property="FontSize" Value="16"/>
@@ -42,7 +41,7 @@
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
 
-    <!-- Клетка сопротивления: иконка сверху, поле под ней. -->
+    <!-- Resistance cell: icon on top, input below. -->
     <DataTemplate x:Key="ResistanceCellTemplate">
         <StackPanel Width="52" Margin="2,4">
             <Image Source="{Binding Option.IconPath}" Width="26" Height="26"
@@ -65,7 +64,7 @@
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
 
-    <!-- Панель со скруглёнными углами. -->
+    <!-- Panel with rounded corners. -->
     <Style x:Key="Card" TargetType="Border">
         <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource OutlineBrush}"/>
@@ -74,8 +73,8 @@
         <Setter Property="Padding" Value="14"/>
     </Style>
 
-    <!-- Горизонтальная линия-разделитель; высота фиксирована, чтобы колонки монет
-         и колонка подписей оставались выровненными построчно. -->
+    <!-- Horizontal divider. Fixed height keeps the coin columns and the label column
+         aligned row by row. -->
     <Style x:Key="RowDivider" TargetType="Border">
         <Setter Property="Background" Value="{DynamicResource OutlineBrush}"/>
         <Setter Property="Height" Value="1"/>
@@ -117,7 +116,7 @@
         </Setter>
     </Style>
 
-    <!-- Второстепенная кнопка: без заливки акцентом. -->
+    <!-- Secondary button: no accent fill. -->
     <Style x:Key="SecondaryButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
         <Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}"/>
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
@@ -148,8 +147,8 @@
     </Style>
 
     <Style TargetType="TextBox">
-        <!-- Enter применяет набранное и отпускает поле: это ждут во всех полях,
-             поэтому висит на общем стиле, а не на каждом по отдельности. -->
+        <!-- Enter commits the value and releases the field. Every field is expected to work
+             this way, so it lives on the shared style. -->
         <Setter Property="behaviors:EnterCommits.Enabled" Value="True"/>
         <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}"/>
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
@@ -169,8 +168,8 @@
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             SnapsToDevicePixels="True">
-                        <!-- Padding здесь не повторяем: поле применяет его к тексту само,
-                             а второй отступ раздувает содержимое и обрезает цифры. -->
+                        <!-- Padding isn't repeated here: the text box applies it to the text
+                             itself, and a second one bloats the content and clips digits. -->
                         <ScrollViewer x:Name="PART_ContentHost"
                                       Focusable="False"
                                       HorizontalScrollBarVisibility="Hidden"
@@ -189,9 +188,9 @@
         </Setter>
     </Style>
 
-    <!-- Флажок без подписи: сама подпись живёт в колонке слева.
-         Background задаёт цвет во включённом состоянии — так один шаблон
-         обслуживает и обычный флажок, и синий флажок крита. -->
+    <!-- Checkbox without a caption: the caption lives in the label column on the left.
+         Background is the checked color, so one template serves both the regular
+         checkbox and the blue crit checkbox. -->
     <Style TargetType="CheckBox">
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
@@ -216,8 +215,8 @@
                               Visibility="Collapsed"/>
                     </Grid>
                     <ControlTemplate.Triggers>
-                        <!-- TemplateBinding в триггерах не работает, поэтому цвет
-                             берём привязкой к самому контролу. -->
+                        <!-- TemplateBinding doesn't work in triggers, so the color is
+                             bound to the templated control instead. -->
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Box" Property="BorderBrush"
                                     Value="{Binding Background, RelativeSource={RelativeSource TemplatedParent}}"/>
@@ -235,7 +234,7 @@
         </Setter>
     </Style>
 
-    <!-- Пункт списка с иконкой: используется и в выпадающем списке, и для выбранного значения. -->
+    <!-- Item with an icon: used both in the dropdown and for the selected value. -->
     <DataTemplate x:Key="ElementOptionTemplate">
         <StackPanel Orientation="Horizontal">
             <Image Source="{Binding IconPath}" Width="18" Height="18" Margin="0,0,6,0"
@@ -284,7 +283,7 @@
                                 BorderThickness="1"
                                 SnapsToDevicePixels="True"/>
 
-                        <!-- Кнопка на всю площадь: клик в любое место раскрывает список. -->
+                        <!-- A button over the whole area: clicking anywhere opens the list. -->
                         <ToggleButton Background="Transparent" BorderThickness="0" Focusable="False"
                                       ClickMode="Press"
                                       IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
@@ -326,7 +325,7 @@
         </Setter>
     </Style>
 
-    <!-- Маленькая кнопка без заливки: удаление строки бонуса. -->
+    <!-- Small borderless button: removes a bonus row. -->
     <Style x:Key="IconButton" TargetType="Button">
         <Setter Property="Foreground" Value="{DynamicResource SubtleTextBrush}"/>
         <Setter Property="FontSize" Value="13"/>
@@ -349,8 +348,8 @@
         </Setter>
     </Style>
 
-    <!-- Подсказки: без своего шаблона они берут системный светлый фон, а текст —
-         цвет темы, и в тёмной теме получается белое по белому. -->
+    <!-- Tooltips: without a template they get the system light background but the theme's
+         text color, which is white on white in the dark theme. -->
     <Style TargetType="ToolTip">
         <Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}"/>
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
@@ -373,7 +372,7 @@
         </Setter>
     </Style>
 
-    <!-- Полосы прокрутки: скруглённый ползунок, без кнопок со стрелками. -->
+    <!-- Scrollbars: rounded thumb, no arrow buttons. -->
     <Style x:Key="ScrollThumbStyle" TargetType="Thumb">
         <Setter Property="IsTabStop" Value="False"/>
         <Setter Property="Template">
@@ -396,7 +395,7 @@
         </Setter>
     </Style>
 
-    <!-- Область дорожки: невидима, но кликабельна для постраничной прокрутки. -->
+    <!-- Track area: invisible but clickable for page scrolling. -->
     <Style x:Key="ScrollPageButton" TargetType="RepeatButton">
         <Setter Property="IsTabStop" Value="False"/>
         <Setter Property="Focusable" Value="False"/>
@@ -457,7 +456,7 @@
         </Style.Triggers>
     </Style>
 
-    <!-- Квадратная кнопка с картинкой. -->
+    <!-- Square button with an image. -->
     <Style x:Key="IconTileButton" TargetType="Button">
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
@@ -483,14 +482,14 @@
         </Setter>
     </Style>
 
-    <!-- Компактная кнопка добавления бонуса. -->
+    <!-- Compact button used in toolbars, filters and popups. -->
     <Style x:Key="SmallButton" TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
         <Setter Property="Padding" Value="8,4"/>
         <Setter Property="FontSize" Value="12"/>
     </Style>
 
-    <!-- Списки без иконок: обычный ComboBox в приложении показывает элемент с картинкой,
-         а здесь в пунктах простые строки и столбцы таблицы. -->
+    <!-- Lists without icons: the app's default ComboBox shows an item with an image,
+         while these items are plain strings or table columns. -->
     <DataTemplate x:Key="PlainTextItemTemplate">
         <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
     </DataTemplate>
@@ -499,8 +498,8 @@
         <TextBlock Text="{Binding Title}" VerticalAlignment="Center"/>
     </DataTemplate>
 
-    <!-- Меню по правой кнопке: системное белое в тёмной теме выглядит чужеродно,
-         поэтому шаблон свой. Пункт с подменю и обычный пункт различаются ролью. -->
+    <!-- Context menu: the system white menu looks out of place in the dark theme, so it has
+         its own template. Items with a submenu and plain items differ by role. -->
     <ControlTemplate x:Key="MenuItemTemplate" TargetType="MenuItem">
         <Border x:Name="Root" CornerRadius="6" Background="Transparent" Padding="10,6">
             <Grid>
@@ -596,8 +595,8 @@
         </Setter>
     </Style>
 
-    <!-- Клетка таблицы: рамку рисует сама клетка, поэтому поле внутри плоское.
-         В фокусе подсвечивается заливкой — иначе не видно, куда попал курсор. -->
+    <!-- Table cell editor: the row draws the grid itself, so the field is flat.
+         It is filled when focused, otherwise you can't tell where the caret is. -->
     <Style x:Key="TableCellTextBox" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
@@ -610,8 +609,10 @@
         </Style.Triggers>
     </Style>
 
-    <!-- То же для выбора из списка: в клетке видно только значение и стрелку. -->
+    <!-- Same for picking from a list: the cell shows only the value and a chevron. -->
     <Style x:Key="TableCellComboBox" TargetType="ComboBox">
+        <!-- No dashed focus rectangle: a focused cell is filled, like the text editor. -->
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
         <Setter Property="MinHeight" Value="28"/>
         <Setter Property="Cursor" Value="Hand"/>
@@ -656,13 +657,16 @@
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Root" Property="Background" Value="{DynamicResource InputBackgroundBrush}"/>
                         </Trigger>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource InputBackgroundBrush}"/>
+                        </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
-    <!-- Вкладки верхнего уровня: полоса заголовков и область содержимого. -->
+    <!-- Top-level tabs: header strip and content area. -->
     <Style TargetType="TabControl">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
@@ -676,8 +680,8 @@
                         </Grid.RowDefinitions>
                         <TabPanel IsItemsHost="True" Panel.ZIndex="1" Margin="2,0,2,12"
                                   KeyboardNavigation.TabIndex="1"/>
-                        <!-- Имя обязательное: по нему WPF отдаёт содержимое вкладки
-                             дереву доступности, иначе снаружи вкладка выглядит пустой. -->
+                        <!-- The name is required: WPF exposes the tab content to the accessibility
+                             tree through it, otherwise the tab looks empty from outside. -->
                         <ContentPresenter x:Name="PART_SelectedContentHost" Grid.Row="1"
                                           ContentSource="SelectedContent"/>
                     </Grid>
@@ -686,13 +690,13 @@
         </Setter>
     </Style>
 
-    <!-- Ярлык вкладки: та же скруглённая плитка, что и у кнопок; выбранная залита акцентом. -->
+    <!-- Tab header: the same rounded tile as buttons; the selected one is filled with the accent. -->
     <Style TargetType="TabItem">
         <Setter Property="Foreground" Value="{DynamicResource SubtleTextBrush}"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
-        <!-- Курсор ставим на сам ярлык, а не на TabItem: содержимое вкладки —
-             его логический потомок, и рука расползлась бы на всю страницу. -->
+        <!-- The cursor goes on the header itself, not on TabItem: the tab content is its
+             logical child, and the hand cursor would spread over the whole page. -->
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TabItem">
@@ -731,7 +735,7 @@
         </Setter>
     </Style>
 
-    <!-- Кнопка-образец цвета в настройках: сама заливка приходит содержимым. -->
+    <!-- Color swatch button in settings: the fill comes in as content. -->
     <Style x:Key="SwatchButton" TargetType="Button">
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
@@ -757,7 +761,7 @@
         </Setter>
     </Style>
 
-    <!-- Ползунок: системный в тёмной теме выглядит чужеродно. -->
+    <!-- Slider: the system one looks out of place in the dark theme. -->
     <Style TargetType="Slider">
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="MinHeight" Value="24"/>
@@ -807,7 +811,7 @@
         </Setter>
     </Style>
 
-    <!-- Заголовок столбца таблицы: выглядит подписью, работает кнопкой сортировки. -->
+    <!-- Table column header: looks like a label, works as a sort button. -->
     <Style x:Key="TableHeaderButton" TargetType="Button">
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
@@ -832,49 +836,14 @@
         </Setter>
     </Style>
 
-    <!-- Флажок крита: тот же шаблон, другой цвет заливки. -->
+    <!-- Crit checkbox: same template, different fill. -->
     <Style x:Key="CritCheckBox" TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
         <Setter Property="Background" Value="{DynamicResource CritBrush}"/>
     </Style>
 
+    <!-- Time Moratorium checkbox: same template, amber fill. -->
     <Style x:Key="MoratoriumCheckBox" TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
         <Setter Property="Background" Value="{DynamicResource MoratoriumBrush}"/>
-    </Style>
-
-    <!-- Переключатель темы. -->
-    <Style x:Key="ThemeToggle" TargetType="ToggleButton">
-        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
-        <Setter Property="Padding" Value="12,6"/>
-        <Setter Property="Cursor" Value="Hand"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="ToggleButton">
-                    <Border x:Name="Root"
-                            CornerRadius="8"
-                            Background="{DynamicResource SurfaceBrush}"
-                            BorderBrush="{DynamicResource OutlineBrush}"
-                            BorderThickness="1"
-                            SnapsToDevicePixels="True">
-                        <ContentPresenter Margin="{TemplateBinding Padding}"
-                                          HorizontalAlignment="Center"
-                                          VerticalAlignment="Center"/>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Root" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-        <Style.Triggers>
-            <Trigger Property="IsChecked" Value="True">
-                <Setter Property="Content" Value="Light theme"/>
-            </Trigger>
-            <Trigger Property="IsChecked" Value="False">
-                <Setter Property="Content" Value="Dark theme"/>
-            </Trigger>
-        </Style.Triggers>
     </Style>
 
 </ResourceDictionary>

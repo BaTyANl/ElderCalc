@@ -11,14 +11,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Та же иконка нужна как ресурс: из неё берётся значок в заголовке окна. -->
+    <!-- The same icon is needed as a resource: the window title bar icon comes from it. -->
     <Resource Include="Assets\elderjar.ico"/>
 
-    <!-- Шрифт вшивается в сборку, ставить его в систему не требуется.
-         Берём статические начертания: вариативные оси WPF не поддерживает. -->
+    <!-- The font is embedded in the assembly, so it doesn't need to be installed.
+         Static weights are used: WPF doesn't support variable font axes. -->
     <Resource Include="Assets\Fonts\*.ttf"/>
 
-    <!-- Иконки типов урона и грехов. -->
+    <!-- Damage type and sin icons. -->
     <Resource Include="Assets\Icons\*.png"/>
   </ItemGroup>
 

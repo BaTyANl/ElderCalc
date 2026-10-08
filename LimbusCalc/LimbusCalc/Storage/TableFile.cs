@@ -5,19 +5,19 @@ using LimbusCalc.ViewModels;
 namespace LimbusCalc.Storage;
 
 /// <summary>
-/// Выгрузка и загрузка таблицы файлом по выбору пользователя. Формат определяется
-/// расширением: .xlsx — книга Excel, всё остальное — тот же JSON, в котором таблица
-/// хранится между запусками.
+/// Exports and imports a table to a file the user picks. The extension decides the format:
+/// .xlsx is an Excel workbook, anything else is the same JSON the table is stored in.
 /// </summary>
 public static class TableFile
 {
     /// <summary>
-    /// Фильтр для диалогов сохранения и открытия. JSON стоит первым: он и есть
-    /// родной формат таблицы, а книга Excel нужна, когда её открывают глазами.
+    /// Filter for the save and open dialogs. JSON comes first: it's the table's native format,
+    /// while the workbook is for reading in Excel.
     /// </summary>
     public const string DialogFilter =
         "JSON file (*.json)|*.json|Excel workbook (*.xlsx)|*.xlsx";
 
+    /// <summary>Writes the table to a file: an .xlsx path makes a workbook, anything else JSON.</summary>
     public static void Export(TableViewModel table, string path)
     {
         ArgumentNullException.ThrowIfNull(table);
@@ -28,28 +28,29 @@ public static class TableFile
             return;
         }
 
-        // Выгрузку открывают и правят руками, поэтому с отступами — в отличие
-        // от файла в профиле, который переписывается на каждой правке.
+        // Exports are opened and edited by hand, so they're indented — unlike the profile
+        // file, which is rewritten on every edit.
         using FileStream stream = File.Create(path);
         TableStorage.Write(stream, TableStorage.Snapshot(table), indented: true);
     }
 
-    public static void Import(TableViewModel table, string path)
+    /// <summary>Reads a table from a file: replacing the rows, or after them with <paramref name="append"/>.</summary>
+    public static void Import(TableViewModel table, string path, bool append = false)
     {
         ArgumentNullException.ThrowIfNull(table);
 
         if (IsExcel(path))
         {
-            ExcelFile.Read(table, path);
+            ExcelFile.Read(table, path, append);
             return;
         }
 
         if (JsonNode.Parse(File.ReadAllText(path)) is not JsonArray rows)
         {
-            throw new InvalidDataException("В файле ожидался список строк таблицы.");
+            throw new InvalidDataException("The file should contain a list of table rows.");
         }
 
-        TableStorage.FromJson(table, rows);
+        TableStorage.FromJson(table, rows, append);
     }
 
     private static bool IsExcel(string path) =>

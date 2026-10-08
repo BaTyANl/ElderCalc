@@ -17,8 +17,7 @@
         Background="{DynamicResource AppBackgroundBrush}">
 
     <Window.Resources>
-        <!-- Подсказка в списке выглядит как пункт выпадающего списка: окно одно,
-             а привычка нажимать на такие строки у пользователя уже есть. -->
+        <!-- A suggestion looks like a dropdown item: users already know to click such rows. -->
         <Style x:Key="SuggestionItem" TargetType="ListBoxItem">
             <Setter Property="Padding" Value="8,5"/>
             <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
@@ -52,9 +51,9 @@
                        Foreground="{DynamicResource SubtleTextBrush}"
                        TextWrapping="Wrap" Margin="0,0,0,6"/>
 
-            <!-- Строка выбирается набором: в справочнике легко за сотню строк, и листать
-                 их до нужной дольше, чем набрать пару букв названия. Подходящие
-                 показываются тут же под полем. -->
+            <!-- The row is chosen by typing: a table easily has over a hundred rows, and typing
+                 a few letters of the name is faster than scrolling. Matches appear right
+                 under the field. -->
             <TextBlock Text="Name" Style="{StaticResource FieldLabelText}"/>
             <TextBox x:Name="IdentityBox"
                      AutomationProperties.AutomationId="ExportSearchBox"

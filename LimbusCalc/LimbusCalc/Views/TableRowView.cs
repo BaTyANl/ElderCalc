@@ -3,28 +3,30 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Automation.Peers;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using TextElement = System.Windows.Documents.TextElement;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using LimbusCalc.ViewModels;
 
 namespace LimbusCalc.Views;
 
 /// <summary>
-/// Строка справочной таблицы, которая рисует свои клетки сама. Раньше каждая клетка
-/// была шаблоном из рамки, сетки, подписи и иконок — на экране это тысячи элементов,
-/// и на прокрутке их создание было самой дорогой частью. Здесь строка — один элемент:
-/// при прокрутке меняются только данные, а рисование обходится в доли миллисекунды.
-/// Правка и меню остаются прежними: клик переводится в клетку по координатам.
+/// A table row that draws its own cells. A template per cell (border, grid, text, icons)
+/// meant thousands of elements on screen, and creating them was the most expensive part of
+/// scrolling. Here a row is a single element: scrolling only swaps the data, and drawing
+/// takes a fraction of a millisecond. Clicks are mapped to cells by coordinates.
 /// </summary>
 public sealed class TableRowView : FrameworkElement
 {
-    /// <summary>Высота строки; у шапки и строки средних своя разметка.</summary>
+    /// <summary>Row height; the header and the averages row have their own markup.</summary>
     public const double RowHeight = 28;
 
-    // Кисти и вид клеток берутся из ресурсов так же, как через DynamicResource:
-    // смена темы или настроек перерисовывает строку сразу.
+    // Brushes and the cell look come from resources the same way DynamicResource works,
+    // so a theme or settings change repaints the row immediately.
     public static readonly DependencyProperty GridBrushProperty = Register<Brush?>("GridBrush", null);
     public static readonly DependencyProperty TextBrushProperty = Register<Brush?>("TextBrush", Brushes.Black);
     public static readonly DependencyProperty SubtleBrushProperty = Register<Brush?>("SubtleBrush", Brushes.Gray);
@@ -33,8 +35,10 @@ public sealed class TableRowView : FrameworkElement
     public static readonly DependencyProperty IconVisibilityProperty = Register("IconVisibility", Visibility.Visible);
     public static readonly DependencyProperty DamageAlignmentProperty = Register("DamageAlignment", TextAlignment.Left);
     public static readonly DependencyProperty DamagePaddingProperty = Register("DamagePadding", new Thickness(8, 4, 40, 4));
+    public static readonly DependencyProperty HeatBrushProperty = Register<Brush?>("HeatBrush", null);
+    public static readonly DependencyProperty HeatVisibilityProperty = Register("HeatVisibility", Visibility.Collapsed);
 
-    /// <summary>Иконки общие на все строки: картинок всего десяток, а клеток — тысячи.</summary>
+    /// <summary>Icons are shared by all rows: there are a dozen images but thousands of cells.</summary>
     private static readonly Dictionary<string, ImageSource> Icons = [];
 
     private static readonly Geometry Chevron = Geometry.Parse("M0,0 L4,4 L8,0");
@@ -52,6 +56,8 @@ public sealed class TableRowView : FrameworkElement
         SetResourceReference(IconVisibilityProperty, SettingsViewModel.SkillIconVisibilityKey);
         SetResourceReference(DamageAlignmentProperty, SettingsViewModel.DamageAlignmentKey);
         SetResourceReference(DamagePaddingProperty, SettingsViewModel.DamagePaddingKey);
+        SetResourceReference(HeatBrushProperty, "HeatBrush");
+        SetResourceReference(HeatVisibilityProperty, SettingsViewModel.DamageScaleVisibilityKey);
 
         RenderOptions.SetBitmapScalingMode(this, BitmapScalingMode.HighQuality);
 
@@ -60,10 +66,10 @@ public sealed class TableRowView : FrameworkElement
         Unloaded += (_, _) => Attach(null);
     }
 
-    /// <summary>Строка, которую сейчас показывает элемент; при прокрутке он переходит к другой.</summary>
+    /// <summary>The row this element shows right now; it moves to another one when scrolling.</summary>
     public TableRowViewModel? Row => _row;
 
-    /// <summary>Клетка под точкой и её границы в координатах строки.</summary>
+    /// <summary>The cell under the point and its bounds in row coordinates.</summary>
     public TableCell? CellAt(Point point, out Rect bounds)
     {
         bounds = Rect.Empty;
@@ -91,7 +97,7 @@ public sealed class TableRowView : FrameworkElement
         return null;
     }
 
-    /// <summary>Границы клетки в координатах строки.</summary>
+    /// <summary>A cell's bounds in row coordinates.</summary>
     public Rect BoundsOf(TableCell target)
     {
         double x = 0;
@@ -135,7 +141,7 @@ public sealed class TableRowView : FrameworkElement
             TextElement.GetFontWeight(this),
             TextElement.GetFontStretch(this));
 
-        // Прозрачная подложка: иначе щелчок мимо текста проходил бы сквозь строку.
+        // A transparent background, otherwise clicks between texts would fall through the row.
         dc.DrawRectangle(Brushes.Transparent, null, new Rect(RenderSize));
 
         Brush? grid = (Brush?)GetValue(GridBrushProperty);
@@ -144,12 +150,19 @@ public sealed class TableRowView : FrameworkElement
         foreach (TableCell cell in _row.Cells)
         {
             double width = cell.Column.ActualWidth;
+
+            // A hidden column takes no space and has nothing to draw.
+            if (width <= 0)
+            {
+                continue;
+            }
+
             Rect bounds = new(x, 0, width, RowHeight);
 
             DrawCell(dc, cell, bounds, typeface, pixelsPerDip);
 
-            // Линии сетки — по правому и нижнему краю клетки, как было у рамок.
-            // Направляющие ставят их точно на пиксели: иначе на 125% они расплывались бы.
+            // Grid lines along the right and bottom edge of each cell. Guidelines snap them to
+            // pixels; without them they'd blur at 125% scaling.
             if (grid is not null)
             {
                 GuidelineSet guides = new(
@@ -170,16 +183,132 @@ public sealed class TableRowView : FrameworkElement
     {
         base.OnMouseMove(e);
 
-        // Над выбором из списка — рука, как у кнопки: клик раскрывает список.
+        // A hand over list cells, like on a button: a click opens the list.
         TableCell? cell = CellAt(e.GetPosition(this), out _);
         Cursor = cell?.Column.Kind == TableCellKind.Options ? Cursors.Hand : null;
+
+        // Each cell has its own tooltip but the element covers the whole row. A regular
+        // element tooltip wouldn't change between cells, so the tooltip is managed here.
+        if (ReferenceEquals(_tipView, this) && ReferenceEquals(_tipCell, cell))
+        {
+            return;
+        }
+
+        HideTip();
+
+        if (cell is not null)
+        {
+            _tipView = this;
+            _tipCell = cell;
+            TipDelay.Start();
+        }
     }
+
+    protected override void OnMouseLeave(MouseEventArgs e)
+    {
+        base.OnMouseLeave(e);
+
+        if (ReferenceEquals(_tipView, this))
+        {
+            HideTip();
+        }
+    }
+
+    protected override void OnPreviewMouseDown(MouseButtonEventArgs e)
+    {
+        base.OnPreviewMouseDown(e);
+
+        // A click opens an editor or a menu; the tooltip would only get in the way.
+        HideTip();
+    }
+
+    /// <summary>One tooltip for all rows: only one is ever visible.</summary>
+    private static readonly ToolTip Tip = new() { Placement = PlacementMode.Bottom };
+
+    /// <summary>A delay like regular tooltips have, so they don't flicker as the mouse passes.</summary>
+    private static readonly DispatcherTimer TipDelay = CreateTipDelay();
+
+    private static TableRowView? _tipView;
+    private static TableCell? _tipCell;
+
+    private static DispatcherTimer CreateTipDelay()
+    {
+        DispatcherTimer timer = new() { Interval = TimeSpan.FromMilliseconds(450) };
+        timer.Tick += (_, _) => ShowTip();
+        return timer;
+    }
+
+    /// <summary>Hides the tooltip — on scroll, click, or when the mouse leaves the cell.</summary>
+    public static void HideTip()
+    {
+        TipDelay.Stop();
+        Tip.IsOpen = false;
+        _tipView = null;
+        _tipCell = null;
+    }
+
+    private static void ShowTip()
+    {
+        TipDelay.Stop();
+
+        if (_tipView is not { IsMouseOver: true } view
+            || _tipCell is not TableCell cell
+            || view.BoundsOf(cell) is not { IsEmpty: false } bounds
+            || view.TipFor(cell, bounds) is not string text)
+        {
+            return;
+        }
+
+        Tip.Content = text;
+        Tip.PlacementTarget = view;
+        Tip.PlacementRectangle = bounds;
+        Tip.IsOpen = true;
+    }
+
+    /// <summary>
+    /// What to show over a cell: the setup summary, the DPSC calculation, or the full name
+    /// when it's cut off with an ellipsis.
+    /// </summary>
+    private string? TipFor(TableCell cell, Rect bounds)
+    {
+        if (CellTips.Describe(cell) is string described)
+        {
+            return described;
+        }
+
+        double room = cell.Column.Kind switch
+        {
+            TableCellKind.Text => bounds.Width - 16,
+            TableCellKind.Options => bounds.Width - 30,
+            _ => double.PositiveInfinity,
+        };
+
+        return !cell.IsEmpty && TextWidth(cell.Value, SizeOf(cell)) > room ? cell.Value : null;
+    }
+
+    private double TextWidth(string value, double fontSize) =>
+        new FormattedText(
+            value,
+            CultureInfo.CurrentUICulture,
+            FlowDirection.LeftToRight,
+            new Typeface(
+                TextElement.GetFontFamily(this),
+                TextElement.GetFontStyle(this),
+                TextElement.GetFontWeight(this),
+                TextElement.GetFontStretch(this)),
+            fontSize,
+            Brushes.Black,
+            null,
+            TextFormattingMode.Ideal,
+            VisualTreeHelper.GetDpi(this).PixelsPerDip).WidthIncludingTrailingWhitespace;
 
     protected override AutomationPeer OnCreateAutomationPeer() => new TableRowAutomationPeer(this);
 
     private void DrawCell(DrawingContext dc, TableCell cell, Rect bounds, Typeface typeface, double pixelsPerDip)
     {
         Brush text = (Brush?)GetValue(TextBrushProperty) ?? Brushes.Black;
+
+        DrawHeat(dc, cell, bounds);
 
         switch (cell.Column.Kind)
         {
@@ -193,7 +322,7 @@ public sealed class TableRowView : FrameworkElement
                 DrawDamage(dc, cell, bounds, text, typeface, pixelsPerDip);
                 break;
 
-            // Sin Cost и DPSC — просто числа по центру: без меток и обводки.
+            // Sin Cost and DPSC are plain centered numbers: no marks and no outline.
             case TableCellKind.Integer:
             case TableCellKind.Computed:
                 if (cell.IsVisible)
@@ -212,8 +341,30 @@ public sealed class TableRowView : FrameworkElement
     }
 
     /// <summary>
-    /// Клетка урона: обводка по происхождению, число и иконки типа и греха справа.
-    /// Не прошедшая фильтр клетка остаётся пустой — сетка на месте, значения нет.
+    /// Fill by the color scale: the higher the value in its column, the stronger the fill.
+    /// Even the lowest gets a light tint, so it's clear the cell is on the scale.
+    /// </summary>
+    private void DrawHeat(DrawingContext dc, TableCell cell, Rect bounds)
+    {
+        if (!cell.Column.HasScale
+            || !cell.IsVisible
+            || (Visibility)GetValue(HeatVisibilityProperty) != Visibility.Visible
+            || GetValue(HeatBrushProperty) is not Brush heat
+            || cell.Number is not double value
+            || cell.Column.ScaleOf(value) is not double share)
+        {
+            return;
+        }
+
+        // Stops short of the bottom and right grid lines so the fill doesn't cover them.
+        dc.PushOpacity(0.05 + 0.5 * share);
+        dc.DrawRectangle(heat, null, new Rect(bounds.X, 0, bounds.Width - 1, RowHeight - 1));
+        dc.Pop();
+    }
+
+    /// <summary>
+    /// A damage cell: outline by origin, the number, and type and sin icons on the right.
+    /// A cell filtered out stays empty — the grid is there, the value isn't.
     /// </summary>
     private void DrawDamage(DrawingContext dc, TableCell cell, Rect bounds, Brush text, Typeface typeface, double pixelsPerDip)
     {
@@ -229,7 +380,7 @@ public sealed class TableRowView : FrameworkElement
             _ => null,
         };
 
-        // Выключенная обводка — кисть с нулевой прозрачностью; её и рисовать незачем.
+        // A disabled outline is a brush with zero opacity; no point drawing it.
         if (outline is not null && outline.Opacity > 0)
         {
             Pen pen = new(outline, 1.5);
@@ -259,8 +410,8 @@ public sealed class TableRowView : FrameworkElement
     }
 
     /// <summary>
-    /// Размер шрифта клетки: свой у столбца, если задан, иначе как у таблицы вокруг —
-    /// он приходит от вкладки, как приходил к прежним подписям клеток.
+    /// The cell font size: the column's own if set, otherwise the table's, which is
+    /// inherited from the tab.
     /// </summary>
     private double SizeOf(TableCell cell) => cell.Column.FontSize ?? TextElement.GetFontSize(this);
 
@@ -293,11 +444,11 @@ public sealed class TableRowView : FrameworkElement
             MaxTextWidth = area.Width,
             MaxLineCount = 1,
             TextAlignment = alignment,
-            // Длинное название обрезается многоточием, а не вылезает в соседнюю клетку.
+            // A long name is cut off with an ellipsis instead of spilling into the next cell.
             Trimming = TextTrimming.CharacterEllipsis,
         };
 
-        // По центру высоты без нижней линии сетки — так стоял текст в прежних клетках.
+        // Vertically centered, not counting the bottom grid line.
         double y = Math.Round((RowHeight - 1 - formatted.Height) / 2);
         dc.DrawText(formatted, new Point(area.X, y));
     }
@@ -333,9 +484,9 @@ public sealed class TableRowView : FrameworkElement
     }
 
     /// <summary>
-    /// Переходит к другой строке: отписывается от прежних клеток и столбцов,
-    /// подписывается на новые. Элемент переиспользуется при прокрутке, поэтому
-    /// подписки нельзя оставлять висеть.
+    /// Switches to another row: unsubscribes from the old cells and columns and subscribes
+    /// to the new ones. The element is reused while scrolling, so subscriptions must not
+    /// be left behind.
     /// </summary>
     private void Attach(TableRowViewModel? row)
     {
@@ -382,17 +533,24 @@ public sealed class TableRowView : FrameworkElement
     {
         InvalidateVisual();
 
-        // Экранному чтецу — новое содержимое. Посредник есть, только пока его кто-то
-        // спрашивал, так что без чтеца это ничего не стоит.
+        // Let a screen reader know about the new content. The peer exists only once something
+        // has asked for it, so without a screen reader this costs nothing.
         UIElementAutomationPeer.FromElement(this)?.InvalidatePeer();
     }
 
     private void OnColumnChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(TableColumn.ActualWidth))
+        switch (e.PropertyName)
         {
-            InvalidateMeasure();
-            InvalidateVisual();
+            case nameof(TableColumn.ActualWidth):
+                InvalidateMeasure();
+                InvalidateVisual();
+                break;
+
+            // The scale bounds moved, so every cell of the column gets a different fill.
+            case nameof(TableColumn.Scale):
+                InvalidateVisual();
+                break;
         }
     }
 
@@ -405,8 +563,8 @@ public sealed class TableRowView : FrameworkElement
 }
 
 /// <summary>
-/// Строка для экранных чтецов и автоматизации: своих элементов у клеток больше нет,
-/// поэтому строка сама рассказывает о них — по подписи на клетку с её местом на экране.
+/// The row for screen readers and UI automation: cells have no elements of their own, so the
+/// row describes them — one text item per cell with its place on screen.
 /// </summary>
 internal sealed class TableRowAutomationPeer(TableRowView owner) : FrameworkElementAutomationPeer(owner)
 {
@@ -427,7 +585,7 @@ internal sealed class TableRowAutomationPeer(TableRowView owner) : FrameworkElem
 
         foreach (TableCell cell in row.Row.Cells)
         {
-            // Скрытое фильтром и пустое не показываем — на экране его тоже нет.
+            // Skip filtered-out and empty cells — they aren't visible on screen either.
             if (cell.IsVisible && !string.IsNullOrEmpty(cell.Value))
             {
                 cells.Add(new TableCellAutomationPeer(row, cell));
@@ -438,7 +596,7 @@ internal sealed class TableRowAutomationPeer(TableRowView owner) : FrameworkElem
     }
 }
 
-/// <summary>Одна нарисованная клетка как текстовый элемент для автоматизации.</summary>
+/// <summary>One drawn cell exposed as a text element to UI automation.</summary>
 internal sealed class TableCellAutomationPeer(TableRowView row, TableCell cell) : AutomationPeer
 {
     protected override string GetNameCore() => cell.Value;
@@ -451,8 +609,8 @@ internal sealed class TableCellAutomationPeer(TableRowView row, TableCell cell) 
 
     protected override Rect GetBoundingRectangleCore()
     {
-        // Строку могли уже переиспользовать под другие данные — тогда клетки в ней нет,
-        // и границ у неё тоже нет. Бросать отсюда нельзя: сорвался бы весь запрос дерева.
+        // The row may already be reused for other data — then the cell isn't in it and has no
+        // bounds. Throwing here isn't an option: it would break the whole tree query.
         Rect bounds = row.BoundsOf(cell);
 
         if (bounds.IsEmpty || PresentationSource.FromVisual(row) is null)

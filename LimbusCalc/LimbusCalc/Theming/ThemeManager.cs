@@ -11,20 +11,21 @@ public enum AppTheme
 }
 
 /// <summary>
-/// Переключает тему, подменяя первый словарь ресурсов приложения.
-/// Кисти в стилях берутся через DynamicResource, поэтому окно перекрашивается сразу.
+/// Switches the theme by replacing the application's first resource dictionary.
+/// Styles take their brushes through DynamicResource, so windows repaint immediately.
 /// </summary>
 public static class ThemeManager
 {
-    /// <summary>Позиция словаря темы в App.xaml — он должен идти первым.</summary>
+    /// <summary>Position of the theme dictionary in App.xaml; it must come first.</summary>
     private const int ThemeDictionaryIndex = 0;
 
-    /// <summary>DWMWA_USE_IMMERSIVE_DARK_MODE: тёмный заголовок окна в Windows 10/11.</summary>
+    /// <summary>DWMWA_USE_IMMERSIVE_DARK_MODE: dark window title bar on Windows 10/11.</summary>
     private const int UseImmersiveDarkModeAttribute = 20;
 
-    /// <summary>Должна совпадать с темой, подключённой в App.xaml.</summary>
+    /// <summary>Must match the theme referenced in App.xaml.</summary>
     public static AppTheme Current { get; private set; } = AppSettings.DefaultTheme;
 
+    /// <summary>Switches the theme and recolors the title bars of open windows.</summary>
     public static void Apply(AppTheme theme)
     {
         Current = theme;
@@ -43,8 +44,8 @@ public static class ThemeManager
     }
 
     /// <summary>
-    /// Заголовок окна рисует система, а не WPF, поэтому его тему приходится задавать отдельно.
-    /// Вызывать только когда окно уже создано, иначе описателя ещё нет.
+    /// The title bar is drawn by the system, not WPF, so its theme is set separately.
+    /// Call only once the window has a handle.
     /// </summary>
     public static void ApplyTitleBar(Window window, AppTheme theme)
     {

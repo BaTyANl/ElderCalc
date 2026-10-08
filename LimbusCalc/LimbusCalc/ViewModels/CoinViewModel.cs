@@ -3,7 +3,7 @@ using LimbusCalc.Calculation;
 
 namespace LimbusCalc.ViewModels;
 
-/// <summary>Колонка монеты: сверху поля ввода, под чертой — посчитанные значения.</summary>
+/// <summary>A coin column: inputs on top, calculated values below the line.</summary>
 public sealed class CoinViewModel : ObservableObject
 {
     private int _number;
@@ -19,7 +19,7 @@ public sealed class CoinViewModel : ObservableObject
     private double _modStat;
     private double _damage;
 
-    /// <summary>Имена свойств, изменение которых требует пересчёта.</summary>
+    /// <summary>Names of properties whose change requires a recalculation.</summary>
     public static readonly HashSet<string> InputPropertyNames =
     [
         nameof(Active),
@@ -31,13 +31,14 @@ public sealed class CoinViewModel : ObservableObject
         nameof(Weight),
     ];
 
+    /// <summary>1-based position of the coin in the skill; shown as "Coin N".</summary>
     public int Number
     {
         get => _number;
         set => SetProperty(ref _number, value);
     }
 
-    /// <summary>Монета выпала орлом и участвует в броске.</summary>
+    /// <summary>The coin landed heads and adds its power to the roll.</summary>
     public bool Active
     {
         get => _active;
@@ -51,8 +52,8 @@ public sealed class CoinViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Динамический модификатор в процентах: 63 означает +63%, то есть множитель 1.63.
-    /// Отрицательное значение уменьшает урон: -37 даёт множитель 0.63.
+    /// Dynamic modifier in percent: 63 means +63%, a multiplier of 1.63.
+    /// A negative value lowers damage: -37 gives a multiplier of 0.63.
     /// </summary>
     public double ModDynPercent
     {
@@ -67,26 +68,26 @@ public sealed class CoinViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Значения бонусов этой монеты. Порядок соответствует строкам бонусов в таблице,
-    /// список синхронизирует <see cref="MainViewModel"/>.
+    /// This coin's bonus values. The order matches the bonus rows in the table;
+    /// <see cref="MainViewModel"/> keeps the list in sync.
     /// </summary>
     public ObservableCollection<CoinBonusViewModel> Bonuses { get; } = [];
 
-    /// <summary>По этой монете прошёл крит.</summary>
+    /// <summary>The coin crit.</summary>
     public bool HasCrit
     {
         get => _hasCrit;
         set => SetProperty(ref _hasCrit, value);
     }
 
-    /// <summary>Крит-модификатор этой монеты в процентах: 20 означает +20%.</summary>
+    /// <summary>This coin's crit modifier in percent: 20 means +20%.</summary>
     public double CritPercent
     {
         get => _critPercent;
         set => SetProperty(ref _critPercent, value);
     }
 
-    /// <summary>Вес этой монеты — по скольким целям она бьёт. Только целое.</summary>
+    /// <summary>This coin's weight — how many targets it hits. Whole numbers only.</summary>
     public int Weight
     {
         get => _weight;
@@ -99,30 +100,33 @@ public sealed class CoinViewModel : ObservableObject
         }
     }
 
-    /// <summary>Есть ли дополнительные цели: со второй и дальше.</summary>
+    /// <summary>Whether there are extra targets, from the second one on.</summary>
     public bool HasSubtargets => Weight >= 2;
 
     /// <summary>
-    /// Дополнительные цели этой монеты, начиная со второй. Список держит в согласии
-    /// с весом <see cref="MainViewModel"/>.
+    /// Extra targets of this coin, starting from the second. <see cref="MainViewModel"/>
+    /// keeps the list in line with the weight.
     /// </summary>
     public ObservableCollection<SubtargetViewModel> Subtargets { get; } = [];
 
-    /// <summary>Подписи столбцов в окне подцелей — те же элементы и в том же порядке.</summary>
+    /// <summary>Column labels in the subtargets window: the same elements in the same order.</summary>
     public IReadOnlyList<ElementOption> ResistanceHeaders => ElementOptions.ResistanceOrder;
 
+    /// <summary>Calculated roll of this coin: the previous roll plus its power when heads.</summary>
     public double Roll
     {
         get => _roll;
         private set => SetProperty(ref _roll, value);
     }
 
+    /// <summary>Calculated Mod stat for the main target.</summary>
     public double ModStat
     {
         get => _modStat;
         private set => SetProperty(ref _modStat, value);
     }
 
+    /// <summary>Calculated damage of the coin without Time Moratorium, as shown in the column.</summary>
     public double Damage
     {
         get => _damage;
@@ -130,8 +134,8 @@ public sealed class CoinViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Копия всех введённых значений. Номер не переносится: его назначает список монет.
-    /// Посчитанные Roll/ModStat/Damage тоже не копируем — они появятся при пересчёте.
+    /// A copy of all entered values. The number isn't copied: the coin list assigns it.
+    /// Calculated Roll/ModStat/Damage aren't copied either — they come with the next recalculation.
     /// </summary>
     public CoinViewModel Clone() => new()
     {
@@ -145,9 +149,9 @@ public sealed class CoinViewModel : ObservableObject
     };
 
     /// <param name="passiveModDynPercent">
-    /// Общая для всех монет надбавка к Dyn mod в процентах; складывается с собственной.
+    /// A Dyn mod bonus in percent shared by all coins; added to the coin's own.
     /// </param>
-    /// <param name="clashCount">Число клэшей — оно общее для всех монет скилла.</param>
+    /// <param name="clashCount">Number of clashes, shared by all coins of the skill.</param>
     public Coin ToModel(double passiveModDynPercent, int clashCount)
     {
         Coin coin = new()
@@ -180,11 +184,12 @@ public sealed class CoinViewModel : ObservableObject
         return coin;
     }
 
+    /// <summary>Shows the calculated values of this coin.</summary>
     public void ApplyResult(CoinBreakdown breakdown)
     {
         Roll = breakdown.Roll;
         ModStat = breakdown.ModStat;
-        // В таблице показываем урон без Time Moratorium: его прибавка учтена только в итоге.
+        // The table shows damage without Time Moratorium: its bonus counts only in the total.
         Damage = breakdown.BaseDamage;
     }
 }

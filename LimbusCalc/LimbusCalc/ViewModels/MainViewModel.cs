@@ -5,7 +5,7 @@ using LimbusCalc.Calculation;
 
 namespace LimbusCalc.ViewModels;
 
-/// <summary>Состояние главного окна: общие параметры, список монет и итог.</summary>
+/// <summary>State of the main window: shared parameters, the coin list and the total.</summary>
 public sealed class MainViewModel : ObservableObject
 {
     private double _baseRoll;
@@ -33,35 +33,36 @@ public sealed class MainViewModel : ObservableObject
     private readonly List<ResistanceViewModel> _allResistances = [];
 
     /// <summary>
-    /// Общие части подцелей по названию врага. Регистр не важен, пробелы по краям тоже:
-    /// «Boss» и «boss » — один и тот же враг.
+    /// Shared parts of subtargets by enemy name. Case and surrounding spaces don't matter:
+    /// "Boss" and "boss " are the same enemy.
     /// </summary>
     private readonly Dictionary<string, SharedTargetViewModel> _sharedTargets =
         new(StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>The skill's coins, left to right.</summary>
     public ObservableCollection<CoinViewModel> Coins { get; } = [];
 
-    /// <summary>Справочник личностей — вкладка ID. В расчёте пока не участвует.</summary>
+    /// <summary>The ID reference table (the ID tab).</summary>
     public TableViewModel IdTable { get; } = TableViewModel.CreateIdTable();
 
-    /// <summary>Справочник E.G.O. — одноимённая вкладка.</summary>
+    /// <summary>The E.G.O. reference table (the E.G.O. tab).</summary>
     public TableViewModel EgoTable { get; } = TableViewModel.CreateEgoTable();
 
-    /// <summary>Строки бонусов: вид и цель общие для всех монет, значения — свои у каждой.</summary>
+    /// <summary>Bonus rows: kind and target are shared by all coins, values are per coin.</summary>
     public ObservableCollection<BonusRowViewModel> BonusRows { get; } = [];
 
-    /// <summary>Сопротивления к типам урона — три в ряд.</summary>
+    /// <summary>Resistances to damage types, three in a row.</summary>
     public IReadOnlyList<ResistanceViewModel> TypeResistances { get; }
 
-    /// <summary>Верхний ряд сопротивлений к грехам: три штуки.</summary>
+    /// <summary>Top row of sin resistances: three of them.</summary>
     public IReadOnlyList<ResistanceViewModel> SinResistancesTop { get; }
 
-    /// <summary>Нижний ряд сопротивлений к грехам: четыре штуки.</summary>
+    /// <summary>Bottom row of sin resistances: four of them.</summary>
     public IReadOnlyList<ResistanceViewModel> SinResistancesBottom { get; }
 
     public MainViewModel()
     {
-        // Порядок как в игре: типы slash-pierce-blunt, грехи трапецией 3 + 4.
+        // Same order as in the game: Slash-Pierce-Blunt, then sins as a 3 + 4 trapezoid.
         TypeResistances = CreateResistances(Element.Slash, Element.Pierce, Element.Blunt);
         SinResistancesTop = CreateResistances(Element.Wrath, Element.Lust, Element.Sloth);
         SinResistancesBottom = CreateResistances(
@@ -79,7 +80,7 @@ public sealed class MainViewModel : ObservableObject
 
     public IReadOnlyList<ElementOption> SinOptions => ElementOptions.Sins;
 
-    /// <summary>"Base roll": бросок до прибавок монет.</summary>
+    /// <summary>"Base roll": the roll before coin power is added.</summary>
     public double BaseRoll
     {
         get => _baseRoll;
@@ -92,7 +93,7 @@ public sealed class MainViewModel : ObservableObject
         }
     }
 
-    /// <summary>Надбавка к Dyn mod в процентах, общая для всех монет.</summary>
+    /// <summary>A Dyn mod bonus in percent shared by all coins.</summary>
     public double PassiveModDynPercent
     {
         get => _passiveModDynPercent;
@@ -105,7 +106,7 @@ public sealed class MainViewModel : ObservableObject
         }
     }
 
-    /// <summary>Тип урона навыка. В расчёте пока не участвует — ждёт сопротивлений.</summary>
+    /// <summary>Damage type of the skill; the target's resistance to it affects Mod stat.</summary>
     public ElementOption SkillType
     {
         get => _skillType;
@@ -118,7 +119,7 @@ public sealed class MainViewModel : ObservableObject
         }
     }
 
-    /// <summary>Грех навыка. В расчёте пока не участвует — ждёт сопротивлений.</summary>
+    /// <summary>Sin of the skill; the target's resistance to it affects Mod stat.</summary>
     public ElementOption SkillSin
     {
         get => _skillSin;
@@ -131,7 +132,7 @@ public sealed class MainViewModel : ObservableObject
         }
     }
 
-    /// <summary>Число клэшей — общее для всех монет скилла, каждый даёт 3% к Mod stat.</summary>
+    /// <summary>Number of clashes, shared by all coins of the skill; each adds 3% to Mod stat.</summary>
     public int ClashCount
     {
         get => _clashCount;
@@ -144,7 +145,7 @@ public sealed class MainViewModel : ObservableObject
         }
     }
 
-    /// <summary>Time Moratorium включён: урон растёт за стаки и становится sloth-уроном.</summary>
+    /// <summary>Time Moratorium is on: damage grows per stack and becomes Sloth damage.</summary>
     public bool TimeMoratorium
     {
         get => _timeMoratorium;
@@ -157,7 +158,7 @@ public sealed class MainViewModel : ObservableObject
         }
     }
 
-    /// <summary>Число стаков; допустимы только 1 и 2, всё прочее подтягивается к границе.</summary>
+    /// <summary>Number of stacks; only 1 and 2 are allowed, anything else snaps to the limit.</summary>
     public int TimeMoratoriumStacks
     {
         get => _timeMoratoriumStacks;
@@ -173,19 +174,20 @@ public sealed class MainViewModel : ObservableObject
             }
             else if (value != clamped)
             {
-                // Значение уже на границе, но ввели за её пределами — вернём поле к границе.
+                // Already at the limit but the input went past it: snap the field back.
                 OnPropertyChanged();
             }
         }
     }
 
+    /// <summary>The skill's total damage including Time Moratorium.</summary>
     public double Total
     {
         get => _total;
         private set => SetProperty(ref _total, value);
     }
 
-    /// <summary>Итог без Time Moratorium — левая часть равенства в строке итога.</summary>
+    /// <summary>The total without Time Moratorium: the left side of the equation in the total row.</summary>
     public double TotalBase
     {
         get => _totalBase;
@@ -193,9 +195,9 @@ public sealed class MainViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Красное число в строке итога. Когда показываем равенство, это его левая часть,
-    /// то есть урон до моратория. Когда равенства нет — сразу настоящий итог,
-    /// иначе прибавка моратория потерялась бы с экрана.
+    /// The red number in the total row. With the equation shown it's the left side, i.e. the
+    /// damage before the moratorium. Without the equation it's the real total, otherwise
+    /// the moratorium bonus would vanish from the screen.
     /// </summary>
     public double TotalLeading
     {
@@ -204,11 +206,11 @@ public sealed class MainViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Множитель Time Moratorium: прибавка за стаки на сопротивление основной цели к sloth.
-    /// Берётся по формуле, а не как отношение итогов — иначе округление урона вниз
-    /// искажало бы его на мелких числах (5 превращается в 11, и выходит 2.2 вместо 2.3).
-    /// Если у основной цели моратория нет, а у подцелей есть, единого множителя из
-    /// формулы не существует — тогда показываем фактическое отношение итогов.
+    /// The Time Moratorium multiplier: the per-stack bonus times the main target's Sloth
+    /// resistance. Taken from the formula rather than as a ratio of totals, because flooring
+    /// distorts small numbers (5 becomes 11, giving 2.2 instead of 2.3).
+    /// If the main target has no moratorium but subtargets do, the formula has no single
+    /// multiplier, so the actual ratio of totals is shown instead.
     /// </summary>
     public double MoratoriumBuff
     {
@@ -217,9 +219,8 @@ public sealed class MainViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Показывать ли равенство в строке итога. Опираемся на то, что мораторий
-    /// действительно изменил урон, а не только на общий флажок: он может быть выключен,
-    /// а у подцели включён.
+    /// Whether the total row shows the equation. Based on the moratorium actually changing
+    /// the damage, not just on the shared checkbox: it may be off while a subtarget has it on.
     /// </summary>
     public bool ShowMoratoriumEquation
     {
@@ -227,28 +228,28 @@ public sealed class MainViewModel : ObservableObject
         private set => SetProperty(ref _showMoratoriumEquation, value);
     }
 
-    /// <summary>Распределение урона по целям — таблица в отдельном окне.</summary>
+    /// <summary>Damage split by target — the table in a separate window.</summary>
     public IReadOnlyList<TargetDamageRow> DamageByTarget
     {
         get => _damageByTarget;
         private set => SetProperty(ref _damageByTarget, value);
     }
 
-    /// <summary>Столбцы монет в таблице распределения — они же кнопки сортировки.</summary>
+    /// <summary>Coin columns of the damage-by-target table; they double as sort buttons.</summary>
     public IReadOnlyList<TargetColumnViewModel> CoinColumns
     {
         get => _coinColumns;
         private set => SetProperty(ref _coinColumns, value);
     }
 
-    /// <summary>Столбец с названиями целей: сортирует по алфавиту.</summary>
+    /// <summary>The target name column: sorts alphabetically.</summary>
     public TargetColumnViewModel TitleColumn
     {
         get => _titleColumn;
         private set => SetProperty(ref _titleColumn, value);
     }
 
-    /// <summary>Столбец итога по цели: сортирует по урону.</summary>
+    /// <summary>The per-target total column: sorts by damage.</summary>
     public TargetColumnViewModel TotalColumn
     {
         get => _totalColumn;
@@ -256,9 +257,9 @@ public sealed class MainViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Отсортировать таблицу распределения по этому столбцу. Тот же столбец второй раз
-    /// переворачивает порядок. Урон начинаем с большего — интересен обычно он,
-    /// а названия с начала алфавита.
+    /// Sorts the damage-by-target table by this column. Clicking the same column again
+    /// reverses the order. Damage starts from the highest — that's usually what matters —
+    /// and names from the start of the alphabet.
     /// </summary>
     public void SortDamageByTarget(TargetColumnViewModel column)
     {
@@ -278,7 +279,7 @@ public sealed class MainViewModel : ObservableObject
         Recalculate();
     }
 
-    /// <summary>Есть ли вообще что распределять: хоть у одной монеты больше одной цели.</summary>
+    /// <summary>Whether there's anything to split: at least one coin hits more than one target.</summary>
     public bool HasMultipleTargets
     {
         get => _hasMultipleTargets;
@@ -286,27 +287,27 @@ public sealed class MainViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Новая монета повторяет предыдущую: у монет одного скилла параметры обычно совпадают,
-    /// и перенабирать их заново незачем. Первая монета создаётся с нулями.
+    /// A new coin copies the previous one: coins of one skill usually share parameters,
+    /// and retyping them is pointless. The first coin starts with zeros.
     /// </summary>
     public void AddCoin()
     {
         CoinViewModel? source = Coins.Count > 0 ? Coins[^1] : null;
         CoinViewModel coin = source?.Clone() ?? new CoinViewModel();
 
-        // Строки бонусов общие, поэтому у новой монеты должно быть столько же значений.
+        // Bonus rows are shared, so the new coin needs as many values.
         for (int i = 0; i < BonusRows.Count; i++)
         {
             double value = source is not null && i < source.Bonuses.Count ? source.Bonuses[i].Value : 0.0;
             coin.Bonuses.Add(CreateBonusValue(BonusRows[i], value));
         }
 
-        // Вес скопирован, поэтому подцелей столько же; переносим и их настройки —
-        // у монет одного скилла цели, как правило, те же самые.
+        // The weight was copied, so there are as many subtargets; their settings come along
+        // too — coins of one skill usually hit the same targets.
         SyncSubtargets(coin);
 
-        // Монета в списке до переноса названий: по списку считается, держит ли группу
-        // кто-то ещё, и новая монета должна попасть в этот подсчёт.
+        // Add the coin to the list before copying names: the list is used to count who else
+        // holds a group, and the new coin must be part of that count.
         Coins.Add(coin);
 
         if (source is not null)
@@ -328,7 +329,7 @@ public sealed class MainViewModel : ObservableObject
         }
     }
 
-    /// <summary>Добавляет строку бонуса и по нулевому значению каждой монете.</summary>
+    /// <summary>Adds a bonus row with a zero value for every coin.</summary>
     public void AddBonus(BonusKind kind)
     {
         BonusRowViewModel row = new() { Kind = kind };
@@ -343,6 +344,7 @@ public sealed class MainViewModel : ObservableObject
         Recalculate();
     }
 
+    /// <summary>Removes a bonus row together with its value on every coin.</summary>
     public void RemoveBonus(BonusRowViewModel row)
     {
         int index = BonusRows.IndexOf(row);
@@ -367,6 +369,10 @@ public sealed class MainViewModel : ObservableObject
         Recalculate();
     }
 
+    /// <summary>
+    /// Builds the calculation input from the current state and updates every result:
+    /// per-coin values, totals, the moratorium equation and the damage-by-target table.
+    /// </summary>
     public void Recalculate()
     {
         Skill skill = new()
@@ -394,7 +400,7 @@ public sealed class MainViewModel : ObservableObject
             input.Resistances[resistance.Option.Element] = resistance.Value;
         }
 
-        // Сопротивления подцелей уже перенесены внутри ToModel каждой монеты.
+        // Subtarget resistances are already carried over inside each coin's ToModel.
 
         DamageResult result = DamageCalculator.Calculate(input);
 
@@ -415,8 +421,8 @@ public sealed class MainViewModel : ObservableObject
 
         HasMultipleTargets = DamageByTarget.Count > 1;
 
-        // При нескольких целях разбор моратория живёт в окне распределения,
-        // а в главном окне остаётся просто итог. При одной цели показать его негде.
+        // With several targets the moratorium breakdown lives in the damage-by-target window,
+        // and the main window shows just the total. With one target there's nowhere else to show it.
         ShowMoratoriumEquation = result.Total != result.TotalBase && !HasMultipleTargets;
         TotalLeading = ShowMoratoriumEquation ? result.TotalBase : result.Total;
 
@@ -426,7 +432,7 @@ public sealed class MainViewModel : ObservableObject
             : result.TotalBase != 0.0 ? result.Total / result.TotalBase : 1.0;
     }
 
-    /// <summary>Пересобирает заголовки таблицы: подписи монет и стрелку сортировки.</summary>
+    /// <summary>Rebuilds the table headers: coin labels and the sort arrow.</summary>
     private void UpdateColumns()
     {
         TitleColumn = CreateColumn("Target", TargetSortKey.Title, -1);
@@ -452,8 +458,8 @@ public sealed class MainViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Названия подцелей по монетам для таблицы распределения: строка там — это враг,
-    /// поэтому важно, как именно каждая монета зовёт цель с каждой позиции.
+    /// Subtarget names per coin for the damage-by-target table: a row there is an enemy,
+    /// so what each coin calls the target at each position matters.
     /// </summary>
     private IReadOnlyList<IReadOnlyList<string>> SubtargetTitles()
     {
@@ -516,8 +522,8 @@ public sealed class MainViewModel : ObservableObject
 
     private void OnCoinPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        // Пересчитываем только по правкам пользователя: свойства с результатами
-        // меняем мы сами внутри Recalculate, и реакция на них зациклила бы расчёт.
+        // Recalculate only on user edits: Recalculate itself sets the result properties,
+        // and reacting to them would loop the calculation.
         if (e.PropertyName is null || !CoinViewModel.InputPropertyNames.Contains(e.PropertyName))
         {
             return;
@@ -532,8 +538,8 @@ public sealed class MainViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Приводит список дополнительных целей монеты в согласие с её весом.
-    /// Новые цели заводятся с сопротивлениями основной — их потом можно поправить.
+    /// Brings a coin's extra targets in line with its weight.
+    /// New targets start with the main target's resistances and can be edited afterwards.
     /// </summary>
     private void SyncSubtargets(CoinViewModel coin)
     {
@@ -541,8 +547,8 @@ public sealed class MainViewModel : ObservableObject
 
         while (coin.Subtargets.Count > needed)
         {
-            // Отписываем только собственные свойства подцели: общая часть переживает
-            // монету и достаётся следующей, чтобы настройки врага не терялись.
+            // Unsubscribe only the subtarget's own properties: the shared part outlives the
+            // coin and goes to the next one, so the enemy's settings aren't lost.
             coin.Subtargets[^1].PropertyChanged -= OnResistanceChanged;
             coin.Subtargets.RemoveAt(coin.Subtargets.Count - 1);
         }
@@ -554,8 +560,8 @@ public sealed class MainViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Переносит подцель на новую монету. Название копируем первым: по нему подцель
-    /// попадает в ту же группу врага, а с группой приезжают сопротивления и мораторий.
+    /// Moves a subtarget to a new coin. The name is copied first: it puts the subtarget into
+    /// the same enemy group, and the group brings resistances and the moratorium along.
     /// </summary>
     private static void CopySubtarget(SubtargetViewModel from, SubtargetViewModel to)
     {
@@ -566,10 +572,10 @@ public sealed class MainViewModel : ObservableObject
         to.CritPercent = from.CritPercent;
     }
 
-    /// <summary>Новая подцель повторяет основную: и сопротивления, и модификаторы монеты.</summary>
+    /// <summary>A new subtarget copies the main target: both the resistances and the coin's modifiers.</summary>
     private SubtargetViewModel CreateSubtarget(CoinViewModel coin, int number)
     {
-        // По умолчанию — всё как у основной цели этой монеты; к ним же возвращает сброс.
+        // By default everything matches this coin's main target; a reset returns to these values.
         MainTargetParameters defaults = MainParametersOf(coin);
 
         SubtargetViewModel subtarget = new()
@@ -592,10 +598,10 @@ public sealed class MainViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Куда переехать подцели после переименования. Есть группа с таким названием —
-    /// подключаемся к ней, и сопротивления с мораторием подтягиваются оттуда сразу же.
-    /// Названия ещё нет: если группу больше никто не держит, переносим её под новое
-    /// название целиком, иначе отделяемся от соседей копией — их настройки не наши.
+    /// Where a subtarget goes after being renamed. If a group with that name exists, it joins
+    /// it and takes its resistances and moratorium right away. If the name is new: when nobody
+    /// else holds the current group, the whole group moves under the new name; otherwise the
+    /// subtarget splits off with a copy — the neighbors' settings aren't its own.
     /// </summary>
     private SharedTargetViewModel ResolveShared(SubtargetViewModel subtarget)
     {
@@ -617,14 +623,14 @@ public sealed class MainViewModel : ObservableObject
             return SharedTargetFor(key, current);
         }
 
-        // Ту же группу под другим ключом: набранные значения остаются, а старое
-        // название освобождается — иначе при наборе по букве копились бы огрызки.
+        // The same group under a different key: the entered values stay and the old name is
+        // freed — otherwise typing letter by letter would leave stubs behind.
         Forget(current);
         _sharedTargets.Add(key, current);
         return current;
     }
 
-    /// <summary>Убирает название, за которым больше не стоит ни одна подцель.</summary>
+    /// <summary>Removes a name that no subtarget uses any more.</summary>
     private void Forget(SharedTargetViewModel shared)
     {
         foreach (KeyValuePair<string, SharedTargetViewModel> pair in _sharedTargets)
@@ -637,7 +643,7 @@ public sealed class MainViewModel : ObservableObject
         }
     }
 
-    /// <summary>Держит ли эту группу кто-то ещё, кроме самой подцели.</summary>
+    /// <summary>Whether anyone besides this subtarget holds the group.</summary>
     private bool IsSoleOwner(SubtargetViewModel subtarget, SharedTargetViewModel shared)
     {
         foreach (CoinViewModel coin in Coins)
@@ -655,14 +661,14 @@ public sealed class MainViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Общая часть подцели с этим названием: заводится один раз и достаётся всем монетам,
-    /// где такое название вписано. Поэтому правка сопротивлений или моратория у одной
-    /// монеты видна у остальных, а подцели с разными названиями друг друга не задевают.
-    /// При уменьшении веса группу не выбрасываем: вернёшь вес — настройки врага на месте.
+    /// The shared part of the subtarget with this name: created once and given to every coin
+    /// where the name is entered. So editing resistances or the moratorium on one coin shows
+    /// on the others, while subtargets with different names don't affect each other.
+    /// Lowering the weight doesn't drop the group: restore the weight and the enemy's settings are back.
     /// </summary>
     /// <param name="template">
-    /// Откуда взять значения, если группы ещё нет. При переименовании это прежняя группа
-    /// подцели: имя поменяли, а набранные сопротивления терять незачем.
+    /// Where to take the values if the group doesn't exist yet. On rename it's the subtarget's
+    /// previous group: the name changed, but the entered resistances shouldn't be lost.
     /// </param>
     private SharedTargetViewModel SharedTargetFor(string name, SharedTargetViewModel? template)
     {
@@ -702,8 +708,8 @@ public sealed class MainViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Текущие значения основной цели. Читаем их при каждом обращении, а не запоминаем:
-    /// сброс должен подтягивать то, что стоит сейчас, а не то, что было при создании.
+    /// The main target's current values. Read on every call rather than cached: a reset must
+    /// pick up what's set now, not what was set when the subtarget was created.
     /// </summary>
     private MainTargetParameters MainParametersOf(CoinViewModel coin) => new(
         coin.ModDynPercent,

@@ -8,11 +8,11 @@ using LimbusCalc.ViewModels;
 namespace LimbusCalc.Storage;
 
 /// <summary>
-/// Р§С‚РµРЅРёРµ Рё Р·Р°РїРёСЃСЊ С‚Р°Р±Р»РёС†С‹ РІ .xlsx. Р¤РѕСЂРјР°С‚ СЃРѕР±РёСЂР°РµС‚СЃСЏ РІСЂСѓС‡РЅСѓСЋ, Р±РµР· СЃС‚РѕСЂРѕРЅРЅРёС… Р±РёР±Р»РёРѕС‚РµРє:
-/// РЅСѓР¶РЅР° СЂРѕРІРЅРѕ РѕРґРЅР° СЃС‚СЂР°РЅРёС†Р° СЃ С€Р°РїРєРѕР№ Рё СЃС‚СЂРѕРєР°РјРё, Р° С‚СЏРЅСѓС‚СЊ СЂР°РґРё СЌС‚РѕРіРѕ РїР°РєРµС‚ РЅР° РґРµСЃСЏС‚РѕРє
-/// РјРµРіР°Р±Р°Р№С‚ РІ РµРґРёРЅС‹Р№ exe РЅРµР·Р°С‡РµРј.
-/// РЎС‚СЂРѕРєРё РїРёС€СѓС‚СЃСЏ РІСЃС‚СЂРѕРµРЅРЅС‹РјРё (inlineStr), РїРѕСЌС‚РѕРјСѓ РѕС‚РґРµР»СЊРЅР°СЏ С‚Р°Р±Р»РёС†Р° СЃС‚СЂРѕРє РЅРµ РЅСѓР¶РЅР°;
-/// РїСЂРё С‡С‚РµРЅРёРё РѕР±С‰Р°СЏ С‚Р°Р±Р»РёС†Р° СЃС‚СЂРѕРє РІСЃС‘ СЂР°РІРЅРѕ РїРѕРґРґРµСЂР¶РёРІР°РµС‚СЃСЏ вЂ” РµС‘ РєР»Р°РґСѓС‚ Excel Рё Google Sheets.
+/// Reads and writes a table as .xlsx. The format is assembled by hand, without third-party
+/// libraries: exactly one sheet with a header and rows is needed, and bundling a package of
+/// a dozen megabytes into the single exe for that isn't worth it.
+/// Strings are written inline (inlineStr), so no shared string table is needed; reading
+/// still supports the shared string table, since Excel and Google Sheets produce one.
 /// </summary>
 public static class ExcelFile
 {
@@ -23,8 +23,8 @@ public static class ExcelFile
         "http://schemas.openxmlformats.org/package/2006/relationships";
 
     /// <summary>
-    /// РћСЃРЅРѕРІР° С‚РёРїРѕРІ СЃРІСЏР·РµР№. Р”РµСЂР¶РёРј РµС‘ СЃС‚СЂРѕРєРѕР№: Р·РЅР°С‡РµРЅРёРµ Р°С‚СЂРёР±СѓС‚Р° Type вЂ” СЌС‚Рѕ Р°РґСЂРµСЃ С†РµР»РёРєРѕРј,
-    /// Р° РЅРµ РёРјСЏ РІ РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІРµ РёРјС‘РЅ, Рё СЃРєР»РµР№РєР° С‡РµСЂРµР· XNamespace РґР°Р»Р° Р±С‹ В«{...}officeDocumentВ».
+    /// The base of relationship types. Kept as a string: the Type attribute holds the whole
+    /// address rather than a namespaced name, and XNamespace would produce "{...}officeDocument".
     /// </summary>
     private const string RelationBase =
         "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
@@ -34,7 +34,7 @@ public static class ExcelFile
     private static readonly XNamespace ContentTypes =
         "http://schemas.openxmlformats.org/package/2006/content-types";
 
-    /// <summary>Р’С‹РіСЂСѓР¶Р°РµС‚ С‚Р°Р±Р»РёС†Сѓ: РїРµСЂРІР°СЏ СЃС‚СЂРѕРєР° вЂ” РЅР°Р·РІР°РЅРёСЏ СЃС‚РѕР»Р±С†РѕРІ, РґР°Р»СЊС€Рµ РґР°РЅРЅС‹Рµ.</summary>
+    /// <summary>Exports the table: the first row holds column titles, then the data.</summary>
     public static void Write(TableViewModel table, string path)
     {
         ArgumentNullException.ThrowIfNull(table);
@@ -98,10 +98,10 @@ public static class ExcelFile
     }
 
     /// <summary>
-    /// Р§РёС‚Р°РµС‚ С‚Р°Р±Р»РёС†Сѓ РёР· РєРЅРёРіРё. РљР»РµС‚РєРё СЂР°СЃРєР»Р°РґС‹РІР°СЋС‚СЃСЏ РїРѕ РЅР°Р·РІР°РЅРёСЏРј СЃС‚РѕР»Р±С†РѕРІ РёР· РїРµСЂРІРѕР№
-    /// СЃС‚СЂРѕРєРё, РїРѕСЌС‚РѕРјСѓ РїРѕСЂСЏРґРѕРє СЃС‚РѕР»Р±С†РѕРІ РІ С„Р°Р№Р»Рµ Р·РЅР°С‡РµРЅРёСЏ РЅРµ РёРјРµРµС‚, Р° Р»РёС€РЅРёРµ РїСЂРѕРїСѓСЃРєР°СЋС‚СЃСЏ.
+    /// Reads a table from a workbook. Cells are matched by the column titles in the first
+    /// row, so the column order in the file doesn't matter and unknown columns are skipped.
     /// </summary>
-    public static void Read(TableViewModel table, string path)
+    public static void Read(TableViewModel table, string path, bool append = false)
     {
         ArgumentNullException.ThrowIfNull(table);
 
@@ -110,7 +110,7 @@ public static class ExcelFile
         ZipArchiveEntry sheet = zip.Entries.FirstOrDefault(entry =>
             entry.FullName.StartsWith("xl/worksheets/", StringComparison.OrdinalIgnoreCase)
             && entry.FullName.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
-            ?? throw new InvalidDataException("Р’ РєРЅРёРіРµ РЅРµС‚ РЅРё РѕРґРЅРѕР№ СЃС‚СЂР°РЅРёС†С‹.");
+            ?? throw new InvalidDataException("The workbook has no sheets.");
 
         string[] shared = ReadSharedStrings(zip);
 
@@ -129,14 +129,17 @@ public static class ExcelFile
 
         string[] headers = rows[0];
 
-        // Пакетом: пересчитывать фильтр и средние после каждой клетки незачем.
+        // In bulk: there's no point recalculating filters and averages after every cell.
         using IDisposable bulk = table.BeginBulkChange();
 
-        table.Clear();
+        if (!append)
+        {
+            table.Clear();
+        }
 
         foreach (string[] values in rows.Skip(1))
         {
-            // РџСѓСЃС‚С‹Рµ СЃС‚СЂРѕРєРё РёР· С…РІРѕСЃС‚Р° Р»РёСЃС‚Р° РІ С‚Р°Р±Р»РёС†Сѓ РЅРµ РїРµСЂРµРЅРѕСЃРёРј.
+            // Empty rows at the end of the sheet are not carried into the table.
             if (values.All(string.IsNullOrWhiteSpace))
             {
                 continue;
@@ -266,7 +269,7 @@ public static class ExcelFile
         content.Save(writer);
     }
 
-    /// <summary>РќРѕР»СЊ вЂ” СЌС‚Рѕ СЃС‚РѕР»Р±РµС† A, 26 вЂ” AA.</summary>
+    /// <summary>Zero is column A, 26 is AA.</summary>
     private static string ColumnName(int index)
     {
         string name = string.Empty;
@@ -279,7 +282,7 @@ public static class ExcelFile
         return name;
     }
 
-    /// <summary>РќРѕРјРµСЂ СЃС‚РѕР»Р±С†Р° РёР· СЃСЃС‹Р»РєРё РІРёРґР° "B12"; -1, РµСЃР»Рё СЃСЃС‹Р»РєРё РЅРµС‚.</summary>
+    /// <summary>Column index from a reference like "B12"; -1 if there's none.</summary>
     private static int ColumnIndex(string reference)
     {
         int index = 0;
@@ -299,7 +302,7 @@ public static class ExcelFile
         return letters == 0 ? -1 : index - 1;
     }
 
-    /// <summary>РќР°Р·РІР°РЅРёРµ СЃС‚СЂР°РЅРёС†С‹: Excel РЅРµ РїСѓСЃРєР°РµС‚ С‡Р°СЃС‚СЊ Р·РЅР°РєРѕРІ Рё РґР»РёРЅСѓ Р±РѕР»СЊС€Рµ 31.</summary>
+    /// <summary>Sheet name: Excel rejects some characters and anything longer than 31.</summary>
     private static string SheetName(string title)
     {
         string cleaned = new([.. title.Where(symbol => !"\\/?*[]:".Contains(symbol))]);
