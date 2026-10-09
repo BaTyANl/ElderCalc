@@ -1,0 +1,1797 @@
+[
+  {
+    "Danger Level": "WAW",
+    "Sinner": "Faust",
+    "Type": "Awakening",
+    "Name": "Boucher un trou",
+    "Sin Cost": 2,
+    "1T Damage": {
+      "damage": 237,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 12,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "coins": [
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 200,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 200,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 200,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 200,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 200,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 1
+          }
+        ]
+      }
+    },
+    "3T Damage": {
+      "damage": 663,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 12,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "coins": [
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 180,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 180,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 180,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 180,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 180,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 180,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 180,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 180,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 180,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 180,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 180,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 180,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 180,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 180,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 180,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              }
+            ]
+          }
+        ],
+        "targets": [
+          {
+            "name": "Subtarget 2",
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 3",
+            "timeMoratoriumStacks": 1
+          }
+        ]
+      }
+    },
+    "7T Damage": {
+      "damage": 861,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 16,
+        "passiveModDynPercent": 12,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "coins": [
+          {
+            "power": -3,
+            "modDynPercent": 75,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 7,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 4",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 5",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 6",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 7",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              }
+            ]
+          },
+          {
+            "power": -3,
+            "modDynPercent": 75,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 7,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 4",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 5",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 6",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 7",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              }
+            ]
+          },
+          {
+            "power": -3,
+            "modDynPercent": 75,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 7,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 4",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 5",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 6",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 7",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              }
+            ]
+          }
+        ],
+        "targets": [
+          {
+            "name": "Subtarget 2",
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 3",
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 4",
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 5",
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 6",
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 7",
+            "timeMoratoriumStacks": 1
+          }
+        ]
+      }
+    },
+    "Max Damage": {
+      "damage": 1470,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 6,
+        "passiveModDynPercent": 12,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "coins": [
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 140,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 7,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 4",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 5",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 6",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 7",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 140,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 7,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 4",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 5",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 6",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 7",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 140,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 7,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 4",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 5",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 6",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 7",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 140,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 7,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 4",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 5",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 6",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 7",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 140,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 7,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 4",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 5",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 6",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 7",
+                "modDynPercent": 140,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "Danger Level": "WAW",
+    "Sinner": "Faust",
+    "Type": "Corrosion",
+    "Name": "Hollow",
+    "Sin Cost": 2,
+    "1T Damage": {
+      "damage": 123,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 16,
+        "passiveModDynPercent": 12,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "coins": [
+          {
+            "power": -3,
+            "modDynPercent": 75,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 1
+          },
+          {
+            "power": -3,
+            "modDynPercent": 75,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 1
+          },
+          {
+            "power": -3,
+            "modDynPercent": 75,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 1
+          }
+        ]
+      }
+    },
+    "3T Damage": {
+      "damage": 369,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 16,
+        "passiveModDynPercent": 12,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "coins": [
+          {
+            "power": -3,
+            "modDynPercent": 75,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              }
+            ]
+          },
+          {
+            "power": -3,
+            "modDynPercent": 75,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              }
+            ]
+          },
+          {
+            "power": -3,
+            "modDynPercent": 75,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              }
+            ]
+          }
+        ],
+        "targets": [
+          {
+            "name": "Subtarget 2",
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 3",
+            "timeMoratoriumStacks": 1
+          }
+        ]
+      }
+    },
+    "7T Damage": {
+      "damage": 924,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 17,
+        "passiveModDynPercent": 12,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "coins": [
+          {
+            "power": -3,
+            "modDynPercent": 75,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 7,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 4",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 5",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 6",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 7",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              }
+            ]
+          },
+          {
+            "power": -3,
+            "modDynPercent": 75,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 7,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 4",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 5",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 6",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 7",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              }
+            ]
+          },
+          {
+            "power": -3,
+            "modDynPercent": 75,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 7,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 4",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 5",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 6",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 7",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Max Damage": {
+      "damage": 924,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 17,
+        "passiveModDynPercent": 12,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "coins": [
+          {
+            "power": -3,
+            "modDynPercent": 75,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 7,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 4",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 5",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 6",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 7",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              }
+            ]
+          },
+          {
+            "power": -3,
+            "modDynPercent": 75,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 7,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 4",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 5",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 6",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 7",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              }
+            ]
+          },
+          {
+            "power": -3,
+            "modDynPercent": 75,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 7,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 4",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 5",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 6",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 7",
+                "modDynPercent": 75,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "Danger Level": "WAW",
+    "Sinner": "Meursault",
+    "Type": "Awakening",
+    "Name": "Hollow",
+    "Sin Cost": 0,
+    "1T Damage": {
+      "damage": 387,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 12,
+        "passiveModDynPercent": 12,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "coins": [
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 220,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "critPercent": 120,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 12,
+            "modDynPercent": 160,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 1
+          }
+        ]
+      }
+    },
+    "3T Damage": {
+      "damage": 635,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 12,
+        "passiveModDynPercent": 12,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "coins": [
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 220,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "critPercent": 120,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 12,
+            "modDynPercent": 160,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 150,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 150,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              }
+            ]
+          }
+        ],
+        "targets": [
+          {
+            "name": "Subtarget 2",
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 3",
+            "timeMoratoriumStacks": 1
+          }
+        ]
+      }
+    },
+    "7T Damage": {
+      "damage": 892,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 12,
+        "passiveModDynPercent": 12,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "coins": [
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 220,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "critPercent": 120,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 12,
+            "modDynPercent": 60,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 7,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 150,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 150,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 4",
+                "modDynPercent": 50,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 5",
+                "modDynPercent": 50,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 6",
+                "modDynPercent": 50,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 7",
+                "modDynPercent": 50,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              }
+            ]
+          }
+        ],
+        "targets": [
+          {
+            "name": "Subtarget 2",
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 3",
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 4",
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 5",
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 6",
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 7",
+            "timeMoratoriumStacks": 1
+          }
+        ]
+      }
+    },
+    "Max Damage": {
+      "damage": 1257,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 15,
+        "passiveModDynPercent": 12,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "coins": [
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 220,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "critPercent": 120
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true
+          },
+          {
+            "active": true,
+            "power": 2,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true
+          },
+          {
+            "active": true,
+            "power": 12,
+            "modDynPercent": 160,
+            "offenseDefenseDiff": 6,
+            "hasCrit": true,
+            "weight": 7,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 150,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 150,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 4",
+                "modDynPercent": 150,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 5",
+                "modDynPercent": 150,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 6",
+                "modDynPercent": 150,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 7",
+                "modDynPercent": 150,
+                "offenseDefenseDiff": 6,
+                "hasCrit": true
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "Danger Level": "WAW",
+    "Sinner": "Meursault",
+    "Type": "Corrosion",
+    "Name": "Hollow",
+    "Sin Cost": 0,
+    "1T Damage": {
+      "damage": 290,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 21,
+        "passiveModDynPercent": 12,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "bonuses": [
+          {
+            "kind": "Percent",
+            "target": "Pierce",
+            "values": [
+              0,
+              20
+            ]
+          }
+        ],
+        "coins": [
+          {
+            "power": -2,
+            "modDynPercent": 200,
+            "offenseDefenseDiff": 8,
+            "hasCrit": true,
+            "weight": 1
+          },
+          {
+            "power": -2,
+            "modDynPercent": 430,
+            "offenseDefenseDiff": 8,
+            "hasCrit": true,
+            "weight": 1
+          }
+        ]
+      }
+    },
+    "3T Damage": {
+      "damage": 870,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 21,
+        "passiveModDynPercent": 12,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "bonuses": [
+          {
+            "kind": "Percent",
+            "target": "Pierce",
+            "values": [
+              0,
+              20
+            ]
+          }
+        ],
+        "coins": [
+          {
+            "power": -2,
+            "modDynPercent": 200,
+            "offenseDefenseDiff": 8,
+            "hasCrit": true,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 200,
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 200,
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              }
+            ]
+          },
+          {
+            "power": -2,
+            "modDynPercent": 430,
+            "offenseDefenseDiff": 8,
+            "hasCrit": true,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 430,
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 430,
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              }
+            ]
+          }
+        ],
+        "targets": [
+          {
+            "name": "Subtarget 2",
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 3",
+            "timeMoratoriumStacks": 1
+          }
+        ]
+      }
+    },
+    "7T Damage": {
+      "damage": 1092,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 21,
+        "passiveModDynPercent": 12,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "bonuses": [
+          {
+            "kind": "Percent",
+            "target": "Pierce",
+            "values": [
+              0,
+              20
+            ]
+          }
+        ],
+        "coins": [
+          {
+            "power": -2,
+            "offenseDefenseDiff": 8,
+            "hasCrit": true,
+            "weight": 7,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 4",
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 5",
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 6",
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 7",
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              }
+            ]
+          },
+          {
+            "power": -2,
+            "modDynPercent": 230,
+            "offenseDefenseDiff": 8,
+            "hasCrit": true,
+            "weight": 7,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 230,
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 230,
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 4",
+                "modDynPercent": 230,
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 5",
+                "modDynPercent": 230,
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 6",
+                "modDynPercent": 230,
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 7",
+                "modDynPercent": 230,
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              }
+            ]
+          }
+        ],
+        "targets": [
+          {
+            "name": "Subtarget 2",
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 3",
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 4",
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 5",
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 6",
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 7",
+            "timeMoratoriumStacks": 1
+          }
+        ]
+      }
+    },
+    "Max Damage": {
+      "damage": 2324,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 24,
+        "passiveModDynPercent": 12,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "bonuses": [
+          {
+            "kind": "Percent",
+            "target": "Pierce",
+            "values": [
+              0,
+              20
+            ]
+          }
+        ],
+        "coins": [
+          {
+            "power": -2,
+            "modDynPercent": 200,
+            "offenseDefenseDiff": 8,
+            "hasCrit": true,
+            "weight": 7,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 200,
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 200,
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 4",
+                "modDynPercent": 200,
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 5",
+                "modDynPercent": 200,
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 6",
+                "modDynPercent": 200,
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 7",
+                "modDynPercent": 200,
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              }
+            ]
+          },
+          {
+            "power": -2,
+            "modDynPercent": 430,
+            "offenseDefenseDiff": 8,
+            "hasCrit": true,
+            "weight": 7,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 430,
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 430,
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 4",
+                "modDynPercent": 430,
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 5",
+                "modDynPercent": 430,
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 6",
+                "modDynPercent": 430,
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 7",
+                "modDynPercent": 430,
+                "offenseDefenseDiff": 8,
+                "hasCrit": true
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+]
