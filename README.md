@@ -1,2 +1,2 @@
 # ElderCalc
-Basic and Advanced damage calculator for Limbus Company
+Advanced damage calculator for Limbus Company
