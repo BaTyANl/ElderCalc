@@ -11,6 +11,8 @@ namespace LimbusCalc
         {
             InitializeComponent();
 
+            // No taller than the screen's free area; the content scrolls instead.
+            MaxHeight = SystemParameters.WorkArea.Height;
             DataContext = viewModel;
         }
 
@@ -22,18 +24,26 @@ namespace LimbusCalc
         }
 
         /// <summary>
-        /// A palette color. The button itself tells which outline it belongs to:
-        /// the outline setting is in its Tag and the color is its data.
+        /// A palette color. The button itself tells which setting it belongs to — an outline or
+        /// an end of the damage scale: the setting is in its Tag and the color is its data.
         /// </summary>
         private void Swatch_Click(object sender, RoutedEventArgs e)
         {
             if (sender is FrameworkElement
                 {
-                    Tag: OutlineSettingsViewModel outline,
+                    Tag: IColorSetting setting,
                     DataContext: string hex,
                 })
             {
-                outline.Hex = hex;
+                setting.Hex = hex;
+            }
+        }
+
+        private void ResetDamageScale_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is SettingsViewModel settings)
+            {
+                settings.ResetDamageScale();
             }
         }
     }

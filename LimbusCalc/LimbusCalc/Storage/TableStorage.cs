@@ -313,14 +313,37 @@ public static class TableStorage
     {
         ArgumentNullException.ThrowIfNull(table);
 
-        List<List<SnapshotCell>> rows = new(table.Rows.Count);
+        return Snapshot(table.Rows, table.Columns, _ => true);
+    }
 
-        foreach (TableRowViewModel row in table.Rows)
+    /// <summary>
+    /// A snapshot of chosen rows and columns — for exporting part of a table.
+    /// <paramref name="include"/> can leave out single cells, such as those hidden by a filter.
+    /// </summary>
+    public static TableSnapshot Snapshot(
+        IEnumerable<TableRowViewModel> source,
+        IReadOnlyList<TableColumn> columns,
+        Func<TableCell, bool> include)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(columns);
+        ArgumentNullException.ThrowIfNull(include);
+
+        List<List<SnapshotCell>> rows = [];
+
+        foreach (TableRowViewModel row in source)
         {
             List<SnapshotCell> cells = [];
 
-            foreach (TableCell cell in row.Cells)
+            foreach (TableColumn column in columns)
             {
+                TableCell cell = row.Cells[column.Index];
+
+                if (!include(cell))
+                {
+                    continue;
+                }
+
                 // Computed cells are recalculated on reading; empty ones stay empty anyway.
                 if (cell.Column.Kind == TableCellKind.Computed
                     || (cell.IsEmpty && cell.SkillType is null && cell.SkillSin is null && !cell.HasSetup))

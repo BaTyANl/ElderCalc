@@ -1,3 +1,4 @@
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Globalization;
 using System.Windows;
@@ -10,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using LimbusCalc.Theming;
 using LimbusCalc.ViewModels;
 
 namespace LimbusCalc.Views;
@@ -35,8 +37,10 @@ public sealed class TableRowView : FrameworkElement
     public static readonly DependencyProperty IconVisibilityProperty = Register("IconVisibility", Visibility.Visible);
     public static readonly DependencyProperty DamageAlignmentProperty = Register("DamageAlignment", TextAlignment.Left);
     public static readonly DependencyProperty DamagePaddingProperty = Register("DamagePadding", new Thickness(8, 4, 40, 4));
-    public static readonly DependencyProperty HeatBrushProperty = Register<Brush?>("HeatBrush", null);
+    public static readonly DependencyProperty HeatGradientProperty = Register<HeatGradient?>("HeatGradient", null);
     public static readonly DependencyProperty HeatVisibilityProperty = Register("HeatVisibility", Visibility.Collapsed);
+    public static readonly DependencyProperty HoverBrushProperty = Register<Brush?>("HoverBrush", null);
+    public static readonly DependencyProperty StarBrushProperty = Register<Brush?>("StarBrush", Brushes.Goldenrod);
 
     /// <summary>Icons are shared by all rows: there are a dozen images but thousands of cells.</summary>
     private static readonly Dictionary<string, ImageSource> Icons = [];
@@ -56,8 +60,10 @@ public sealed class TableRowView : FrameworkElement
         SetResourceReference(IconVisibilityProperty, SettingsViewModel.SkillIconVisibilityKey);
         SetResourceReference(DamageAlignmentProperty, SettingsViewModel.DamageAlignmentKey);
         SetResourceReference(DamagePaddingProperty, SettingsViewModel.DamagePaddingKey);
-        SetResourceReference(HeatBrushProperty, "HeatBrush");
+        SetResourceReference(HeatGradientProperty, SettingsViewModel.DamageScaleGradientKey);
         SetResourceReference(HeatVisibilityProperty, SettingsViewModel.DamageScaleVisibilityKey);
+        SetResourceReference(HoverBrushProperty, "SurfaceAltBrush");
+        SetResourceReference(StarBrushProperty, "MoratoriumBrush");
 
         RenderOptions.SetBitmapScalingMode(this, BitmapScalingMode.HighQuality);
 
@@ -68,6 +74,20 @@ public sealed class TableRowView : FrameworkElement
 
     /// <summary>The row this element shows right now; it moves to another one when scrolling.</summary>
     public TableRowViewModel? Row => _row;
+
+    /// <summary>The row's cells in screen order: columns can be moved, the data order stays.</summary>
+    internal IEnumerable<TableCell> CellsOnScreen()
+    {
+        if (_row is null)
+        {
+            yield break;
+        }
+
+        foreach (TableColumn column in _row.DisplayColumns)
+        {
+            yield return _row.Cells[column.Index];
+        }
+    }
 
     /// <summary>The cell under the point and its bounds in row coordinates.</summary>
     public TableCell? CellAt(Point point, out Rect bounds)
@@ -81,7 +101,7 @@ public sealed class TableRowView : FrameworkElement
 
         double x = 0;
 
-        foreach (TableCell cell in _row.Cells)
+        foreach (TableCell cell in CellsOnScreen())
         {
             double width = cell.Column.ActualWidth;
 
@@ -102,7 +122,7 @@ public sealed class TableRowView : FrameworkElement
     {
         double x = 0;
 
-        foreach (TableCell cell in _row?.Cells ?? [])
+        foreach (TableCell cell in CellsOnScreen())
         {
             if (ReferenceEquals(cell, target))
             {
@@ -119,7 +139,7 @@ public sealed class TableRowView : FrameworkElement
     {
         double width = 0;
 
-        foreach (TableCell cell in _row?.Cells ?? [])
+        foreach (TableCell cell in CellsOnScreen())
         {
             width += cell.Column.ActualWidth;
         }
@@ -144,10 +164,17 @@ public sealed class TableRowView : FrameworkElement
         // A transparent background, otherwise clicks between texts would fall through the row.
         dc.DrawRectangle(Brushes.Transparent, null, new Rect(RenderSize));
 
+        // The row under the mouse is tinted, so the eye doesn't slip to a neighbor across
+        // a wide table.
+        if (IsMouseOver && GetValue(HoverBrushProperty) is Brush hover)
+        {
+            dc.DrawRectangle(hover, null, new Rect(0, 0, RenderSize.Width, RowHeight - 1));
+        }
+
         Brush? grid = (Brush?)GetValue(GridBrushProperty);
         double x = 0;
 
-        foreach (TableCell cell in _row.Cells)
+        foreach (TableCell cell in CellsOnScreen())
         {
             double width = cell.Column.ActualWidth;
 
@@ -185,7 +212,7 @@ public sealed class TableRowView : FrameworkElement
 
         // A hand over list cells, like on a button: a click opens the list.
         TableCell? cell = CellAt(e.GetPosition(this), out _);
-        Cursor = cell?.Column.Kind == TableCellKind.Options ? Cursors.Hand : null;
+        Cursor = cell?.Column.Kind is TableCellKind.Options or TableCellKind.Favorite ? Cursors.Hand : null;
 
         // Each cell has its own tooltip but the element covers the whole row. A regular
         // element tooltip wouldn't change between cells, so the tooltip is managed here.
@@ -204,9 +231,16 @@ public sealed class TableRowView : FrameworkElement
         }
     }
 
+    protected override void OnMouseEnter(MouseEventArgs e)
+    {
+        base.OnMouseEnter(e);
+        InvalidateVisual();
+    }
+
     protected override void OnMouseLeave(MouseEventArgs e)
     {
         base.OnMouseLeave(e);
+        InvalidateVisual();
 
         if (ReferenceEquals(_tipView, this))
         {
@@ -318,6 +352,10 @@ public sealed class TableRowView : FrameworkElement
                 DrawChevron(dc, bounds);
                 break;
 
+            case TableCellKind.Favorite:
+                DrawStar(dc, cell, bounds, typeface, pixelsPerDip);
+                break;
+
             case TableCellKind.Integer when cell.Column.AcceptsSetup:
                 DrawDamage(dc, cell, bounds, text, typeface, pixelsPerDip);
                 break;
@@ -341,15 +379,15 @@ public sealed class TableRowView : FrameworkElement
     }
 
     /// <summary>
-    /// Fill by the color scale: the higher the value in its column, the stronger the fill.
-    /// Even the lowest gets a light tint, so it's clear the cell is on the scale.
+    /// Fill by the color scale: the value's place in its column picks a color and opacity
+    /// between the lowest and highest ends set in the settings.
     /// </summary>
     private void DrawHeat(DrawingContext dc, TableCell cell, Rect bounds)
     {
         if (!cell.Column.HasScale
             || !cell.IsVisible
             || (Visibility)GetValue(HeatVisibilityProperty) != Visibility.Visible
-            || GetValue(HeatBrushProperty) is not Brush heat
+            || GetValue(HeatGradientProperty) is not HeatGradient gradient
             || cell.Number is not double value
             || cell.Column.ScaleOf(value) is not double share)
         {
@@ -357,9 +395,7 @@ public sealed class TableRowView : FrameworkElement
         }
 
         // Stops short of the bottom and right grid lines so the fill doesn't cover them.
-        dc.PushOpacity(0.05 + 0.5 * share);
-        dc.DrawRectangle(heat, null, new Rect(bounds.X, 0, bounds.Width - 1, RowHeight - 1));
-        dc.Pop();
+        dc.DrawRectangle(gradient.BrushAt(share), null, new Rect(bounds.X, 0, bounds.Width - 1, RowHeight - 1));
     }
 
     /// <summary>
@@ -453,6 +489,31 @@ public sealed class TableRowView : FrameworkElement
         dc.DrawText(formatted, new Point(area.X, y));
     }
 
+    /// <summary>
+    /// The favorite star: filled for favorites, a faint outline otherwise, so it's clear
+    /// where to click.
+    /// </summary>
+    private void DrawStar(DrawingContext dc, TableCell cell, Rect bounds, Typeface typeface, double pixelsPerDip)
+    {
+        bool favorite = !cell.IsEmpty;
+        Brush brush = favorite
+            ? (Brush?)GetValue(StarBrushProperty) ?? Brushes.Goldenrod
+            : (Brush?)GetValue(SubtleBrushProperty) ?? Brushes.Gray;
+
+        if (!favorite)
+        {
+            dc.PushOpacity(0.55);
+        }
+
+        DrawText(dc, favorite ? "★" : "☆", new Rect(bounds.X, 0, bounds.Width - 1, RowHeight),
+            TextAlignment.Center, 16, brush, typeface, pixelsPerDip);
+
+        if (!favorite)
+        {
+            dc.Pop();
+        }
+    }
+
     private void DrawChevron(DrawingContext dc, Rect bounds)
     {
         if (GetValue(SubtleBrushProperty) is not Brush brush)
@@ -501,6 +562,11 @@ public sealed class TableRowView : FrameworkElement
             {
                 cell.PropertyChanged -= OnCellChanged;
             }
+
+            if (_row.DisplayColumns is INotifyCollectionChanged oldOrder)
+            {
+                oldOrder.CollectionChanged -= OnColumnsMoved;
+            }
         }
 
         foreach (TableColumn column in _columns)
@@ -522,11 +588,23 @@ public sealed class TableRowView : FrameworkElement
                     cell.Column.PropertyChanged += OnColumnChanged;
                 }
             }
+
+            if (_row.DisplayColumns is INotifyCollectionChanged newOrder)
+            {
+                newOrder.CollectionChanged += OnColumnsMoved;
+            }
         }
 
         InvalidateMeasure();
         InvalidateVisual();
         UIElementAutomationPeer.FromElement(this)?.InvalidatePeer();
+    }
+
+    /// <summary>A column was moved: cells change places, so the row is drawn again.</summary>
+    private void OnColumnsMoved(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        InvalidateMeasure();
+        InvalidateVisual();
     }
 
     private void OnCellChanged(object? sender, PropertyChangedEventArgs e)
@@ -583,7 +661,7 @@ internal sealed class TableRowAutomationPeer(TableRowView owner) : FrameworkElem
 
         List<AutomationPeer> cells = [];
 
-        foreach (TableCell cell in row.Row.Cells)
+        foreach (TableCell cell in row.CellsOnScreen())
         {
             // Skip filtered-out and empty cells — they aren't visible on screen either.
             if (cell.IsVisible && !string.IsNullOrEmpty(cell.Value))

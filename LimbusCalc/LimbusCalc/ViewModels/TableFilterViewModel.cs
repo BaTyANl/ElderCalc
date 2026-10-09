@@ -64,15 +64,18 @@ public sealed class FilterListViewModel : ObservableObject
 public sealed class TableFilterViewModel : ObservableObject
 {
     private string _search = string.Empty;
+    private bool _favoritesOnly;
 
     public TableFilterViewModel(
         IReadOnlyList<string> sinners,
         IReadOnlyList<string> rarities,
-        IReadOnlyList<string> egoTypes)
+        IReadOnlyList<string> egoTypes,
+        IReadOnlyList<string> rangeColumns)
     {
         ArgumentNullException.ThrowIfNull(sinners);
         ArgumentNullException.ThrowIfNull(rarities);
         ArgumentNullException.ThrowIfNull(egoTypes);
+        ArgumentNullException.ThrowIfNull(rangeColumns);
 
         // "Type" in E.G.O. means Awakening/Corrosion, so the damage type is "Attack Type".
         TypeList = new FilterListViewModel
@@ -112,6 +115,64 @@ public sealed class TableFilterViewModel : ObservableObject
                 item.PropertyChanged += OnItemChanged;
             }
         }
+
+        Ranges = [.. rangeColumns.Select(key => new RangeFilterViewModel { Key = key })];
+
+        foreach (RangeFilterViewModel range in Ranges)
+        {
+            range.Changed += (_, _) => OnRangeChanged();
+        }
+    }
+
+    /// <summary>Value ranges, one per numeric column; empty bounds mean "no limit".</summary>
+    public IReadOnlyList<RangeFilterViewModel> Ranges { get; }
+
+    /// <summary>Range button label: how many ranges are set.</summary>
+    public string RangeLabel
+    {
+        get
+        {
+            int count = Ranges.Count(range => range.IsSet);
+
+            return count == 0 ? "Range: any" : $"Range: {count}";
+        }
+    }
+
+    /// <summary>Show only favorite rows.</summary>
+    public bool FavoritesOnly
+    {
+        get => _favoritesOnly;
+        set
+        {
+            if (SetProperty(ref _favoritesOnly, value))
+            {
+                OnPropertyChanged(nameof(IsActive));
+                Changed?.Invoke(this, EventArgs.Empty);
+            }
+        }
+    }
+
+    /// <summary>Whether a row's values fit every set range; <paramref name="valueOf"/> reads a column by key.</summary>
+    public bool AllowsRanges(Func<string, double?> valueOf)
+    {
+        ArgumentNullException.ThrowIfNull(valueOf);
+
+        foreach (RangeFilterViewModel range in Ranges)
+        {
+            if (range.IsSet && !range.Allows(valueOf(range.Key)))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void OnRangeChanged()
+    {
+        OnPropertyChanged(nameof(RangeLabel));
+        OnPropertyChanged(nameof(IsActive));
+        Changed?.Invoke(this, EventArgs.Empty);
     }
 
     public FilterListViewModel TypeList { get; }
@@ -150,7 +211,8 @@ public sealed class TableFilterViewModel : ObservableObject
 
     /// <summary>Whether any filter or the search is set.</summary>
     public bool IsActive =>
-        FiltersMarks || SinnerList.Any || RarityList.Any || EgoTypeList.Any || _search.Length > 0;
+        FiltersMarks || SinnerList.Any || RarityList.Any || EgoTypeList.Any || _search.Length > 0
+        || _favoritesOnly || Ranges.Any(range => range.IsSet);
 
     /// <summary>Whether the row's name matches the search.</summary>
     public bool AllowsName(string? name) =>
@@ -207,6 +269,12 @@ public sealed class TableFilterViewModel : ObservableObject
             list.Clear();
         }
 
+        foreach (RangeFilterViewModel range in Ranges)
+        {
+            range.Clear();
+        }
+
+        FavoritesOnly = false;
         Search = string.Empty;
     }
 
@@ -236,4 +304,73 @@ public sealed class TableFilterViewModel : ObservableObject
         OnPropertyChanged(nameof(IsActive));
         Changed?.Invoke(this, EventArgs.Empty);
     }
+}
+
+/// <summary>
+/// A value range on one numeric column: rows outside it are hidden. A row without a value
+/// in the column doesn't fit a set range — there's nothing to compare.
+/// </summary>
+public sealed class RangeFilterViewModel : ObservableObject
+{
+    private string _min = string.Empty;
+    private string _max = string.Empty;
+
+    /// <summary>Key of the column; also the label, since the four DPSC columns share a title.</summary>
+    public required string Key { get; init; }
+
+    /// <summary>The lower bound as typed; empty or not a number means no bound.</summary>
+    public string Min
+    {
+        get => _min;
+        set => SetBound(ref _min, value);
+    }
+
+    /// <summary>The upper bound as typed; empty or not a number means no bound.</summary>
+    public string Max
+    {
+        get => _max;
+        set => SetBound(ref _max, value);
+    }
+
+    public bool IsSet => Parse(_min) is not null || Parse(_max) is not null;
+
+    internal event EventHandler? Changed;
+
+    public bool Allows(double? value)
+    {
+        double? min = Parse(_min);
+        double? max = Parse(_max);
+
+        if (min is null && max is null)
+        {
+            return true;
+        }
+
+        return value is double actual && (min is null || actual >= min) && (max is null || actual <= max);
+    }
+
+    internal void Clear()
+    {
+        Min = string.Empty;
+        Max = string.Empty;
+    }
+
+    private void SetBound(ref string field, string? value)
+    {
+        if (SetProperty(ref field, value ?? string.Empty))
+        {
+            OnPropertyChanged(nameof(IsSet));
+            Changed?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    /// <summary>Accepts both a dot and a comma as the decimal separator.</summary>
+    private static double? Parse(string text) =>
+        double.TryParse(
+            text.Trim().Replace(',', '.'),
+            System.Globalization.NumberStyles.Float,
+            System.Globalization.CultureInfo.InvariantCulture,
+            out double value)
+            ? value
+            : null;
 }

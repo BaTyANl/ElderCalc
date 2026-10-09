@@ -4,6 +4,7 @@ using System.Text.Json.Nodes;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -688,6 +689,29 @@ namespace LimbusCalc
             ColumnsPopup.IsOpen = true;
         }
 
+        private void ResetLayout_Click(object sender, RoutedEventArgs e)
+        {
+            if (ColumnsPopup.DataContext is TableViewModel table)
+            {
+                EndEdit();
+                table.ResetLayout();
+            }
+        }
+
+        /// <summary>Opens the value range popup next to its button.</summary>
+        private void FilterRange_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not FrameworkElement { DataContext: TableFilterViewModel filter } element)
+            {
+                return;
+            }
+
+            RangePopup.IsOpen = false;
+            RangePopup.DataContext = filter;
+            RangePopup.PlacementTarget = element;
+            RangePopup.IsOpen = true;
+        }
+
         private void ShowAllColumns_Click(object sender, RoutedEventArgs e)
         {
             if (ColumnsPopup.DataContext is TableViewModel table)
@@ -898,10 +922,25 @@ namespace LimbusCalc
         /// </summary>
         private void RowView_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (sender is TableRowView view
-                && view.CellAt(e.GetPosition(view), out Rect bounds) is TableCell cell
-                && cell.Column.Kind != TableCellKind.Computed
-                && cell.IsVisible)
+            if (sender is not TableRowView view
+                || view.CellAt(e.GetPosition(view), out Rect bounds) is not TableCell cell)
+            {
+                return;
+            }
+
+            if (cell.Column.Kind == TableCellKind.Favorite)
+            {
+                if (view.Row is TableRowViewModel row && TableOf(view) is TableViewModel table)
+                {
+                    EndEdit();
+                    table.ToggleFavorite(row);
+                }
+
+                e.Handled = true;
+                return;
+            }
+
+            if (cell.Column.Kind != TableCellKind.Computed && cell.IsVisible)
             {
                 BeginEdit(cell, view, bounds);
             }
@@ -1083,7 +1122,9 @@ namespace LimbusCalc
 
         /// <summary>Whether a cell can be edited: not computed, not hidden by the filter or column visibility.</summary>
         private static bool CanEdit(TableCell cell) =>
-            cell.Column.Kind != TableCellKind.Computed && cell.IsVisible && !cell.Column.IsHidden;
+            cell.Column.Kind is not (TableCellKind.Computed or TableCellKind.Favorite)
+            && cell.IsVisible
+            && !cell.Column.IsHidden;
 
         /// <summary>
         /// Moves the edit to a neighboring cell: one row up or down in the same column, or one cell
@@ -1100,9 +1141,11 @@ namespace LimbusCalc
                 return false;
             }
 
+            // Columns in screen order: they can be moved.
             List<TableRowViewModel> visible = [.. table.Rows.Where(item => item.IsVisible)];
+            List<TableColumn> order = [.. table.DisplayColumns];
             int rowIndex = visible.IndexOf(row);
-            int columnIndex = IndexOf(row.Cells, cell);
+            int columnIndex = order.IndexOf(cell.Column);
 
             if (rowIndex < 0 || columnIndex < 0)
             {
@@ -1113,7 +1156,7 @@ namespace LimbusCalc
             {
                 for (int i = rowIndex + rowStep; i >= 0 && i < visible.Count; i += rowStep)
                 {
-                    if (visible[i].CellOf(cell.Column) is TableCell below && CanEdit(below))
+                    if (visible[i].Cells[cell.Column.Index] is TableCell below && CanEdit(below))
                     {
                         ShowCell(rows, visible[i], below, openList: false);
                         return true;
@@ -1123,7 +1166,7 @@ namespace LimbusCalc
                 return false;
             }
 
-            int width = row.Cells.Count;
+            int width = order.Count;
 
             while (true)
             {
@@ -1141,7 +1184,7 @@ namespace LimbusCalc
                     columnIndex = columnStep > 0 ? 0 : width - 1;
                 }
 
-                TableCell next = visible[rowIndex].Cells[columnIndex];
+                TableCell next = visible[rowIndex].Cells[order[columnIndex].Index];
 
                 if (CanEdit(next))
                 {
@@ -1149,19 +1192,6 @@ namespace LimbusCalc
                     return true;
                 }
             }
-        }
-
-        private static int IndexOf(IReadOnlyList<TableCell> cells, TableCell cell)
-        {
-            for (int i = 0; i < cells.Count; i++)
-            {
-                if (ReferenceEquals(cells[i], cell))
-                {
-                    return i;
-                }
-            }
-
-            return -1;
         }
 
         /// <summary>
@@ -1537,12 +1567,21 @@ namespace LimbusCalc
                 return;
             }
 
+            EndEdit();
+
+            ExportTableWindow choices = new(table) { Owner = this };
+
+            if (choices.ShowDialog() != true || choices.Options is not TableExportOptions options)
+            {
+                return;
+            }
+
             SaveFileDialog dialog = new()
             {
                 Title = $"Export {table.Title}",
-                Filter = TableFile.DialogFilter,
+                Filter = TableExport.FilterFor(options.Format),
                 FileName = Path.GetFileNameWithoutExtension(_tableFiles[table]),
-                DefaultExt = ".json",
+                DefaultExt = TableExport.ExtensionFor(options.Format),
                 AddExtension = true,
             };
 
@@ -1553,12 +1592,47 @@ namespace LimbusCalc
 
             try
             {
-                TableFile.Export(table, dialog.FileName);
+                TableExport.Write(table, dialog.FileName, options);
             }
             catch (Exception error)
             {
                 Report("Export failed", error);
             }
+        }
+
+        /// <summary>
+        /// Copies a picture of the table, as it is on screen, to the clipboard — ready to paste
+        /// into Discord or a document. The button says "Copied" for a moment to confirm it.
+        /// </summary>
+        private void CopyImage_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not Button { DataContext: TableViewModel table } button)
+            {
+                return;
+            }
+
+            EndEdit();
+
+            try
+            {
+                TableImage.CopyToClipboard(table, VisualTreeHelper.GetDpi(this).DpiScaleX);
+            }
+            catch (Exception error)
+            {
+                Report("Copy failed", error);
+                return;
+            }
+
+            object label = button.Content;
+            button.Content = "Copied ✓";
+
+            DispatcherTimer reset = new() { Interval = TimeSpan.FromSeconds(1.5) };
+            reset.Tick += (_, _) =>
+            {
+                reset.Stop();
+                button.Content = label;
+            };
+            reset.Start();
         }
 
         /// <summary>
@@ -1623,10 +1697,100 @@ namespace LimbusCalc
         /// <summary>Left click on a header sorts by that column and reverses the order on repeat.</summary>
         private void ColumnHeader_LeftClick(object sender, MouseButtonEventArgs e)
         {
-            if (sender is FrameworkElement { DataContext: TableColumn column } element
-                && TableOf(element) is TableViewModel table)
+            if (sender is not FrameworkElement { DataContext: TableColumn column } element
+                || TableOf(element) is not TableViewModel table)
             {
-                table.SortBy(column);
+                return;
+            }
+
+            bool dragged = _headerDrag is { Moved: true };
+
+            if (_headerDrag is not null)
+            {
+                element.ReleaseMouseCapture();
+                _headerDrag = null;
+            }
+
+            // The end of a drag isn't a click.
+            if (!dragged)
+            {
+                table.SortBy(column, add: (Keyboard.Modifiers & ModifierKeys.Shift) != 0);
+            }
+        }
+
+        /// <summary>A header being pressed or dragged: the column and where the press began.</summary>
+        private sealed class HeaderDrag(TableColumn column, Point start)
+        {
+            public TableColumn Column { get; } = column;
+
+            public Point Start { get; } = start;
+
+            /// <summary>The mouse went far enough for this to be a drag, not a click.</summary>
+            public bool Moved { get; set; }
+        }
+
+        private HeaderDrag? _headerDrag;
+
+        private void ColumnHeader_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is FrameworkElement { DataContext: TableColumn column } element)
+            {
+                EndEdit();
+                _headerDrag = new HeaderDrag(column, e.GetPosition(element));
+                element.CaptureMouse();
+            }
+        }
+
+        /// <summary>
+        /// Moves the dragged column live: as the mouse passes over another header, the column
+        /// takes its place. Small movements don't count, so a click still sorts.
+        /// </summary>
+        private void ColumnHeader_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_headerDrag is not HeaderDrag drag
+                || e.LeftButton != MouseButtonState.Pressed
+                || sender is not FrameworkElement element
+                || TableOf(element) is not TableViewModel table
+                || ItemsControl.ItemsControlFromItemContainer(VisualTreeHelper.GetParent(element)) is not ItemsControl header)
+            {
+                return;
+            }
+
+            Point position = e.GetPosition(element);
+
+            if (!drag.Moved
+                && Math.Abs(position.X - drag.Start.X) < SystemParameters.MinimumHorizontalDragDistance)
+            {
+                return;
+            }
+
+            drag.Moved = true;
+            element.Cursor = Cursors.SizeAll;
+
+            // Which column is under the mouse, counting only shown ones.
+            double x = e.GetPosition(header).X;
+            double left = 0;
+
+            for (int i = 0; i < table.DisplayColumns.Count; i++)
+            {
+                left += table.DisplayColumns[i].ActualWidth;
+
+                if (x < left || i == table.DisplayColumns.Count - 1)
+                {
+                    table.MoveColumn(drag.Column, i);
+                    break;
+                }
+            }
+        }
+
+        /// <summary>Dragging a header's right edge resizes the column.</summary>
+        private void ColumnResize_DragDelta(object sender, DragDeltaEventArgs e)
+        {
+            if (sender is FrameworkElement { DataContext: TableColumn column } grip
+                && TableOf(grip) is TableViewModel table)
+            {
+                EndEdit();
+                table.ResizeColumn(column, column.ActualWidth + e.HorizontalChange);
             }
         }
 

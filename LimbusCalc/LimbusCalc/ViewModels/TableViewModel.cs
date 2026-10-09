@@ -19,6 +19,9 @@ public enum TableCellKind
 
     /// <summary>Calculated from other cells of the row; not editable.</summary>
     Computed,
+
+    /// <summary>A favorite mark: a star toggled by a click. Favorite rows stay on top.</summary>
+    Favorite,
 }
 
 /// <summary>Where a cell's damage came from.</summary>
@@ -73,8 +76,43 @@ public sealed class TableColumn : ObservableObject
     private double? _actualWidth;
     private bool _isHidden;
     private double[] _scale = [];
+    private double? _userWidth;
 
     private string? _key;
+
+    /// <summary>
+    /// Position of the column among the row's cells. This data order never changes;
+    /// the order on screen is <see cref="TableViewModel.DisplayColumns"/>.
+    /// </summary>
+    public int Index { get; internal set; }
+
+    /// <summary>Width set by dragging the header edge; null keeps the default.</summary>
+    public double? UserWidth
+    {
+        get => _userWidth;
+        internal set
+        {
+            if (SetProperty(ref _userWidth, value))
+            {
+                OnPropertyChanged(nameof(CurrentWidth));
+            }
+        }
+    }
+
+    /// <summary>The width the column asks for: the user's if set, otherwise the default.</summary>
+    public double CurrentWidth => _userWidth ?? Width;
+
+    /// <summary>Header tooltip: the column's description plus how the header can be used.</summary>
+    public string HeaderTip =>
+        (Description is null ? string.Empty : Description + Environment.NewLine)
+        + (IsSortable ? "Click to sort, Shift+click to sort by several columns. " : string.Empty)
+        + "Drag to move, drag the edge to resize.";
+
+    /// <summary>
+    /// Whether the table can be sorted by this column. Not by the star: favorites are always
+    /// on top already, so sorting by it would change nothing.
+    /// </summary>
+    public bool IsSortable => Kind != TableCellKind.Favorite;
 
     public required string Title { get; init; }
 
@@ -149,7 +187,7 @@ public sealed class TableColumn : ObservableObject
     /// </summary>
     public double ActualWidth
     {
-        get => _isHidden ? 0.0 : _actualWidth ?? Width;
+        get => _isHidden ? 0.0 : _actualWidth ?? CurrentWidth;
         internal set
         {
             if (_actualWidth != value)
@@ -258,7 +296,7 @@ public sealed class TableColumn : ObservableObject
             {
                 column.OtherWidth = columns
                     .Where(other => other != column && !other.IsHidden)
-                    .Sum(other => other.Width);
+                    .Sum(other => other.CurrentWidth);
             }
         }
     }
@@ -404,6 +442,15 @@ public sealed class TableRowViewModel : ObservableObject
 
     public required IReadOnlyList<TableCell> Cells { get; init; }
 
+    /// <summary>
+    /// The table's columns in screen order, shared by all rows of the table. A row view draws
+    /// its cells in this order; <see cref="TableColumn.Index"/> finds each cell.
+    /// </summary>
+    public IReadOnlyList<TableColumn> DisplayColumns { get; internal set; } = [];
+
+    /// <summary>Whether the row is marked as a favorite.</summary>
+    public bool IsFavorite => Cells.Any(cell => cell.Column.Kind == TableCellKind.Favorite && !cell.IsEmpty);
+
     /// <summary>Whether the row passes the filter.</summary>
     public bool IsVisible
     {
@@ -497,11 +544,11 @@ public sealed class ColumnChoiceViewModel : ObservableObject
 /// A reference table with a given set of columns. Shared by ID and E.G.O.: they differ only
 /// in columns, the behavior is the same.
 /// </summary>
-public sealed class TableViewModel : ObservableObject
+public sealed partial class TableViewModel : ObservableObject
 {
-    private TableColumn? _sortColumn;
-    private bool _sortDescending;
-    private IReadOnlyList<TableAverage>? _averages;
+    /// <summary>Sort keys from the main one to the last; Shift+click on a header adds one.</summary>
+    private readonly List<SortKeyState> _sort = [];
+    private ObservableCollection<TableAverage>? _averages;
     private int _bulkDepth;
     private bool _bulkChanged;
     private bool _isLoading;
@@ -564,10 +611,14 @@ public sealed class TableViewModel : ObservableObject
         }
     }
 
-    /// <summary>The sort column and direction — to remember between launches.</summary>
-    public string? SortKey => _sortColumn?.Key;
+    /// <summary>The main sort column and its direction.</summary>
+    public string? SortKey => _sort.Count == 0 ? null : _sort[0].Column.Key;
 
-    public bool SortDescending => _sortDescending;
+    public bool SortDescending => _sort.Count > 0 && _sort[0].Descending;
+
+    /// <summary>All sort keys with their directions — to remember between launches.</summary>
+    public IReadOnlyList<(string Key, bool Descending)> SortKeys =>
+        [.. _sort.Select(key => (key.Column.Key, key.Descending))];
 
     /// <summary>
     /// Hides or shows a column. The stretching column takes the freed space, so widths are
@@ -606,11 +657,12 @@ public sealed class TableViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Restores the sort remembered from the last launch. The column with that key may no
-    /// longer exist — then the table stays unsorted.
+    /// Restores the sort remembered from the last launch. Columns that no longer exist are
+    /// skipped; if none is left, the table stays unsorted.
     /// </summary>
-    public void RestoreSort(string? columnKey, bool descending, IReadOnlyList<SkillSortKey> priority)
+    public void RestoreSort(IReadOnlyList<(string Key, bool Descending)> keys, IReadOnlyList<SkillSortKey> priority)
     {
+        ArgumentNullException.ThrowIfNull(keys);
         ArgumentNullException.ThrowIfNull(priority);
 
         for (int target = 0; target < priority.Count; target++)
@@ -623,8 +675,17 @@ public sealed class TableViewModel : ObservableObject
             }
         }
 
-        _sortColumn = Columns.FirstOrDefault(column => column.Key == columnKey);
-        _sortDescending = _sortColumn is not null && descending;
+        _sort.Clear();
+
+        foreach ((string key, bool descending) in keys)
+        {
+            if (Columns.FirstOrDefault(column => column.Key == key) is TableColumn { IsSortable: true } column
+                && _sort.All(existing => existing.Column != column))
+            {
+                _sort.Add(new SortKeyState(column, descending));
+            }
+        }
+
         ApplySort();
     }
 
@@ -655,16 +716,16 @@ public sealed class TableViewModel : ObservableObject
     ];
 
     /// <summary>
-    /// The row under the table: average damage per skill column. Created once per column and
-    /// only recalculated afterwards, so bindings don't break.
+    /// The row under the table: average damage per skill column, in screen order. Created once
+    /// per column and only recalculated or reordered afterwards, so bindings don't break.
     /// </summary>
-    public IReadOnlyList<TableAverage> Averages
+    public ObservableCollection<TableAverage> Averages
     {
         get
         {
             if (_averages is null)
             {
-                _averages = [.. Columns.Select(column => new TableAverage { Column = column })];
+                _averages = [.. DisplayColumns.Select(column => new TableAverage { Column = column })];
                 UpdateAverages();
             }
 
@@ -780,6 +841,7 @@ public sealed class TableViewModel : ObservableObject
         TableRowViewModel row = new()
         {
             Cells = [.. Columns.Select(column => new TableCell { Column = column })],
+            DisplayColumns = DisplayColumns,
         };
 
         foreach (TableCell cell in row.Cells)
@@ -1037,24 +1099,94 @@ public sealed class TableViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Sorts by this column; clicking it again reverses the order.
-    /// Cells without data go to the bottom either way: there's nothing to compare.
+    /// Sorts by this column; clicking it again reverses the order. With <paramref name="add"/>
+    /// (Shift+click) the column becomes one more key after the existing ones, or flips its
+    /// direction if it's already a key. Cells without data go to the bottom either way.
     /// </summary>
-    public void SortBy(TableColumn column)
+    public void SortBy(TableColumn column, bool add = false)
     {
         ArgumentNullException.ThrowIfNull(column);
 
-        if (_sortColumn == column)
+        if (!column.IsSortable)
         {
-            _sortDescending = !_sortDescending;
+            return;
+        }
+
+        int index = _sort.FindIndex(key => key.Column == column);
+
+        if (add)
+        {
+            if (index >= 0)
+            {
+                _sort[index] = _sort[index] with { Descending = !_sort[index].Descending };
+            }
+            else
+            {
+                _sort.Add(new SortKeyState(column, Descending: false));
+            }
+        }
+        else if (_sort.Count == 1 && index == 0)
+        {
+            _sort[0] = _sort[0] with { Descending = !_sort[0].Descending };
         }
         else
         {
-            _sortColumn = column;
-            _sortDescending = false;
+            _sort.Clear();
+            _sort.Add(new SortKeyState(column, Descending: false));
         }
 
         ApplySort();
+    }
+
+    /// <summary>The favorite column, if the table has one.</summary>
+    private TableColumn? FavoriteColumn => Columns.FirstOrDefault(column => column.Kind == TableCellKind.Favorite);
+
+    /// <summary>Marks the row as a favorite or removes the mark; favorites move to the top.</summary>
+    public void ToggleFavorite(TableRowViewModel row)
+    {
+        ArgumentNullException.ThrowIfNull(row);
+
+        if (FavoriteColumn is TableColumn favorite)
+        {
+            TableCell cell = row.Cells[favorite.Index];
+            cell.Value = cell.IsEmpty ? "1" : string.Empty;
+        }
+    }
+
+    /// <summary>
+    /// Puts favorite rows above the rest without changing the order inside either part —
+    /// so a sorted table stays sorted within the favorites and within the others.
+    /// </summary>
+    private void PinFavorites()
+    {
+        if (FavoriteColumn is not null)
+        {
+            Reorder([.. Rows.Where(row => row.IsFavorite), .. Rows.Where(row => !row.IsFavorite)]);
+        }
+    }
+
+    /// <summary>Moves rows into the given order. Returns whether anything moved.</summary>
+    private bool Reorder(List<TableRowViewModel> order)
+    {
+        bool moved = false;
+
+        for (int i = 0; i < order.Count; i++)
+        {
+            int current = Rows.IndexOf(order[i]);
+
+            if (current != i)
+            {
+                Rows.Move(current, i);
+                moved = true;
+            }
+        }
+
+        if (moved)
+        {
+            Changed?.Invoke(this, EventArgs.Empty);
+        }
+
+        return moved;
     }
 
     /// <summary>Moves a key in the priority list: -1 up, +1 down.</summary>
@@ -1071,7 +1203,7 @@ public sealed class TableViewModel : ObservableObject
         SortPriority.Move(index, target);
 
         // The key order changed, so the table must be re-sorted right away.
-        if (_sortColumn?.Kind == TableCellKind.Integer)
+        if (_sort.Any(key => key.Column.Kind == TableCellKind.Integer))
         {
             ApplySort();
         }
@@ -1091,60 +1223,38 @@ public sealed class TableViewModel : ObservableObject
             // One pixel goes to the table's outer border; without it the row overflows
             // and an unnecessary horizontal scrollbar appears.
             column.ActualWidth = column.Stretch && viewportWidth > 0.0
-                ? Math.Max(column.Width, viewportWidth - column.OtherWidth - 1.0)
-                : column.Width;
+                ? Math.Max(column.CurrentWidth, viewportWidth - column.OtherWidth - 1.0)
+                : column.CurrentWidth;
         }
     }
 
-    /// <summary>Re-sorts by the current column; does nothing when no column is chosen.</summary>
+    /// <summary>
+    /// Re-sorts by the current keys. Favorites stay on top; with no keys only that is enforced.
+    /// The sort is stable, so rows equal on every key keep their order.
+    /// </summary>
     public void ApplySort()
     {
         UpdateIndicators();
 
-        if (_sortColumn is null || Rows.Count < 2)
+        if (Rows.Count < 2)
         {
             return;
         }
 
-        TableColumn column = _sortColumn;
-        RowComparer comparer = new(column, SortPriority);
-
-        // Empty cells aren't the smallest value but missing data: they stay at the bottom
-        // in both directions.
-        IEnumerable<TableRowViewModel> filled = Rows.Where(row => !IsCellEmpty(row, column));
-        IEnumerable<TableRowViewModel> blank = Rows.Where(row => IsCellEmpty(row, column));
-
-        List<TableRowViewModel> sorted =
-        [
-            .. _sortDescending
-                ? filled.OrderByDescending(row => row, comparer)
-                : filled.OrderBy(row => row, comparer),
-            .. blank,
-        ];
-
-        for (int i = 0; i < sorted.Count; i++)
-        {
-            int current = Rows.IndexOf(sorted[i]);
-
-            if (current != i)
-            {
-                Rows.Move(current, i);
-            }
-        }
-
-        Changed?.Invoke(this, EventArgs.Empty);
+        RowComparer comparer = new(_sort, SortPriority, FavoriteColumn);
+        Reorder([.. Rows.OrderBy(row => row, comparer)]);
     }
 
-    private static bool IsCellEmpty(TableRowViewModel row, TableColumn column) =>
-        row.CellOf(column)?.IsEmpty ?? true;
-
+    /// <summary>Arrows on sorted columns; with several keys each also shows its rank: ▲1, ▼2.</summary>
     private void UpdateIndicators()
     {
         foreach (TableColumn column in Columns)
         {
-            column.Indicator = column == _sortColumn
-                ? _sortDescending ? "▼" : "▲"
-                : string.Empty;
+            int index = _sort.FindIndex(key => key.Column == column);
+
+            column.Indicator = index < 0
+                ? string.Empty
+                : (_sort[index].Descending ? "▼" : "▲") + (_sort.Count > 1 ? $"{index + 1}" : string.Empty);
         }
     }
 
@@ -1171,6 +1281,7 @@ public sealed class TableViewModel : ObservableObject
 
         // Edits didn't react during the bulk change, so everything is recalculated here.
         RecomputeAll();
+        PinFavorites();
 
         OnPropertyChanged(nameof(HasRows));
         OnPropertyChanged(nameof(IsEmpty));
@@ -1204,6 +1315,12 @@ public sealed class TableViewModel : ObservableObject
         // Editing a mark or a value may move the row in or out of the filter.
         ApplyFilter();
         Changed?.Invoke(this, EventArgs.Empty);
+
+        // A new favorite moves up.
+        if (sender is TableCell { Column.Kind: TableCellKind.Favorite })
+        {
+            PinFavorites();
+        }
     }
 
     /// <summary>
@@ -1279,10 +1396,13 @@ public sealed class TableViewModel : ObservableObject
             // Sinner, rarity, E.G.O. type and search select whole rows; damage type and sin
             // select its values. The name column is named differently in ID and E.G.O.,
             // but both answer to "Name".
+            // Favorites and value ranges select whole rows too.
             bool rowOk = Filter.AllowsName(row.CellOf("Name")?.Value)
                 && Filter.AllowsSinner(row.CellOf("Sinner")?.Value)
                 && Filter.AllowsRarity(row.CellOf("Rarity")?.Value)
-                && Filter.AllowsEgoType(row.CellOf("Type")?.Value);
+                && Filter.AllowsEgoType(row.CellOf("Type")?.Value)
+                && (!Filter.FavoritesOnly || row.IsFavorite)
+                && Filter.AllowsRanges(key => row.CellOf(key)?.Number);
 
             bool anyValue = false;
 
@@ -1350,76 +1470,114 @@ public sealed class TableViewModel : ObservableObject
             return;
         }
 
-        for (int i = 0; i < _averages.Count; i++)
+        // The "Average" label goes into the first text column on screen: columns can be moved
+        // and hidden, and the label must not land in a narrow or numeric one.
+        TableAverage? label = _averages.FirstOrDefault(average =>
+            !average.Column.IsHidden && average.Column.Kind is TableCellKind.Text or TableCellKind.Options);
+
+        foreach (TableAverage average in _averages)
         {
-            TableAverage average = _averages[i];
-
-            if (i == 0)
-            {
-                average.Text = "Average";
-                continue;
-            }
-
-            if (average.Column.Kind is not (TableCellKind.Integer or TableCellKind.Computed))
-            {
-                average.Text = string.Empty;
-                continue;
-            }
-
-            double sum = 0.0;
-            int count = 0;
-
-            foreach (TableRowViewModel row in Rows)
-            {
-                // The average covers what's visible: values hidden by the filter don't count.
-                if (!row.IsVisible)
-                {
-                    continue;
-                }
-
-                TableCell? cell = row.CellOf(average.Column);
-
-                if (cell is { IsVisible: true, Number: double value })
-                {
-                    sum += value;
-                    count++;
-                }
-            }
-
-            average.Text = count == 0
-                ? string.Empty
-                : (sum / count).ToString("0.##", CultureInfo.InvariantCulture);
+            average.Text = average == label ? "Average" : AverageOf(average.Column, Rows);
         }
     }
 
-    /// <summary>Compares rows by one column, using the priorities for skill columns.</summary>
-    private sealed class RowComparer(TableColumn column, IEnumerable<SkillSortOption> priority)
+    /// <summary>
+    /// The average of a numeric column over the given rows, or empty text. Only what's visible
+    /// counts: values hidden by the filter don't.
+    /// </summary>
+    internal static string AverageOf(TableColumn column, IEnumerable<TableRowViewModel> rows)
+    {
+        if (column.Kind is not (TableCellKind.Integer or TableCellKind.Computed))
+        {
+            return string.Empty;
+        }
+
+        double sum = 0.0;
+        int count = 0;
+
+        foreach (TableRowViewModel row in rows)
+        {
+            if (row.IsVisible && row.Cells[column.Index] is { IsVisible: true, Number: double value })
+            {
+                sum += value;
+                count++;
+            }
+        }
+
+        return count == 0 ? string.Empty : (sum / count).ToString("0.##", CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>One sort key: a column and its direction.</summary>
+    private readonly record struct SortKeyState(TableColumn Column, bool Descending);
+
+    /// <summary>
+    /// Compares rows: favorites first, then by each key in turn. An empty cell isn't the
+    /// smallest value but missing data, so it goes below filled ones whatever the direction.
+    /// Skill columns use the sort priorities.
+    /// </summary>
+    private sealed class RowComparer(
+        IReadOnlyList<SortKeyState> keys,
+        IEnumerable<SkillSortOption> priority,
+        TableColumn? favorite)
         : IComparer<TableRowViewModel>
     {
         private readonly SkillSortKey[] _priority = [.. priority.Select(option => option.Key)];
 
         public int Compare(TableRowViewModel? x, TableRowViewModel? y)
         {
-            TableCell? left = x?.CellOf(column);
-            TableCell? right = y?.CellOf(column);
-
-            if (left is null || right is null)
+            if (x is null || y is null)
             {
                 return 0;
             }
 
-            return column.Kind switch
+            if (favorite is not null)
             {
-                TableCellKind.Options => IndexOfOption(left).CompareTo(IndexOfOption(right)),
-                TableCellKind.Integer => CompareSkills(left, right),
-                // Computed columns have no marks — there's nothing to compare but the number.
-                TableCellKind.Computed => (left.Number ?? 0.0).CompareTo(right.Number ?? 0.0),
-                _ => string.Compare(left.Value, right.Value, StringComparison.OrdinalIgnoreCase),
-            };
+                bool leftFavorite = !x.Cells[favorite.Index].IsEmpty;
+                bool rightFavorite = !y.Cells[favorite.Index].IsEmpty;
+
+                if (leftFavorite != rightFavorite)
+                {
+                    return leftFavorite ? -1 : 1;
+                }
+            }
+
+            foreach ((TableColumn column, bool descending) in keys)
+            {
+                TableCell left = x.Cells[column.Index];
+                TableCell right = y.Cells[column.Index];
+
+                if (left.IsEmpty != right.IsEmpty)
+                {
+                    return left.IsEmpty ? 1 : -1;
+                }
+
+                if (left.IsEmpty)
+                {
+                    continue;
+                }
+
+                int result = CompareCells(column, left, right);
+
+                if (result != 0)
+                {
+                    return descending ? -result : result;
+                }
+            }
+
+            return 0;
         }
 
+        private int CompareCells(TableColumn column, TableCell left, TableCell right) => column.Kind switch
+        {
+            TableCellKind.Options => IndexOfOption(column, left).CompareTo(IndexOfOption(column, right)),
+            TableCellKind.Integer => CompareSkills(left, right),
+            // Computed columns have no marks — there's nothing to compare but the number.
+            TableCellKind.Computed => (left.Number ?? 0.0).CompareTo(right.Number ?? 0.0),
+            _ => string.Compare(left.Value, right.Value, StringComparison.OrdinalIgnoreCase),
+        };
+
         /// <summary>Rarity compares by option order: 0 is below 00, which is below 000.</summary>
-        private int IndexOfOption(TableCell cell)
+        private static int IndexOfOption(TableColumn column, TableCell cell)
         {
             for (int i = 0; i < column.Options.Count; i++)
             {
@@ -1577,8 +1735,27 @@ public sealed class TableViewModel : ObservableObject
         };
     }
 
-    private static TableViewModel Create(string title, IReadOnlyList<TableColumn> columns)
+    private static TableViewModel Create(string title, IReadOnlyList<TableColumn> dataColumns)
     {
+        // Every table starts with the favorite star.
+        IReadOnlyList<TableColumn> columns =
+        [
+            new TableColumn
+            {
+                Key = "Favorite",
+                Title = "★",
+                Description = "Favorite: click the star to keep the row on top.",
+                Width = 34,
+                Kind = TableCellKind.Favorite,
+            },
+            .. dataColumns,
+        ];
+
+        for (int i = 0; i < columns.Count; i++)
+        {
+            columns[i].Index = i;
+        }
+
         TableColumn.MeasureStretch(columns);
 
         // Rarity options come from the column itself: the filter shouldn't know them separately.
@@ -1592,8 +1769,19 @@ public sealed class TableViewModel : ObservableObject
         {
             Title = title,
             Columns = columns,
-            Filter = new TableFilterViewModel(Sinners, rarities, egoTypes),
+            // Value ranges can be set on every numeric column, DPSC included.
+            Filter = new TableFilterViewModel(
+                Sinners,
+                rarities,
+                egoTypes,
+                [.. columns.Where(column => column.Kind is TableCellKind.Integer or TableCellKind.Computed)
+                    .Select(column => column.Key)]),
         };
+
+        foreach (TableColumn column in columns)
+        {
+            table.DisplayColumns.Add(column);
+        }
 
         table.Filter.Changed += (_, _) => table.ApplyFilter();
         return table;

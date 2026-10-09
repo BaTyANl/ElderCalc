@@ -103,12 +103,18 @@ public sealed class ExportToTableViewModel : ObservableObject
 
             string sinner = row.CellOf("Sinner")?.Value.Trim() ?? string.Empty;
 
+            // E.G.O. kind: Awakening or Corrosion. The ID table has no such column.
+            string kind = row.CellOf("Type")?.Value.Trim() ?? string.Empty;
+
+            string label = sinner.Length == 0 ? name : $"{sinner} — {name}";
+
             targets.Add(new ExportTargetViewModel
             {
                 Row = row,
                 // The same name appears under different sinners, so the label has both:
-                // otherwise "LCB Sinner" would show up twelve times in a row.
-                Display = sinner.Length == 0 ? name : $"{sinner} — {name}",
+                // otherwise "LCB Sinner" would show up twelve times in a row. An E.G.O.
+                // also shows its kind, since its awakening and corrosion are separate rows.
+                Display = kind.Length == 0 ? label : $"{label} ({kind})",
             });
         }
 

@@ -17,6 +17,15 @@ public sealed class OutlineSettings
     public required double Opacity { get; set; }
 }
 
+/// <summary>One end of the damage color scale: a color and how opaque it is.</summary>
+public sealed class ScaleStop
+{
+    public required Color Color { get; set; }
+
+    /// <summary>Opacity from 0 to 1.</summary>
+    public required double Opacity { get; set; }
+}
+
 /// <summary>
 /// App settings between launches: theme, cell look and outlines. The file lives in the user
 /// profile rather than next to the exe, which may sit in a read-only folder.
@@ -84,6 +93,33 @@ public static class AppSettings
                 : DefaultTheme;
     }
 
+    /// <summary>
+    /// The lowest value of the damage scale: the same green as the highest, nearly transparent,
+    /// so weak values are barely tinted.
+    /// </summary>
+    public static ScaleStop DefaultScaleLow() => new() { Color = Color.FromRgb(0x3F, 0xB2, 0x7F), Opacity = 0.05 };
+
+    /// <summary>The highest value of the damage scale: a clear green.</summary>
+    public static ScaleStop DefaultScaleHigh() => new() { Color = Color.FromRgb(0x3F, 0xB2, 0x7F), Opacity = 0.55 };
+
+    public static ScaleStop LoadScaleStop(string key, ScaleStop fallback)
+    {
+        ArgumentNullException.ThrowIfNull(fallback);
+
+        if (Read()?[key] is not JsonObject stored)
+        {
+            return fallback;
+        }
+
+        return new ScaleStop
+        {
+            Color = ParseColor((string?)stored["Color"], fallback.Color),
+            Opacity = stored["Opacity"] is JsonNode opacity
+                ? Math.Clamp(Number(opacity, fallback.Opacity), 0.0, 1.0)
+                : fallback.Opacity,
+        };
+    }
+
     public static OutlineSettings LoadOutline(string key, OutlineSettings fallback)
     {
         ArgumentNullException.ThrowIfNull(fallback);
@@ -109,10 +145,14 @@ public static class AppSettings
         OutlineSettings manual,
         OutlineSettings calculator,
         bool showSkillIcons,
-        bool showDamageScale)
+        bool showDamageScale,
+        ScaleStop scaleLow,
+        ScaleStop scaleHigh)
     {
         ArgumentNullException.ThrowIfNull(manual);
         ArgumentNullException.ThrowIfNull(calculator);
+        ArgumentNullException.ThrowIfNull(scaleLow);
+        ArgumentNullException.ThrowIfNull(scaleHigh);
 
         try
         {
@@ -128,6 +168,8 @@ public static class AppSettings
                 ["Theme"] = theme.ToString(),
                 ["ShowSkillIcons"] = showSkillIcons,
                 ["ShowDamageScale"] = showDamageScale,
+                ["DamageScaleLow"] = Write(scaleLow),
+                ["DamageScaleHigh"] = Write(scaleHigh),
                 ["ManualOutline"] = Write(manual),
                 ["CalculatorOutline"] = Write(calculator),
             };
@@ -142,6 +184,12 @@ public static class AppSettings
             // Settings aren't critical: if saving fails, the next launch uses the defaults.
         }
     }
+
+    private static JsonObject Write(ScaleStop stop) => new()
+    {
+        ["Color"] = ToHex(stop.Color),
+        ["Opacity"] = Math.Round(stop.Opacity, 3),
+    };
 
     private static JsonObject Write(OutlineSettings outline) => new()
     {

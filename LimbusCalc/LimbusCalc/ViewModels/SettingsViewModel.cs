@@ -8,7 +8,7 @@ namespace LimbusCalc.ViewModels;
 /// One outline setting: on or off, color and opacity. Edited in the settings window and
 /// repainted through a brush in the application resources.
 /// </summary>
-public sealed class OutlineSettingsViewModel : ObservableObject
+public sealed class OutlineSettingsViewModel : ObservableObject, IColorSetting
 {
     private readonly string _resourceKey;
     private readonly Action _changed;
@@ -102,6 +102,81 @@ public sealed class OutlineSettingsViewModel : ObservableObject
     }
 }
 
+/// <summary>A color setting a palette swatch can be applied to.</summary>
+public interface IColorSetting
+{
+    string Hex { get; set; }
+}
+
+/// <summary>
+/// One end of the damage color scale: a color and its opacity. Any change rebuilds the
+/// gradient, so the table repaints right away.
+/// </summary>
+public sealed class ScaleStopViewModel : ObservableObject, IColorSetting
+{
+    private readonly Action _changed;
+    private Color _color;
+    private double _opacity;
+
+    public ScaleStopViewModel(string title, ScaleStop stored, Action changed)
+    {
+        ArgumentNullException.ThrowIfNull(stored);
+
+        Title = title;
+        _color = stored.Color;
+        _opacity = stored.Opacity;
+        _changed = changed;
+    }
+
+    public string Title { get; }
+
+    public Color Color
+    {
+        get => _color;
+        set
+        {
+            if (SetProperty(ref _color, value))
+            {
+                OnPropertyChanged(nameof(Hex));
+                OnPropertyChanged(nameof(PreviewColor));
+                _changed();
+            }
+        }
+    }
+
+    /// <summary>The color as text, so it can be typed in.</summary>
+    public string Hex
+    {
+        get => AppSettings.ToHex(Color);
+        set => Color = AppSettings.ParseColor(value, Color);
+    }
+
+    /// <summary>Opacity in percent: easier to read on a slider.</summary>
+    public double OpacityPercent
+    {
+        get => Math.Round(_opacity * 100.0);
+        set
+        {
+            if (SetProperty(ref _opacity, Math.Clamp(value, 0.0, 100.0) / 100.0, nameof(OpacityPercent)))
+            {
+                OnPropertyChanged(nameof(PreviewColor));
+                _changed();
+            }
+        }
+    }
+
+    /// <summary>The color with its opacity, for the preview strip.</summary>
+    public Color PreviewColor => Color.FromArgb((byte)Math.Round(_opacity * 255), Color.R, Color.G, Color.B);
+
+    public ScaleStop ToModel() => new() { Color = Color, Opacity = _opacity };
+
+    internal void Set(ScaleStop stop)
+    {
+        Color = stop.Color;
+        OpacityPercent = stop.Opacity * 100.0;
+    }
+}
+
 /// <summary>The settings window: theme, table cell look and outlines.</summary>
 public sealed class SettingsViewModel : ObservableObject
 {
@@ -126,6 +201,43 @@ public sealed class SettingsViewModel : ObservableObject
             CalculatorOutlineKey,
             AppSettings.LoadOutline("CalculatorOutline", AppSettings.DefaultCalculatorOutline()),
             Save);
+
+        ScaleLow = new ScaleStopViewModel(
+            "Lowest damage",
+            AppSettings.LoadScaleStop("DamageScaleLow", AppSettings.DefaultScaleLow()),
+            OnScaleChanged);
+
+        ScaleHigh = new ScaleStopViewModel(
+            "Highest damage",
+            AppSettings.LoadScaleStop("DamageScaleHigh", AppSettings.DefaultScaleHigh()),
+            OnScaleChanged);
+    }
+
+    /// <summary>The damage color scale's ends; cells in between get a mix of the two.</summary>
+    public ScaleStopViewModel ScaleLow { get; }
+
+    public ScaleStopViewModel ScaleHigh { get; }
+
+    /// <summary>The gradient table cells draw the damage scale with.</summary>
+    public const string DamageScaleGradientKey = "DamageScaleGradient";
+
+    /// <summary>Puts the default green scale back.</summary>
+    public void ResetDamageScale()
+    {
+        ScaleLow.Set(AppSettings.DefaultScaleLow());
+        ScaleHigh.Set(AppSettings.DefaultScaleHigh());
+    }
+
+    private void OnScaleChanged()
+    {
+        // Called while the stops are being built too, before both exist.
+        if (ScaleLow is null || ScaleHigh is null)
+        {
+            return;
+        }
+
+        ApplyDamageScale();
+        Save();
     }
 
     public const string ManualOutlineKey = "ManualOutlineBrush";
@@ -153,6 +265,7 @@ public sealed class SettingsViewModel : ObservableObject
     [
         "#DE5040", "#E58B2A", "#E5C22A", "#5BA85B",
         "#3E9BC7", "#7A6BD0", "#C765B0", "#98A0AD",
+        "#000000", "#FFFFFF",
     ];
 
     public bool IsDark
@@ -211,9 +324,13 @@ public sealed class SettingsViewModel : ObservableObject
         ApplyDamageScale();
     }
 
-    private void ApplyDamageScale() =>
-        Application.Current.Resources[DamageScaleVisibilityKey] =
-            _showDamageScale ? Visibility.Visible : Visibility.Collapsed;
+    private void ApplyDamageScale()
+    {
+        ResourceDictionary resources = Application.Current.Resources;
+
+        resources[DamageScaleVisibilityKey] = _showDamageScale ? Visibility.Visible : Visibility.Collapsed;
+        resources[DamageScaleGradientKey] = new HeatGradient(ScaleLow.ToModel(), ScaleHigh.ToModel());
+    }
 
     /// <summary>
     /// Puts the cell look into the application resources. Cells take it through DynamicResource,
@@ -234,5 +351,7 @@ public sealed class SettingsViewModel : ObservableObject
             Manual.ToModel(),
             Calculator.ToModel(),
             ShowSkillIcons,
-            ShowDamageScale);
+            ShowDamageScale,
+            ScaleLow.ToModel(),
+            ScaleHigh.ToModel());
 }

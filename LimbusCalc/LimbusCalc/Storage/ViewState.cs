@@ -19,12 +19,34 @@ public sealed class WindowViewState
     public bool Maximized { get; set; }
 }
 
-/// <summary>The look of one table: sorting, filters and hidden columns.</summary>
+/// <summary>One remembered sort key.</summary>
+public sealed class SortState
+{
+    public string Key { get; set; } = string.Empty;
+
+    public bool Descending { get; set; }
+}
+
+/// <summary>A remembered value range: bounds exactly as typed.</summary>
+public sealed class RangeState
+{
+    public string Min { get; set; } = string.Empty;
+
+    public string Max { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// The look of one table: sorting, filters and column layout.
+/// </summary>
 public sealed class TableViewState
 {
+    /// <summary>The single sort key of older versions; read only when <see cref="Sort"/> is empty.</summary>
     public string? SortKey { get; set; }
 
     public bool SortDescending { get; set; }
+
+    /// <summary>Sort keys from the main one to the last.</summary>
+    public List<SortState> Sort { get; set; } = [];
 
     public List<SkillSortKey> SortPriority { get; set; } = [];
 
@@ -33,8 +55,19 @@ public sealed class TableViewState
 
     public string Search { get; set; } = string.Empty;
 
+    public bool FavoritesOnly { get; set; }
+
+    /// <summary>Value ranges by column key; only set ones are stored.</summary>
+    public Dictionary<string, RangeState> Ranges { get; set; } = [];
+
     /// <summary>Keys of hidden columns.</summary>
     public List<string> Hidden { get; set; } = [];
+
+    /// <summary>Column keys in screen order; empty means the default order.</summary>
+    public List<string> ColumnOrder { get; set; } = [];
+
+    /// <summary>Widths set by dragging, by column key.</summary>
+    public Dictionary<string, double> ColumnWidths { get; set; } = [];
 
     /// <summary>Takes the current look of a table to remember it.</summary>
     public static TableViewState Capture(TableViewModel table)
@@ -45,10 +78,19 @@ public sealed class TableViewState
         {
             SortKey = table.SortKey,
             SortDescending = table.SortDescending,
+            Sort = [.. table.SortKeys.Select(key => new SortState { Key = key.Key, Descending = key.Descending })],
             SortPriority = [.. table.SortPriority.Select(option => option.Key)],
             Filters = table.Filter.Selections.ToDictionary(pair => pair.Key, pair => pair.Value.ToList()),
             Search = table.Filter.Search,
+            FavoritesOnly = table.Filter.FavoritesOnly,
+            Ranges = table.Filter.Ranges
+                .Where(range => range.IsSet)
+                .ToDictionary(range => range.Key, range => new RangeState { Min = range.Min, Max = range.Max }),
             Hidden = [.. table.Columns.Where(column => column.IsHidden).Select(column => column.Key)],
+            ColumnOrder = table.HasCustomLayout ? [.. table.DisplayColumns.Select(column => column.Key)] : [],
+            ColumnWidths = table.Columns
+                .Where(column => column.UserWidth is not null)
+                .ToDictionary(column => column.Key, column => column.UserWidth!.Value),
         };
     }
 
@@ -65,11 +107,27 @@ public sealed class TableViewState
             table.SetColumnHidden(column, Hidden.Contains(column.Key));
         }
 
+        table.RestoreLayout(ColumnOrder, ColumnWidths);
+
         table.Filter.Restore(
             Filters.ToDictionary(pair => pair.Key, pair => (IReadOnlyList<string>)pair.Value),
             Search);
 
-        table.RestoreSort(SortKey, SortDescending, SortPriority);
+        table.Filter.FavoritesOnly = FavoritesOnly;
+
+        foreach (RangeFilterViewModel range in table.Filter.Ranges)
+        {
+            RangeState? stored = Ranges.GetValueOrDefault(range.Key);
+            range.Min = stored?.Min ?? string.Empty;
+            range.Max = stored?.Max ?? string.Empty;
+        }
+
+        // Older files remember a single key.
+        List<(string Key, bool Descending)> sort = Sort.Count > 0
+            ? [.. Sort.Select(key => (key.Key, key.Descending))]
+            : SortKey is null ? [] : [(SortKey, SortDescending)];
+
+        table.RestoreSort(sort, SortPriority);
     }
 }
 

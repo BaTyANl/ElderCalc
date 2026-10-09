@@ -27,9 +27,6 @@
          background, so this is amber — the most yellow shade that still reads. -->
     <SolidColorBrush x:Key="MoratoriumTextBrush" Color="#E0A008"/>
 
-    <!-- Damage color scale in tables: the higher the damage, the stronger the fill. -->
-    <SolidColorBrush x:Key="HeatBrush" Color="#2E9E66"/>
-
     <!-- Scrollbar thumb. -->
     <SolidColorBrush x:Key="ScrollThumbBrush" Color="#C3C8D2"/>
     <SolidColorBrush x:Key="ScrollThumbHoverBrush" Color="#A2AAB9"/>

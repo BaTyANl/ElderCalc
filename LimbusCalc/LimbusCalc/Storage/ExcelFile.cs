@@ -39,14 +39,33 @@ public static class ExcelFile
     {
         ArgumentNullException.ThrowIfNull(table);
 
+        Write(table.Title, table.Rows, table.Columns, _ => true, path);
+    }
+
+    /// <summary>
+    /// Exports chosen rows and columns in the given column order. Cells that
+    /// <paramref name="include"/> leaves out stay blank.
+    /// </summary>
+    public static void Write(
+        string title,
+        IEnumerable<TableRowViewModel> rows,
+        IReadOnlyList<TableColumn> columns,
+        Func<TableCell, bool> include,
+        string path)
+    {
+        ArgumentNullException.ThrowIfNull(rows);
+        ArgumentNullException.ThrowIfNull(columns);
+        ArgumentNullException.ThrowIfNull(include);
+
         XElement sheetData = new(Main + "sheetData");
         int number = 1;
 
-        sheetData.Add(BuildRow(number++, [.. table.Columns.Select(column => (object?)column.Title)]));
+        sheetData.Add(BuildRow(number++, [.. columns.Select(column => (object?)column.Title)]));
 
-        foreach (TableRowViewModel row in table.Rows)
+        foreach (TableRowViewModel row in rows)
         {
-            sheetData.Add(BuildRow(number++, [.. row.Cells.Select(ValueOf)]));
+            sheetData.Add(BuildRow(number++, [.. columns.Select(column =>
+                include(row.Cells[column.Index]) ? ValueOf(row.Cells[column.Index]) : null)]));
         }
 
         XDocument sheet = new(new XElement(Main + "worksheet", sheetData));
@@ -83,7 +102,7 @@ public static class ExcelFile
                 new XAttribute(XNamespace.Xmlns + "r", DocumentRelations),
                 new XElement(Main + "sheets",
                     new XElement(Main + "sheet",
-                        new XAttribute("name", SheetName(table.Title)),
+                        new XAttribute("name", SheetName(title)),
                         new XAttribute("sheetId", 1),
                         new XAttribute(DocumentRelations + "id", "rId1"))))));
 

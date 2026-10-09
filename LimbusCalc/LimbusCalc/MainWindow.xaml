@@ -193,6 +193,11 @@
                                     AutomationProperties.AutomationId="ExportButton"
                                     ToolTip="Save the table as .xlsx or .json"
                                     Click="ExportTable_Click"/>
+                            <Button Content="Copy image" Margin="8,0,0,0" MinWidth="86"
+                                    Style="{StaticResource SmallButton}"
+                                    AutomationProperties.AutomationId="CopyImageButton"
+                                    ToolTip="Copy a picture of the table as it is on screen to the clipboard"
+                                    Click="CopyImage_Click"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal">
@@ -275,6 +280,18 @@
                                              Converter={StaticResource BoolToVisibility}}"
                                 Click="FilterList_Click"/>
 
+                        <!-- Value ranges and favorites select whole rows, like the sinner filter. -->
+                        <Button Margin="8,0,0,0" Style="{StaticResource SmallButton}"
+                                AutomationProperties.AutomationId="FilterRangeButton"
+                                Content="{Binding RangeLabel}"
+                                ToolTip="Show only rows whose values fall within a range"
+                                Click="FilterRange_Click"/>
+                        <ToggleButton Margin="8,0,0,0" Style="{StaticResource SmallToggleButton}"
+                                      AutomationProperties.AutomationId="FavoritesOnlyButton"
+                                      Content="★ Favorites"
+                                      IsChecked="{Binding FavoritesOnly}"
+                                      ToolTip="Show only favorite rows"/>
+
                         <!-- Name search is a filter too, so it sits in the same row, set slightly
                              apart since it's not a checkbox list. -->
                         <TextBlock Text="Search" VerticalAlignment="Center"
@@ -319,7 +336,7 @@
                                 <Border BorderBrush="{DynamicResource SubtleTextBrush}"
                                         BorderThickness="0,0,0,2"
                                         HorizontalAlignment="Left">
-                                    <ItemsControl ItemsSource="{Binding Columns}">
+                                    <ItemsControl ItemsSource="{Binding DisplayColumns}">
                                         <ItemsControl.ItemContainerStyle>
                                             <Style TargetType="ContentPresenter">
                                                 <Style.Triggers>
@@ -334,17 +351,32 @@
                                         </ItemsControl.ItemsPanel>
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <!-- Left click sorts by the column; right click on
-                                                     a skill column opens the sort priorities. -->
+                                                <!-- Left click sorts by the column, Shift+click adds it to
+                                                     the sort; dragging moves the column and the right edge
+                                                     resizes it. Right click on a skill column opens the
+                                                     sort priorities. -->
                                                 <Border Padding="8,6" Background="Transparent"
                                                         Width="{Binding ActualWidth}"
-                                                        Cursor="Hand"
                                                         BorderBrush="{DynamicResource OutlineBrush}"
                                                         BorderThickness="0,0,1,0"
                                                         SnapsToDevicePixels="True"
+                                                        MouseLeftButtonDown="ColumnHeader_MouseDown"
+                                                        MouseMove="ColumnHeader_MouseMove"
                                                         MouseLeftButtonUp="ColumnHeader_LeftClick"
                                                         MouseRightButtonUp="ColumnHeader_RightClick"
-                                                        ToolTip="{Binding Description}">
+                                                        ToolTip="{Binding HeaderTip}">
+                                                    <!-- A hand only where a click sorts; the star header just moves. -->
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="Cursor" Value="Hand"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsSortable}" Value="False">
+                                                                    <Setter Property="Cursor" Value="Arrow"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <Grid>
                                                     <!-- A numeric column's title sits above its numbers,
                                                          i.e. centered in the cell. -->
                                                     <StackPanel Orientation="Horizontal">
@@ -357,6 +389,9 @@
                                                                     <DataTrigger Binding="{Binding Kind}" Value="Computed">
                                                                         <Setter Property="HorizontalAlignment" Value="Center"/>
                                                                     </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding Kind}" Value="Favorite">
+                                                                        <Setter Property="HorizontalAlignment" Value="Center"/>
+                                                                    </DataTrigger>
                                                                 </Style.Triggers>
                                                             </Style>
                                                         </StackPanel.Style>
@@ -366,6 +401,10 @@
                                                                    FontSize="15" Margin="5,0,0,0"
                                                                    Foreground="{DynamicResource AccentBrush}"/>
                                                     </StackPanel>
+                                                    <!-- Reaches past the padding to the very edge of the header cell. -->
+                                                    <Thumb Style="{StaticResource ColumnResizeGrip}" Margin="0,-6,-12,-6"
+                                                           DragDelta="ColumnResize_DragDelta"/>
+                                                    </Grid>
                                                 </Border>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
@@ -1021,6 +1060,62 @@
                                 ToolTip="Hide every column except the name"
                                 Click="HideAllColumns_Click"/>
                     </StackPanel>
+
+                    <!-- Order and widths are changed right in the header; this puts them back. -->
+                    <TextBlock Text="Drag a header to move a column, drag its right edge to resize it."
+                               Foreground="{DynamicResource SubtleTextBrush}" TextWrapping="Wrap"
+                               FontSize="12" Margin="0,12,0,6"/>
+                    <Button Content="Reset order and widths" HorizontalAlignment="Left"
+                            Style="{StaticResource SmallButton}"
+                            AutomationProperties.AutomationId="ResetLayoutButton"
+                            IsEnabled="{Binding HasCustomLayout}"
+                            Click="ResetLayout_Click"/>
+                </StackPanel>
+            </Border>
+        </Popup>
+
+        <!-- Value ranges: a minimum and a maximum per numeric column; empty means no limit. -->
+        <Popup x:Name="RangePopup" StaysOpen="False" AllowsTransparency="True"
+               Placement="Bottom" VerticalOffset="4">
+            <Border Style="{StaticResource Card}" Width="300" Margin="6">
+                <StackPanel>
+                    <TextBlock Text="Value range" Style="{StaticResource CardTitleText}"/>
+                    <TextBlock Text="Rows whose value is outside the range, or empty, are hidden. Leave a field empty for no limit."
+                               Foreground="{DynamicResource SubtleTextBrush}" TextWrapping="Wrap"
+                               FontSize="12" Margin="0,0,0,8"/>
+                    <Grid Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="70"/>
+                            <ColumnDefinition Width="70"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="1" Text="Min" Margin="4,0" FontSize="12"
+                                   Foreground="{DynamicResource SubtleTextBrush}"/>
+                        <TextBlock Grid.Column="2" Text="Max" Margin="4,0" FontSize="12"
+                                   Foreground="{DynamicResource SubtleTextBrush}"/>
+                    </Grid>
+                    <ScrollViewer MaxHeight="420" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding Ranges}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="70"/>
+                                            <ColumnDefinition Width="70"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding Key}" VerticalAlignment="Center"/>
+                                        <TextBox Grid.Column="1" Margin="4,0"
+                                                 AutomationProperties.AutomationId="{Binding Key, StringFormat='{}{0} min'}"
+                                                 Text="{Binding Min, UpdateSourceTrigger=PropertyChanged}"/>
+                                        <TextBox Grid.Column="2" Margin="4,0"
+                                                 AutomationProperties.AutomationId="{Binding Key, StringFormat='{}{0} max'}"
+                                                 Text="{Binding Max, UpdateSourceTrigger=PropertyChanged}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
                 </StackPanel>
             </Border>
         </Popup>
