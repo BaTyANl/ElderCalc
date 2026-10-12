@@ -118,7 +118,7 @@ public sealed class TableColumn : ObservableObject
 
     /// <summary>
     /// The name the column is stored under in the file and looked up by. Usually the same as
-    /// the title, but the four DPSC columns share one title and need different keys.
+    /// the title, but the DPSC columns share one title and need different keys.
     /// </summary>
     public string Key
     {
@@ -216,6 +216,12 @@ public sealed class TableColumn : ObservableObject
             }
         }
     }
+
+    /// <summary>
+    /// Whether the column starts hidden: rarely used skills that most IDs don't have. The
+    /// user can still show it from the Columns menu.
+    /// </summary>
+    public bool HiddenByDefault { get; init; }
 
     /// <summary>The name column can't be hidden: rows would be impossible to tell apart.</summary>
     public bool CanHide => !Matches("Name");
@@ -528,7 +534,7 @@ public sealed class ColumnChoiceViewModel : ObservableObject
     public TableColumn Column { get; }
 
     /// <summary>
-    /// The label in the list. The four DPSC columns share one header title, so the key
+    /// The label in the list. The DPSC columns share one header title, so the key
     /// ("1T Damage DPSC") is used here — otherwise they couldn't be told apart.
     /// </summary>
     public string Title => Column.Key;
@@ -1663,7 +1669,13 @@ public sealed partial class TableViewModel : ObservableObject
             Stretch = true,
             Aliases = ["Name"],
         },
-        .. SkillColumns("S1-1", "S1-2", "S2-1", "S2-2", "S3-1", "S3-2", "S3-3", "S3-4", "C-1", "C-2"),
+        .. SkillColumns("S1-1", "S1-2", "S1-3"),
+        SkillColumn("S1-4", hiddenByDefault: true),
+        .. SkillColumns("S2-1", "S2-2", "S2-3"),
+        SkillColumn("S2-4", hiddenByDefault: true),
+        .. SkillColumns("S3-1", "S3-2", "S3-3", "S3-4"),
+        SkillColumn("S3-5", hiddenByDefault: true),
+        .. SkillColumns("C-1", "C-2"),
     ]);
 
     /// <summary>Columns of the E.G.O. table. Every damage column is followed by its DPSC.</summary>
@@ -1695,6 +1707,7 @@ public sealed partial class TableViewModel : ObservableObject
         new TableColumn { Title = "Name", Width = 270, Stretch = true, FontSize = 12 },
         new TableColumn { Title = "Sin Cost", Width = 92, Kind = TableCellKind.Integer },
         .. DamageWithCost("1T Damage", "Single target"),
+        .. DamageWithCost("2T Damage", "Single enemy with 2 parts"),
         .. DamageWithCost("3T Damage", "Single enemy with 3 parts"),
         .. DamageWithCost("7T Damage", "7 different enemies"),
         .. DamageWithCost(
@@ -1704,7 +1717,7 @@ public sealed partial class TableViewModel : ObservableObject
     ]);
 
     /// <summary>
-    /// Damage and its cost per sin: DPSC is calculated and can't be edited. All four share
+    /// Damage and its cost per sin: DPSC is calculated and can't be edited. All of them share
     /// one header title but must be stored separately — hence a separate key.
     /// </summary>
     private static IEnumerable<TableColumn> DamageWithCost(
@@ -1754,6 +1767,7 @@ public sealed partial class TableViewModel : ObservableObject
         for (int i = 0; i < columns.Count; i++)
         {
             columns[i].Index = i;
+            columns[i].IsHidden = columns[i].HiddenByDefault;
         }
 
         TableColumn.MeasureStretch(columns);
@@ -1789,11 +1803,14 @@ public sealed partial class TableViewModel : ObservableObject
 
     /// <summary>Skill columns: whole numbers that accept calculator exports.</summary>
     private static IEnumerable<TableColumn> SkillColumns(params string[] titles) =>
-        titles.Select(title => new TableColumn
-        {
-            Title = title,
-            Width = 92,
-            Kind = TableCellKind.Integer,
-            AcceptsSetup = true,
-        });
+        titles.Select(title => SkillColumn(title));
+
+    private static TableColumn SkillColumn(string title, bool hiddenByDefault = false) => new()
+    {
+        Title = title,
+        Width = 92,
+        Kind = TableCellKind.Integer,
+        AcceptsSetup = true,
+        HiddenByDefault = hiddenByDefault,
+    };
 }

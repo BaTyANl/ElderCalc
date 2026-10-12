@@ -331,6 +331,7 @@
                             BorderThickness="1,1,0,0"
                             SnapsToDevicePixels="True">
                         <ScrollViewer x:Name="HeaderScroll" Tag="TableSyncScroll"
+                                      PreviewMouseWheel="Table_PreviewMouseWheel"
                                       HorizontalScrollBarVisibility="Hidden"
                                       VerticalScrollBarVisibility="Disabled">
                                 <Border BorderBrush="{DynamicResource SubtleTextBrush}"
@@ -421,6 +422,7 @@
                             SnapsToDevicePixels="True"
                             Visibility="{Binding HasRows, Converter={StaticResource BoolToVisibility}}">
                         <ScrollViewer x:Name="AverageScroll" Tag="TableSyncScroll"
+                                      PreviewMouseWheel="Table_PreviewMouseWheel"
                                       HorizontalScrollBarVisibility="Hidden"
                                       VerticalScrollBarVisibility="Disabled">
                             <Border BorderBrush="{DynamicResource SubtleTextBrush}"
@@ -506,6 +508,7 @@
                                                           HorizontalScrollBarVisibility="Auto"
                                                           VerticalScrollBarVisibility="Auto"
                                                           ScrollChanged="TableScroll_ScrollChanged"
+                                                          PreviewMouseWheel="Table_PreviewMouseWheel"
                                                           SizeChanged="TableScroll_SizeChanged">
                                                 <ItemsPresenter/>
                                             </ScrollViewer>

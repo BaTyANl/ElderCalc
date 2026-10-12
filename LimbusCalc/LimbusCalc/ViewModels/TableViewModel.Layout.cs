@@ -77,22 +77,38 @@ public sealed partial class TableViewModel
     }
 
     /// <summary>
-    /// Restores a remembered layout. Unknown keys are skipped, and columns missing from the
-    /// remembered order (added in a newer version) go to the end.
+    /// Restores a remembered layout. Unknown keys are skipped, and a column missing from the
+    /// remembered order (added in a newer version) goes right after its default neighbor:
+    /// S1-3 lands next to S1-2 rather than at the far end.
     /// </summary>
     public void RestoreLayout(IReadOnlyList<string> order, IReadOnlyDictionary<string, double> widths)
     {
         ArgumentNullException.ThrowIfNull(order);
         ArgumentNullException.ThrowIfNull(widths);
 
-        int target = 0;
+        List<TableColumn> placed =
+        [
+            .. order
+                .Select(key => Columns.FirstOrDefault(column => column.Key == key))
+                .OfType<TableColumn>()
+                .Distinct(),
+        ];
 
-        foreach (string key in order)
+        if (placed.Count > 0)
         {
-            if (Columns.FirstOrDefault(column => column.Key == key) is TableColumn column)
+            // In data order, so the left neighbor is always placed by the time it's needed.
+            for (int i = 0; i < Columns.Count; i++)
             {
-                MoveColumn(column, target++);
+                if (!placed.Contains(Columns[i]))
+                {
+                    placed.Insert(i == 0 ? 0 : placed.IndexOf(Columns[i - 1]) + 1, Columns[i]);
+                }
             }
+        }
+
+        for (int i = 0; i < placed.Count; i++)
+        {
+            MoveColumn(placed[i], i);
         }
 
         foreach (TableColumn column in Columns)

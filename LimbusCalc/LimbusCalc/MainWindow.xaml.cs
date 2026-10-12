@@ -620,6 +620,31 @@ namespace LimbusCalc
             }
         }
 
+        /// <summary>
+        /// Ctrl+wheel scrolls the table sideways: over the rows, the header or the averages.
+        /// The rows' viewer does the scrolling, the header and averages follow it as usual.
+        /// </summary>
+        private void Table_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if ((Keyboard.Modifiers & ModifierKeys.Control) == 0 || sender is not ScrollViewer viewer)
+            {
+                return;
+            }
+
+            ScrollViewer? rows = viewer.Name == "TableScroll"
+                ? viewer
+                : Siblings<ScrollViewer>(viewer).FirstOrDefault(other => other.Name == "TableScroll");
+
+            if (rows is null)
+            {
+                return;
+            }
+
+            // Wheel down moves right, like scrolling down a page moves forward.
+            rows.ScrollToHorizontalOffset(rows.HorizontalOffset - e.Delta);
+            e.Handled = true;
+        }
+
         private static IEnumerable<T> Siblings<T>(DependencyObject element)
             where T : DependencyObject
         {

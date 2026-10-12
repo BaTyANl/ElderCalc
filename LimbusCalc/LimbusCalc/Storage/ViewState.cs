@@ -63,6 +63,13 @@ public sealed class TableViewState
     /// <summary>Keys of hidden columns.</summary>
     public List<string> Hidden { get; set; } = [];
 
+    /// <summary>
+    /// Keys of columns hidden by default that the user has shown. Kept apart from
+    /// <see cref="Hidden"/> so a column added in a newer version starts hidden even with an
+    /// older file, which knows nothing about it.
+    /// </summary>
+    public List<string> Shown { get; set; } = [];
+
     /// <summary>Column keys in screen order; empty means the default order.</summary>
     public List<string> ColumnOrder { get; set; } = [];
 
@@ -87,6 +94,7 @@ public sealed class TableViewState
                 .Where(range => range.IsSet)
                 .ToDictionary(range => range.Key, range => new RangeState { Min = range.Min, Max = range.Max }),
             Hidden = [.. table.Columns.Where(column => column.IsHidden).Select(column => column.Key)],
+            Shown = [.. table.Columns.Where(column => column.HiddenByDefault && !column.IsHidden).Select(column => column.Key)],
             ColumnOrder = table.HasCustomLayout ? [.. table.DisplayColumns.Select(column => column.Key)] : [],
             ColumnWidths = table.Columns
                 .Where(column => column.UserWidth is not null)
@@ -104,7 +112,9 @@ public sealed class TableViewState
 
         foreach (TableColumn column in table.Columns)
         {
-            table.SetColumnHidden(column, Hidden.Contains(column.Key));
+            table.SetColumnHidden(
+                column,
+                Hidden.Contains(column.Key) || (column.HiddenByDefault && !Shown.Contains(column.Key)));
         }
 
         table.RestoreLayout(ColumnOrder, ColumnWidths);

@@ -315,7 +315,7 @@ public sealed class RangeFilterViewModel : ObservableObject
     private string _min = string.Empty;
     private string _max = string.Empty;
 
-    /// <summary>Key of the column; also the label, since the four DPSC columns share a title.</summary>
+    /// <summary>Key of the column; also the label, since the DPSC columns share a title.</summary>
     public required string Key { get; init; }
 
     /// <summary>The lower bound as typed; empty or not a number means no bound.</summary>
