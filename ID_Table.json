@@ -22172,7 +22172,7 @@
   {
     "Rarity": "000",
     "Sinner": "Don Quixote",
-    "ID Name": "Haute Cputure::Le Noir Brand Manager",
+    "ID Name": "Haute Couture::Le Noir Brand Manager",
     "S1-1": {
       "damage": 68,
       "type": "Blunt",
@@ -22182,22 +22182,18 @@
         "passiveModDynPercent": 20,
         "skillType": "Blunt",
         "skillSin": "Pride",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "coins": [
           {
             "active": true,
             "power": 5,
             "modDynPercent": 70,
-            "offenseDefenseDiff": 4,
-            "weight": 1
+            "offenseDefenseDiff": 4
           },
           {
             "active": true,
             "power": 10,
             "modDynPercent": 70,
-            "offenseDefenseDiff": 4,
-            "weight": 1
+            "offenseDefenseDiff": 4
           }
         ]
       }
@@ -22211,15 +22207,12 @@
         "passiveModDynPercent": 20,
         "skillType": "Blunt",
         "skillSin": "Pride",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "coins": [
           {
             "active": true,
             "power": 5,
             "modDynPercent": 70,
-            "offenseDefenseDiff": 6,
-            "weight": 1
+            "offenseDefenseDiff": 6
           }
         ]
       }
@@ -22233,8 +22226,6 @@
         "passiveModDynPercent": 20,
         "skillType": "Blunt",
         "skillSin": "Envy",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "bonuses": [
           {
             "kind": "Flat",
@@ -22250,15 +22241,13 @@
             "active": true,
             "power": 6,
             "modDynPercent": 60,
-            "offenseDefenseDiff": 4,
-            "weight": 1
+            "offenseDefenseDiff": 4
           },
           {
             "active": true,
             "power": 15,
             "modDynPercent": 60,
-            "offenseDefenseDiff": 4,
-            "weight": 1
+            "offenseDefenseDiff": 4
           }
         ]
       }
@@ -22272,8 +22261,6 @@
         "passiveModDynPercent": 20,
         "skillType": "Blunt",
         "skillSin": "Sloth",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "bonuses": [
           {
             "kind": "Flat",
@@ -22290,22 +22277,19 @@
             "active": true,
             "power": 7,
             "modDynPercent": 70,
-            "offenseDefenseDiff": 7,
-            "weight": 1
+            "offenseDefenseDiff": 7
           },
           {
             "active": true,
             "power": 7,
             "modDynPercent": 70,
-            "offenseDefenseDiff": 7,
-            "weight": 1
+            "offenseDefenseDiff": 7
           },
           {
             "active": true,
             "power": 16,
             "modDynPercent": 70,
-            "offenseDefenseDiff": 7,
-            "weight": 1
+            "offenseDefenseDiff": 7
           }
         ]
       }
@@ -22319,8 +22303,6 @@
         "passiveModDynPercent": 20,
         "skillType": "Blunt",
         "skillSin": "Sloth",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "bonuses": [
           {
             "kind": "Flat",
@@ -22390,6 +22372,374 @@
               {
                 "name": "Subtarget 3",
                 "offenseDefenseDiff": 8
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "S3-3": {
+      "damage": 347,
+      "type": "Blunt",
+      "sin": "Sloth",
+      "setup": {
+        "baseRoll": 6,
+        "passiveModDynPercent": 20,
+        "skillType": "Blunt",
+        "skillSin": "Sloth",
+        "bonuses": [
+          {
+            "kind": "Flat",
+            "target": "Sloth",
+            "values": [
+              0,
+              0,
+              10
+            ]
+          },
+          {
+            "kind": "Percent",
+            "target": "Sloth",
+            "values": [
+              0,
+              0,
+              90
+            ]
+          }
+        ],
+        "coins": [
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 130,
+            "offenseDefenseDiff": 8
+          },
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 130,
+            "offenseDefenseDiff": 8
+          },
+          {
+            "active": true,
+            "power": 20,
+            "modDynPercent": 130,
+            "offenseDefenseDiff": 8
+          }
+        ]
+      }
+    },
+    "C-1": {
+      "damage": 80,
+      "type": "Blunt",
+      "sin": "Sloth",
+      "setup": {
+        "baseRoll": 7,
+        "passiveModDynPercent": 20,
+        "skillType": "Blunt",
+        "skillSin": "Sloth",
+        "coins": [
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 50,
+            "offenseDefenseDiff": 6
+          },
+          {
+            "active": true,
+            "power": 12,
+            "modDynPercent": 50,
+            "offenseDefenseDiff": 6
+          }
+        ]
+      }
+    }
+  },
+  {
+    "Rarity": "000",
+    "Sinner": "Sinclair",
+    "ID Name": "Haute Couture::The Crimson God of Le Rouge",
+    "S1-1": {
+      "damage": 42,
+      "type": "Pierce",
+      "sin": "Gluttony",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 15,
+        "skillType": "Pierce",
+        "skillSin": "Gluttony",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "offenseDefenseDiff": 4,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "offenseDefenseDiff": 4
+              },
+              {
+                "name": "Subtarget 3",
+                "offenseDefenseDiff": 4
+              }
+            ]
+          }
+        ],
+        "targets": [
+          {
+            "name": "Subtarget 2",
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 3",
+            "timeMoratoriumStacks": 1
+          }
+        ]
+      }
+    },
+    "S1-2": {
+      "damage": 45,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 9,
+        "passiveModDynPercent": 15,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 150,
+            "offenseDefenseDiff": 4,
+            "weight": 1
+          }
+        ]
+      }
+    },
+    "S1-3": {
+      "damage": 58,
+      "type": "Pierce",
+      "sin": "Gluttony",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 25,
+        "skillType": "Pierce",
+        "skillSin": "Gluttony",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "coins": [
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 8,
+            "offenseDefenseDiff": 8,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 8,
+            "offenseDefenseDiff": 8,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 4,
+            "modDynPercent": 8,
+            "offenseDefenseDiff": 8,
+            "weight": 1
+          }
+        ]
+      }
+    },
+    "S2-1": {
+      "damage": 90,
+      "type": "Pierce",
+      "sin": "Wrath",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 15,
+        "skillType": "Pierce",
+        "skillSin": "Wrath",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "coins": [
+          {
+            "active": true,
+            "power": 5,
+            "offenseDefenseDiff": 5,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "offenseDefenseDiff": 5
+              },
+              {
+                "name": "Subtarget 3",
+                "offenseDefenseDiff": 5
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 5,
+            "offenseDefenseDiff": 5,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "offenseDefenseDiff": 5
+              },
+              {
+                "name": "Subtarget 3",
+                "offenseDefenseDiff": 5
+              }
+            ]
+          }
+        ],
+        "targets": [
+          {
+            "name": "Subtarget 2",
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 3",
+            "timeMoratoriumStacks": 1
+          }
+        ]
+      }
+    },
+    "S2-2": {
+      "damage": 104,
+      "type": "Pierce",
+      "sin": "Wrath",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 25,
+        "skillType": "Pierce",
+        "skillSin": "Wrath",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 38,
+            "offenseDefenseDiff": 9,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 40,
+            "offenseDefenseDiff": 9,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 40,
+            "offenseDefenseDiff": 9,
+            "weight": 1
+          }
+        ]
+      }
+    },
+    "S2-3": {
+      "damage": 60,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 6,
+        "passiveModDynPercent": 25,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 40,
+            "offenseDefenseDiff": 8,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 40,
+            "offenseDefenseDiff": 8,
+            "weight": 1
+          }
+        ]
+      }
+    },
+    "S3-1": {
+      "damage": 213,
+      "type": "Pierce",
+      "sin": "Lust",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 15,
+        "skillType": "Pierce",
+        "skillSin": "Lust",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 10,
+            "offenseDefenseDiff": 6,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "offenseDefenseDiff": 6
+              },
+              {
+                "name": "Subtarget 3",
+                "offenseDefenseDiff": 6
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 10,
+            "offenseDefenseDiff": 6,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "offenseDefenseDiff": 6
+              },
+              {
+                "name": "Subtarget 3",
+                "offenseDefenseDiff": 6
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 10,
+            "offenseDefenseDiff": 6,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "offenseDefenseDiff": 6
+              },
+              {
+                "name": "Subtarget 3",
+                "offenseDefenseDiff": 6
               }
             ]
           }
@@ -22407,85 +22757,248 @@
       }
     },
     "S3-3": {
-      "damage": 347,
-      "type": "Blunt",
-      "sin": "Sloth",
+      "damage": 460,
+      "type": "Pierce",
+      "sin": "Lust",
       "setup": {
         "baseRoll": 6,
-        "passiveModDynPercent": 20,
-        "skillType": "Blunt",
-        "skillSin": "Sloth",
+        "passiveModDynPercent": 25,
+        "skillType": "Pierce",
+        "skillSin": "Lust",
         "clashCount": 0,
         "timeMoratoriumStacks": 1,
-        "bonuses": [
-          {
-            "kind": "Flat",
-            "target": "Sloth",
-            "values": [
-              0,
-              0,
-              10
-            ]
-          },
-          {
-            "kind": "Percent",
-            "target": "Sloth",
-            "values": [
-              0,
-              0,
-              90
-            ]
-          }
-        ],
         "coins": [
           {
             "active": true,
-            "power": 7,
-            "modDynPercent": 130,
-            "offenseDefenseDiff": 8,
-            "weight": 1
+            "power": 5,
+            "modDynPercent": 50,
+            "offenseDefenseDiff": 10,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 30,
+                "offenseDefenseDiff": 10
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 30,
+                "offenseDefenseDiff": 10
+              }
+            ]
           },
           {
             "active": true,
-            "power": 7,
-            "modDynPercent": 130,
-            "offenseDefenseDiff": 8,
-            "weight": 1
+            "power": 5,
+            "modDynPercent": 52,
+            "offenseDefenseDiff": 10,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 32,
+                "offenseDefenseDiff": 10
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 32,
+                "offenseDefenseDiff": 10
+              }
+            ]
           },
           {
             "active": true,
-            "power": 20,
-            "modDynPercent": 130,
-            "offenseDefenseDiff": 8,
-            "weight": 1
+            "power": 5,
+            "modDynPercent": 52,
+            "offenseDefenseDiff": 10,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 32,
+                "offenseDefenseDiff": 10
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 32,
+                "offenseDefenseDiff": 10
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 52,
+            "offenseDefenseDiff": 10,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 32,
+                "offenseDefenseDiff": 10
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 32,
+                "offenseDefenseDiff": 10
+              }
+            ]
+          }
+        ],
+        "targets": [
+          {
+            "name": "Subtarget 2",
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 3",
+            "timeMoratoriumStacks": 1
+          }
+        ]
+      }
+    },
+    "S3-4": {
+      "damage": 560,
+      "type": "Pierce",
+      "sin": "Lust",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 25,
+        "skillType": "Pierce",
+        "skillSin": "Lust",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "coins": [
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 20,
+            "offenseDefenseDiff": 10,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "offenseDefenseDiff": 10
+              },
+              {
+                "name": "Subtarget 3",
+                "offenseDefenseDiff": 10
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 22,
+            "offenseDefenseDiff": 10,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 2,
+                "offenseDefenseDiff": 10
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 2,
+                "offenseDefenseDiff": 10
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 22,
+            "offenseDefenseDiff": 10,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 2,
+                "offenseDefenseDiff": 10
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 2,
+                "offenseDefenseDiff": 10
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 22,
+            "offenseDefenseDiff": 10,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 2,
+                "offenseDefenseDiff": 10
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 2,
+                "offenseDefenseDiff": 10
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 67,
+            "offenseDefenseDiff": 10,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 47,
+                "offenseDefenseDiff": 10
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 47,
+                "offenseDefenseDiff": 10
+              }
+            ]
+          }
+        ],
+        "targets": [
+          {
+            "name": "Subtarget 2",
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 3",
+            "timeMoratoriumStacks": 1
           }
         ]
       }
     },
     "C-1": {
-      "damage": 80,
-      "type": "Blunt",
-      "sin": "Sloth",
+      "damage": 59,
+      "type": "Pierce",
+      "sin": "Lust",
       "setup": {
-        "baseRoll": 7,
-        "passiveModDynPercent": 20,
-        "skillType": "Blunt",
-        "skillSin": "Sloth",
+        "baseRoll": 8,
+        "passiveModDynPercent": 25,
+        "skillType": "Pierce",
+        "skillSin": "Lust",
         "clashCount": 0,
         "timeMoratoriumStacks": 1,
         "coins": [
           {
             "active": true,
-            "power": 7,
-            "modDynPercent": 50,
-            "offenseDefenseDiff": 6,
+            "power": 6,
+            "modDynPercent": 20,
+            "offenseDefenseDiff": 7,
             "weight": 1
           },
           {
             "active": true,
-            "power": 12,
-            "modDynPercent": 50,
-            "offenseDefenseDiff": 6,
+            "power": 6,
+            "modDynPercent": 22,
+            "offenseDefenseDiff": 7,
             "weight": 1
           }
         ]
