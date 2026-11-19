@@ -14,48 +14,41 @@
         "passiveModDynPercent": 12,
         "skillType": "Pierce",
         "skillSin": "Pride",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "coins": [
           {
             "active": true,
             "power": 2,
             "modDynPercent": 200,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 2,
             "modDynPercent": 200,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 2,
             "modDynPercent": 200,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 2,
             "modDynPercent": 200,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 2,
             "modDynPercent": 200,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           }
         ]
       }
@@ -69,8 +62,6 @@
         "passiveModDynPercent": 12,
         "skillType": "Pierce",
         "skillSin": "Pride",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "coins": [
           {
             "active": true,
@@ -181,16 +172,6 @@
                 "hasCrit": true
               }
             ]
-          }
-        ],
-        "targets": [
-          {
-            "name": "Subtarget 2",
-            "timeMoratoriumStacks": 1
-          },
-          {
-            "name": "Subtarget 3",
-            "timeMoratoriumStacks": 1
           }
         ]
       }
@@ -204,8 +185,6 @@
         "passiveModDynPercent": 12,
         "skillType": "Pierce",
         "skillSin": "Pride",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "coins": [
           {
             "power": -3,
@@ -341,32 +320,6 @@
                 "hasCrit": true
               }
             ]
-          }
-        ],
-        "targets": [
-          {
-            "name": "Subtarget 2",
-            "timeMoratoriumStacks": 1
-          },
-          {
-            "name": "Subtarget 3",
-            "timeMoratoriumStacks": 1
-          },
-          {
-            "name": "Subtarget 4",
-            "timeMoratoriumStacks": 1
-          },
-          {
-            "name": "Subtarget 5",
-            "timeMoratoriumStacks": 1
-          },
-          {
-            "name": "Subtarget 6",
-            "timeMoratoriumStacks": 1
-          },
-          {
-            "name": "Subtarget 7",
-            "timeMoratoriumStacks": 1
           }
         ]
       }
@@ -630,29 +583,24 @@
         "passiveModDynPercent": 12,
         "skillType": "Pierce",
         "skillSin": "Pride",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "coins": [
           {
             "power": -3,
             "modDynPercent": 75,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "power": -3,
             "modDynPercent": 75,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "power": -3,
             "modDynPercent": 75,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           }
         ]
       }
@@ -666,8 +614,6 @@
         "passiveModDynPercent": 12,
         "skillType": "Pierce",
         "skillSin": "Pride",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "coins": [
           {
             "power": -3,
@@ -731,16 +677,6 @@
                 "hasCrit": true
               }
             ]
-          }
-        ],
-        "targets": [
-          {
-            "name": "Subtarget 2",
-            "timeMoratoriumStacks": 1
-          },
-          {
-            "name": "Subtarget 3",
-            "timeMoratoriumStacks": 1
           }
         ]
       }
@@ -1057,8 +993,6 @@
         "passiveModDynPercent": 12,
         "skillType": "Pierce",
         "skillSin": "Pride",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "coins": [
           {
             "active": true,
@@ -1066,48 +1000,42 @@
             "modDynPercent": 220,
             "offenseDefenseDiff": 6,
             "hasCrit": true,
-            "critPercent": 120,
-            "weight": 1
+            "critPercent": 120
           },
           {
             "active": true,
             "power": 2,
             "modDynPercent": 30,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 2,
             "modDynPercent": 30,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 2,
             "modDynPercent": 30,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 2,
             "modDynPercent": 30,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 12,
             "modDynPercent": 160,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           }
         ]
       }
@@ -1121,8 +1049,6 @@
         "passiveModDynPercent": 12,
         "skillType": "Pierce",
         "skillSin": "Pride",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "coins": [
           {
             "active": true,
@@ -1130,40 +1056,35 @@
             "modDynPercent": 220,
             "offenseDefenseDiff": 6,
             "hasCrit": true,
-            "critPercent": 120,
-            "weight": 1
+            "critPercent": 120
           },
           {
             "active": true,
             "power": 2,
             "modDynPercent": 30,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 2,
             "modDynPercent": 30,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 2,
             "modDynPercent": 30,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 2,
             "modDynPercent": 30,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
@@ -1187,16 +1108,6 @@
               }
             ]
           }
-        ],
-        "targets": [
-          {
-            "name": "Subtarget 2",
-            "timeMoratoriumStacks": 1
-          },
-          {
-            "name": "Subtarget 3",
-            "timeMoratoriumStacks": 1
-          }
         ]
       }
     },
@@ -1209,8 +1120,6 @@
         "passiveModDynPercent": 12,
         "skillType": "Pierce",
         "skillSin": "Pride",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "coins": [
           {
             "active": true,
@@ -1218,40 +1127,35 @@
             "modDynPercent": 220,
             "offenseDefenseDiff": 6,
             "hasCrit": true,
-            "critPercent": 120,
-            "weight": 1
+            "critPercent": 120
           },
           {
             "active": true,
             "power": 2,
             "modDynPercent": 30,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 2,
             "modDynPercent": 30,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 2,
             "modDynPercent": 30,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 2,
             "modDynPercent": 30,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
@@ -1298,32 +1202,6 @@
                 "hasCrit": true
               }
             ]
-          }
-        ],
-        "targets": [
-          {
-            "name": "Subtarget 2",
-            "timeMoratoriumStacks": 1
-          },
-          {
-            "name": "Subtarget 3",
-            "timeMoratoriumStacks": 1
-          },
-          {
-            "name": "Subtarget 4",
-            "timeMoratoriumStacks": 1
-          },
-          {
-            "name": "Subtarget 5",
-            "timeMoratoriumStacks": 1
-          },
-          {
-            "name": "Subtarget 6",
-            "timeMoratoriumStacks": 1
-          },
-          {
-            "name": "Subtarget 7",
-            "timeMoratoriumStacks": 1
           }
         ]
       }
@@ -1439,8 +1317,6 @@
         "passiveModDynPercent": 12,
         "skillType": "Pierce",
         "skillSin": "Pride",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "bonuses": [
           {
             "kind": "Percent",
@@ -1456,15 +1332,13 @@
             "power": -2,
             "modDynPercent": 200,
             "offenseDefenseDiff": 8,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "power": -2,
             "modDynPercent": 430,
             "offenseDefenseDiff": 8,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           }
         ]
       }
@@ -1478,8 +1352,6 @@
         "passiveModDynPercent": 12,
         "skillType": "Pierce",
         "skillSin": "Pride",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "bonuses": [
           {
             "kind": "Percent",
@@ -1533,16 +1405,6 @@
               }
             ]
           }
-        ],
-        "targets": [
-          {
-            "name": "Subtarget 2",
-            "timeMoratoriumStacks": 1
-          },
-          {
-            "name": "Subtarget 3",
-            "timeMoratoriumStacks": 1
-          }
         ]
       }
     },
@@ -1555,8 +1417,6 @@
         "passiveModDynPercent": 12,
         "skillType": "Pierce",
         "skillSin": "Pride",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "bonuses": [
           {
             "kind": "Percent",
@@ -1650,32 +1510,6 @@
                 "hasCrit": true
               }
             ]
-          }
-        ],
-        "targets": [
-          {
-            "name": "Subtarget 2",
-            "timeMoratoriumStacks": 1
-          },
-          {
-            "name": "Subtarget 3",
-            "timeMoratoriumStacks": 1
-          },
-          {
-            "name": "Subtarget 4",
-            "timeMoratoriumStacks": 1
-          },
-          {
-            "name": "Subtarget 5",
-            "timeMoratoriumStacks": 1
-          },
-          {
-            "name": "Subtarget 6",
-            "timeMoratoriumStacks": 1
-          },
-          {
-            "name": "Subtarget 7",
-            "timeMoratoriumStacks": 1
           }
         ]
       }
@@ -1789,6 +1623,426 @@
                 "hasCrit": true
               }
             ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "Danger Level": "HE",
+    "Sinner": "Hong Lu",
+    "Type": "Awakening",
+    "Name": "The Sword sharpened with Tears",
+    "Sin Cost": 0,
+    "1T Damage": {
+      "damage": 294,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 10,
+        "passiveModDynPercent": 35,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "bonuses": [
+          {
+            "kind": "Percent",
+            "target": "Pierce",
+            "values": [
+              11,
+              11
+            ]
+          }
+        ],
+        "coins": [
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 299,
+            "offenseDefenseDiff": 8,
+            "hasCrit": true,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 329,
+            "offenseDefenseDiff": 8,
+            "hasCrit": true,
+            "weight": 1
+          }
+        ]
+      }
+    },
+    "2T Damage": {
+      "damage": 499,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 10,
+        "passiveModDynPercent": 35,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "bonuses": [
+          {
+            "kind": "Percent",
+            "target": "Pierce",
+            "values": [
+              11,
+              11
+            ]
+          }
+        ],
+        "coins": [
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 249,
+            "offenseDefenseDiff": 8,
+            "hasCrit": true,
+            "weight": 2,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 249,
+                "offenseDefenseDiff": 3,
+                "hasCrit": true
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 279,
+            "offenseDefenseDiff": 8,
+            "hasCrit": true,
+            "weight": 2,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 279,
+                "offenseDefenseDiff": 3,
+                "hasCrit": true
+              }
+            ]
+          }
+        ],
+        "targets": [
+          {
+            "name": "Subtarget 2",
+            "timeMoratoriumStacks": 1
+          }
+        ]
+      }
+    },
+    "3T Damage": {
+      "damage": 645,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 10,
+        "passiveModDynPercent": 35,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "bonuses": [
+          {
+            "kind": "Percent",
+            "target": "Pierce",
+            "values": [
+              11,
+              11
+            ]
+          }
+        ],
+        "coins": [
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 199,
+            "offenseDefenseDiff": 8,
+            "hasCrit": true,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 199,
+                "offenseDefenseDiff": 3,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 199,
+                "offenseDefenseDiff": 3,
+                "hasCrit": true
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 229,
+            "offenseDefenseDiff": 8,
+            "hasCrit": true,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 229,
+                "offenseDefenseDiff": 3,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 229,
+                "offenseDefenseDiff": 3,
+                "hasCrit": true
+              }
+            ]
+          }
+        ],
+        "targets": [
+          {
+            "name": "Subtarget 2",
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 3",
+            "timeMoratoriumStacks": 1
+          }
+        ]
+      }
+    }
+  },
+  {
+    "Danger Level": "HE",
+    "Sinner": "Hong Lu",
+    "Type": "Corrosion",
+    "Name": "The Sword sharpened with Tears",
+    "Sin Cost": 0,
+    "1T Damage": {
+      "damage": 662,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 29,
+        "passiveModDynPercent": 45,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "bonuses": [
+          {
+            "kind": "Percent",
+            "target": "Pierce",
+            "values": [
+              11,
+              11,
+              11
+            ]
+          }
+        ],
+        "coins": [
+          {
+            "power": -3,
+            "modDynPercent": 309,
+            "offenseDefenseDiff": 10,
+            "hasCrit": true,
+            "weight": 1
+          },
+          {
+            "power": -3,
+            "modDynPercent": 309,
+            "offenseDefenseDiff": 10,
+            "hasCrit": true,
+            "weight": 1
+          },
+          {
+            "power": -3,
+            "modDynPercent": 339,
+            "offenseDefenseDiff": 10,
+            "hasCrit": true,
+            "weight": 1
+          }
+        ]
+      }
+    },
+    "2T Damage": {
+      "damage": 1088,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 29,
+        "passiveModDynPercent": 45,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "bonuses": [
+          {
+            "kind": "Percent",
+            "target": "Pierce",
+            "values": [
+              11,
+              11,
+              11
+            ]
+          }
+        ],
+        "coins": [
+          {
+            "power": -3,
+            "modDynPercent": 259,
+            "offenseDefenseDiff": 5,
+            "hasCrit": true,
+            "weight": 2,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 259,
+                "offenseDefenseDiff": 5,
+                "hasCrit": true
+              }
+            ]
+          },
+          {
+            "power": -3,
+            "modDynPercent": 259,
+            "offenseDefenseDiff": 5,
+            "hasCrit": true,
+            "weight": 2,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 259,
+                "offenseDefenseDiff": 5,
+                "hasCrit": true
+              }
+            ]
+          },
+          {
+            "power": -3,
+            "modDynPercent": 289,
+            "offenseDefenseDiff": 5,
+            "hasCrit": true,
+            "weight": 2,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 289,
+                "offenseDefenseDiff": 5,
+                "hasCrit": true
+              }
+            ]
+          }
+        ],
+        "targets": [
+          {
+            "name": "Subtarget 2",
+            "timeMoratoriumStacks": 1
+          }
+        ]
+      }
+    },
+    "3T Damage": {
+      "damage": 1557,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 29,
+        "passiveModDynPercent": 45,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "bonuses": [
+          {
+            "kind": "Percent",
+            "target": "Pierce",
+            "values": [
+              11,
+              11,
+              11
+            ]
+          }
+        ],
+        "coins": [
+          {
+            "power": -3,
+            "modDynPercent": 209,
+            "offenseDefenseDiff": 10,
+            "hasCrit": true,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 209,
+                "offenseDefenseDiff": 10,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 209,
+                "offenseDefenseDiff": 10,
+                "hasCrit": true
+              }
+            ]
+          },
+          {
+            "power": -3,
+            "modDynPercent": 209,
+            "offenseDefenseDiff": 10,
+            "hasCrit": true,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 209,
+                "offenseDefenseDiff": 10,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 209,
+                "offenseDefenseDiff": 10,
+                "hasCrit": true
+              }
+            ]
+          },
+          {
+            "power": -3,
+            "modDynPercent": 239,
+            "offenseDefenseDiff": 10,
+            "hasCrit": true,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 239,
+                "offenseDefenseDiff": 10,
+                "hasCrit": true
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 239,
+                "offenseDefenseDiff": 10,
+                "hasCrit": true
+              }
+            ]
+          }
+        ],
+        "targets": [
+          {
+            "name": "Subtarget 2",
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 3",
+            "timeMoratoriumStacks": 1
           }
         ]
       }
