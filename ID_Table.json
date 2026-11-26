@@ -1,5 +1,340 @@
 [
   {
+    "Favorite": "1",
+    "Rarity": "000",
+    "Sinner": "Yi Sang",
+    "ID Name": "Haute Couture::Le Noir B3F Drying Room",
+    "S1-1": {
+      "damage": 44,
+      "type": "Blunt",
+      "sin": "Gluttony",
+      "setup": {
+        "baseRoll": 7,
+        "passiveModDynPercent": 15,
+        "skillType": "Blunt",
+        "skillSin": "Gluttony",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "coins": [
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 20,
+            "offenseDefenseDiff": 4,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 5,
+            "modDynPercent": 20,
+            "offenseDefenseDiff": 4,
+            "weight": 1
+          }
+        ]
+      }
+    },
+    "S2-1": {
+      "damage": 81,
+      "type": "Blunt",
+      "sin": "Gloom",
+      "setup": {
+        "baseRoll": 5,
+        "passiveModDynPercent": 15,
+        "skillType": "Blunt",
+        "skillSin": "Gloom",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 20,
+            "offenseDefenseDiff": 5,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 20,
+            "offenseDefenseDiff": 5,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 30,
+            "offenseDefenseDiff": 5,
+            "weight": 1
+          }
+        ]
+      }
+    },
+    "S3-1": {
+      "damage": 190,
+      "type": "Blunt",
+      "sin": "Sloth",
+      "setup": {
+        "baseRoll": 7,
+        "passiveModDynPercent": 15,
+        "skillType": "Blunt",
+        "skillSin": "Sloth",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "coins": [
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 20,
+            "offenseDefenseDiff": 6,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 20,
+            "offenseDefenseDiff": 6,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 7,
+            "modDynPercent": 20,
+            "offenseDefenseDiff": 6,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "modDynPercent": 20,
+                "offenseDefenseDiff": 6
+              },
+              {
+                "name": "Subtarget 3",
+                "modDynPercent": 20,
+                "offenseDefenseDiff": 6
+              }
+            ]
+          }
+        ],
+        "targets": [
+          {
+            "name": "Subtarget 2",
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 3",
+            "timeMoratoriumStacks": 1
+          }
+        ]
+      }
+    },
+    "S3-2": {
+      "damage": 194,
+      "type": "Blunt",
+      "sin": "Sloth",
+      "setup": {
+        "baseRoll": 19,
+        "passiveModDynPercent": 75,
+        "skillType": "Blunt",
+        "skillSin": "Sloth",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "bonuses": [
+          {
+            "kind": "Percent",
+            "target": "Blunt",
+            "values": [
+              20
+            ]
+          }
+        ],
+        "coins": [
+          {
+            "active": true,
+            "power": 14,
+            "modDynPercent": 230,
+            "offenseDefenseDiff": 7,
+            "weight": 1
+          }
+        ]
+      }
+    }
+  },
+  {
+    "Favorite": "1",
+    "Rarity": "000",
+    "Sinner": "Gregor",
+    "ID Name": "Haute Couture::Le Rouge B2F Skein Nest",
+    "S1-1": {
+      "damage": 42,
+      "type": "Pierce",
+      "sin": "Gluttony",
+      "setup": {
+        "baseRoll": 4,
+        "passiveModDynPercent": 10,
+        "skillType": "Pierce",
+        "skillSin": "Gluttony",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "coins": [
+          {
+            "active": true,
+            "power": 4,
+            "offenseDefenseDiff": 3,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 4,
+            "offenseDefenseDiff": 3,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 4,
+            "offenseDefenseDiff": 3,
+            "weight": 1
+          }
+        ]
+      }
+    },
+    "S2-1": {
+      "damage": 48,
+      "type": "Pierce",
+      "sin": "Lust",
+      "setup": {
+        "baseRoll": 7,
+        "passiveModDynPercent": 10,
+        "skillType": "Pierce",
+        "skillSin": "Lust",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "coins": [
+          {
+            "active": true,
+            "power": 8,
+            "offenseDefenseDiff": 5,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 8,
+            "offenseDefenseDiff": 5,
+            "weight": 1
+          }
+        ]
+      }
+    },
+    "S2-2": {
+      "damage": 111,
+      "type": "Pierce",
+      "sin": "Pride",
+      "setup": {
+        "baseRoll": 6,
+        "passiveModDynPercent": 10,
+        "skillType": "Pierce",
+        "skillSin": "Pride",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "coins": [
+          {
+            "active": true,
+            "power": 2,
+            "offenseDefenseDiff": 5,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "offenseDefenseDiff": 5
+              },
+              {
+                "name": "Subtarget 3",
+                "offenseDefenseDiff": 5
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 2,
+            "offenseDefenseDiff": 5,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "offenseDefenseDiff": 5
+              },
+              {
+                "name": "Subtarget 3",
+                "offenseDefenseDiff": 5
+              }
+            ]
+          },
+          {
+            "active": true,
+            "power": 2,
+            "offenseDefenseDiff": 5,
+            "weight": 3,
+            "subtargets": [
+              {
+                "name": "Subtarget 2",
+                "offenseDefenseDiff": 5
+              },
+              {
+                "name": "Subtarget 3",
+                "offenseDefenseDiff": 5
+              }
+            ]
+          }
+        ],
+        "targets": [
+          {
+            "name": "Subtarget 2",
+            "timeMoratoriumStacks": 1
+          },
+          {
+            "name": "Subtarget 3",
+            "timeMoratoriumStacks": 1
+          }
+        ]
+      }
+    },
+    "S3-1": {
+      "damage": 124,
+      "type": "Pierce",
+      "sin": "Lust",
+      "setup": {
+        "baseRoll": 8,
+        "passiveModDynPercent": 10,
+        "skillType": "Pierce",
+        "skillSin": "Lust",
+        "clashCount": 0,
+        "timeMoratoriumStacks": 1,
+        "coins": [
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 60,
+            "offenseDefenseDiff": 7,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 60,
+            "offenseDefenseDiff": 7,
+            "weight": 1
+          },
+          {
+            "active": true,
+            "power": 6,
+            "modDynPercent": 60,
+            "offenseDefenseDiff": 8,
+            "weight": 1
+          }
+        ]
+      }
+    }
+  },
+  {
     "Rarity": "000",
     "Sinner": "Meursault",
     "ID Name": "The Thumb East Capo llll",
@@ -23334,29 +23669,24 @@
         "passiveModDynPercent": 20,
         "skillType": "Pierce",
         "skillSin": "Lust",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "coins": [
           {
             "active": true,
             "power": 4,
             "offenseDefenseDiff": 5,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 4,
             "offenseDefenseDiff": 5,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 4,
             "offenseDefenseDiff": 5,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           }
         ]
       }
@@ -23370,24 +23700,20 @@
         "passiveModDynPercent": 20,
         "skillType": "Pierce",
         "skillSin": "Sloth",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "coins": [
           {
             "active": true,
             "power": 8,
             "modDynPercent": 10,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 8,
             "modDynPercent": 10,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           }
         ]
       }
@@ -23401,8 +23727,6 @@
         "passiveModDynPercent": 20,
         "skillType": "Pierce",
         "skillSin": "Pride",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "bonuses": [
           {
             "kind": "Percent",
@@ -23418,8 +23742,7 @@
             "power": 12,
             "modDynPercent": 280,
             "offenseDefenseDiff": 7,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           }
         ]
       }
@@ -23433,32 +23756,27 @@
         "passiveModDynPercent": 20,
         "skillType": "Pierce",
         "skillSin": "Pride",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "coins": [
           {
             "active": true,
             "power": 5,
             "modDynPercent": 50,
             "offenseDefenseDiff": 8,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 5,
             "modDynPercent": 50,
             "offenseDefenseDiff": 8,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 5,
             "modDynPercent": 50,
             "offenseDefenseDiff": 8,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           }
         ]
       }
@@ -23472,8 +23790,6 @@
         "passiveModDynPercent": 20,
         "skillType": "Pierce",
         "skillSin": "Pride",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "bonuses": [
           {
             "kind": "Percent",
@@ -23491,24 +23807,21 @@
             "power": 6,
             "modDynPercent": 140,
             "offenseDefenseDiff": 9,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 6,
             "modDynPercent": 160,
             "offenseDefenseDiff": 9,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 6,
             "modDynPercent": 140,
             "offenseDefenseDiff": 9,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           }
         ]
       }
@@ -23522,8 +23835,6 @@
         "passiveModDynPercent": 20,
         "skillType": "Pierce",
         "skillSin": "Pride",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "bonuses": [
           {
             "kind": "Percent",
@@ -23541,24 +23852,21 @@
             "power": 6,
             "modDynPercent": 160,
             "offenseDefenseDiff": 9,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 6,
             "modDynPercent": 160,
             "offenseDefenseDiff": 9,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 6,
             "modDynPercent": 220,
             "offenseDefenseDiff": 9,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           }
         ]
       }
@@ -23572,22 +23880,18 @@
         "passiveModDynPercent": 20,
         "skillType": "Pierce",
         "skillSin": "Envy",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "coins": [
           {
             "active": true,
             "power": 4,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 4,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           }
         ]
       }
@@ -23606,29 +23910,24 @@
         "passiveModDynPercent": 20,
         "skillType": "Pierce",
         "skillSin": "Lust",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "coins": [
           {
             "active": true,
             "power": 4,
             "offenseDefenseDiff": 5,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 4,
             "offenseDefenseDiff": 5,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 4,
             "offenseDefenseDiff": 5,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           }
         ]
       }
@@ -23642,24 +23941,20 @@
         "passiveModDynPercent": 20,
         "skillType": "Pierce",
         "skillSin": "Sloth",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "coins": [
           {
             "active": true,
             "power": 8,
             "modDynPercent": 10,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 8,
             "modDynPercent": 10,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           }
         ]
       }
@@ -23673,8 +23968,6 @@
         "passiveModDynPercent": 20,
         "skillType": "Pierce",
         "skillSin": "Pride",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "bonuses": [
           {
             "kind": "Percent",
@@ -23690,8 +23983,7 @@
             "power": 12,
             "modDynPercent": 280,
             "offenseDefenseDiff": 7,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           }
         ]
       }
@@ -23705,32 +23997,27 @@
         "passiveModDynPercent": 20,
         "skillType": "Pierce",
         "skillSin": "Pride",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "coins": [
           {
             "active": true,
             "power": 5,
             "modDynPercent": 50,
             "offenseDefenseDiff": 8,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 5,
             "modDynPercent": 50,
             "offenseDefenseDiff": 8,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 5,
             "modDynPercent": 50,
             "offenseDefenseDiff": 8,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           }
         ]
       }
@@ -23744,8 +24031,6 @@
         "passiveModDynPercent": 20,
         "skillType": "Pierce",
         "skillSin": "Pride",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "bonuses": [
           {
             "kind": "Percent",
@@ -23824,16 +24109,6 @@
               }
             ]
           }
-        ],
-        "targets": [
-          {
-            "name": "Subtarget 2",
-            "timeMoratoriumStacks": 1
-          },
-          {
-            "name": "Subtarget 3",
-            "timeMoratoriumStacks": 1
-          }
         ]
       }
     },
@@ -23846,8 +24121,6 @@
         "passiveModDynPercent": 20,
         "skillType": "Pierce",
         "skillSin": "Pride",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "bonuses": [
           {
             "kind": "Percent",
@@ -23926,16 +24199,6 @@
               }
             ]
           }
-        ],
-        "targets": [
-          {
-            "name": "Subtarget 2",
-            "timeMoratoriumStacks": 1
-          },
-          {
-            "name": "Subtarget 3",
-            "timeMoratoriumStacks": 1
-          }
         ]
       }
     },
@@ -23948,22 +24211,18 @@
         "passiveModDynPercent": 20,
         "skillType": "Pierce",
         "skillSin": "Envy",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "coins": [
           {
             "active": true,
             "power": 4,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 4,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           }
         ]
       }
@@ -23982,8 +24241,6 @@
         "passiveModDynPercent": 35,
         "skillType": "Pierce",
         "skillSin": "Sloth",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "resistances": {
           "Pierce": 1.1
         },
@@ -23993,16 +24250,14 @@
             "power": 8,
             "modDynPercent": 70,
             "offenseDefenseDiff": 5,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 8,
             "modDynPercent": 40,
             "offenseDefenseDiff": 5,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           }
         ]
       }
@@ -24016,8 +24271,6 @@
         "passiveModDynPercent": 35,
         "skillType": "Pierce",
         "skillSin": "Gluttony",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "resistances": {
           "Pierce": 1.1
         },
@@ -24027,16 +24280,14 @@
             "power": 7,
             "modDynPercent": 40,
             "offenseDefenseDiff": 5,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 11,
             "modDynPercent": 40,
             "offenseDefenseDiff": 5,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           }
         ]
       }
@@ -24050,8 +24301,6 @@
         "passiveModDynPercent": 35,
         "skillType": "Pierce",
         "skillSin": "Pride",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "resistances": {
           "Pierce": 1.1
         },
@@ -24061,24 +24310,21 @@
             "power": 7,
             "modDynPercent": 70,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 7,
             "modDynPercent": 70,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 11,
             "modDynPercent": 100,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           }
         ]
       }
@@ -24092,8 +24338,6 @@
         "passiveModDynPercent": 35,
         "skillType": "Pierce",
         "skillSin": "Pride",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "resistances": {
           "Pierce": 1.1
         },
@@ -24114,24 +24358,21 @@
             "power": 7,
             "modDynPercent": 80,
             "offenseDefenseDiff": 7,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 7,
             "modDynPercent": 80,
             "offenseDefenseDiff": 7,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 15,
             "modDynPercent": 186,
             "offenseDefenseDiff": 7,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           }
         ]
       }
@@ -24150,8 +24391,6 @@
         "passiveModDynPercent": 35,
         "skillType": "Pierce",
         "skillSin": "Gluttony",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "resistances": {
           "Pierce": 1.1
         },
@@ -24161,24 +24400,21 @@
             "power": 5,
             "modDynPercent": 30,
             "offenseDefenseDiff": 5,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 5,
             "modDynPercent": 30,
             "offenseDefenseDiff": 5,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 5,
             "modDynPercent": 20,
             "offenseDefenseDiff": 5,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           }
         ]
       }
@@ -24192,8 +24428,6 @@
         "passiveModDynPercent": 35,
         "skillType": "Pierce",
         "skillSin": "Sloth",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "resistances": {
           "Pierce": 1.1
         },
@@ -24203,24 +24437,21 @@
             "power": 6,
             "modDynPercent": 20,
             "offenseDefenseDiff": 5,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 6,
             "modDynPercent": 20,
             "offenseDefenseDiff": 5,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 6,
             "modDynPercent": 40,
             "offenseDefenseDiff": 5,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           }
         ]
       }
@@ -24234,8 +24465,6 @@
         "passiveModDynPercent": 35,
         "skillType": "Pierce",
         "skillSin": "Pride",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "resistances": {
           "Pierce": 1.1
         },
@@ -24245,32 +24474,28 @@
             "power": 5,
             "modDynPercent": 44,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 5,
             "modDynPercent": 44,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 5,
             "modDynPercent": 44,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 5,
             "modDynPercent": 114,
             "offenseDefenseDiff": 6,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           }
         ]
       }
@@ -24284,8 +24509,6 @@
         "passiveModDynPercent": 35,
         "skillType": "Pierce",
         "skillSin": "Pride",
-        "clashCount": 0,
-        "timeMoratoriumStacks": 1,
         "resistances": {
           "Pierce": 1.1
         },
@@ -24307,32 +24530,28 @@
             "power": 7,
             "modDynPercent": 50,
             "offenseDefenseDiff": 7,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 7,
             "modDynPercent": 50,
             "offenseDefenseDiff": 7,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 7,
             "modDynPercent": 120,
             "offenseDefenseDiff": 7,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           },
           {
             "active": true,
             "power": 7,
             "modDynPercent": 114,
             "offenseDefenseDiff": 7,
-            "hasCrit": true,
-            "weight": 1
+            "hasCrit": true
           }
         ]
       }
